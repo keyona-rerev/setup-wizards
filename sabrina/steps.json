@@ -100,7 +100,7 @@
     },
     {
       "title": "Create the Gmail labels",
-      "instructions": "Create these labels in Gmail on {{owner_email}}.\n\n1. Agent. This is the trigger label. Name it exactly Agent.\n2. One label per lane. Each name must match the lane name exactly.\n\nA label that matches a lane name tells Sabrina which lane a thread belongs to.",
+      "instructions": "Create these labels in Gmail on {{owner_email}}.\n\n1. Agent. This is the trigger label. Name it exactly Agent.\n2. One label per lane. Each name must match the lane name exactly.\n\nA label that matches a lane name tells Sabrina which lane a thread belongs to. Skip any line that shows a name in angle brackets.",
       "copy": [
         {"label": "Labels to create", "text": "Agent\n{{lane1}}\n{{lane2}}\n{{lane3}}\n{{lane4}}\n{{lane5}}\n{{lane6}}"}
       ],
@@ -136,10 +136,10 @@
       "verify_hint": "Triggers shows 8 rows: watchCalendar every 15 minutes, watchGmailLabel every 5, sendPending every 5, watchReplies every 5, watchdog every hour, verifyDeliverables every 2 hours, nudgeSweep daily near 9am, releaseHeavyJobs every 15 minutes."
     },
     {
-      "title": "Other inboxes (optional)",
-      "instructions": "Each extra inbox sends work to Sabrina by email. It does not get its own script.\n\nOn each extra account:\n1. Open Gmail settings, then Filters and Blocked Addresses.\n2. Create a filter. In To, enter {{agent_alias}}.\n3. Choose Apply the label, and pick Agent.\n\nThen add that account's sending address to ALLOWLIST in Code.gs. Sabrina reads only the main mailbox. A job from another inbox cannot be checked automatically. Its deliverables must be type manual.\n\nSkip this step if you have one inbox.",
-      "checkbox_label": "I finished the extra inboxes, or I have none",
-      "verify_hint": "Every sending address is in ALLOWLIST. Every extra inbox has the filter."
+      "title": "Send mail to the alias into Sabrina",
+      "instructions": "Mail sent or forwarded to {{agent_alias}} must get the Agent label. A Gmail filter does this. Make it on the main account first. Each extra inbox sends work to Sabrina by email too. It does not get its own script.\n\nOn the main account, then on each extra account:\n1. Open Gmail settings, then Filters and Blocked Addresses.\n2. Create a filter. In To, enter {{agent_alias}}.\n3. Choose Apply the label, and pick Agent.\n\nThen add each extra account's sending address to ALLOWLIST in Code.gs. Sabrina reads only the main mailbox. A job from another inbox cannot be checked automatically. Its deliverables must be type manual.",
+      "checkbox_label": "The filter exists on the main account and on each extra inbox",
+      "verify_hint": "Every sending address is in ALLOWLIST. The main account and every extra inbox have the filter."
     },
     {
       "title": "Choose the meeting note-taker",
@@ -177,7 +177,7 @@
     },
     {
       "title": "TEST 2: Follow-up and verification",
-      "instructions": "This proves nudges and deliverable checks in ten minutes. You do not wait two days.\n\nRun these in the editor, in order:\n1. smokeTestSetup. An email arrives. The board has a test job with two deliverables.\n2. verifyDeliverables. Deliverable d1 changes to verified.\n3. smokeTestNudge. A nudge arrives as a reply on the same thread.\n4. smokeTestCleanup. The test job closes.\n\nIf nothing arrives on a weekday, check the thread. If it is a weekend, nudgeSweep skips by design.",
+      "instructions": "This proves nudges and deliverable checks in ten minutes. You do not wait two days.\n\nRun these in the editor, in order:\n1. smokeTestSetup. An email arrives. The board has a test job with two deliverables.\n2. verifyDeliverables. Deliverable d1 changes to verified.\n3. smokeTestNudge. A nudge arrives as a reply on the same thread.\n4. smokeTestCleanup. The test job closes.\n\nnudgeSweep does nothing on Saturday and Sunday. Run this test on a weekday.",
       "checkbox_label": "Setup, verify, nudge and cleanup all worked",
       "verify_hint": "In the deliverables tab, d1 is verified and d2 is waived after cleanup."
     },
@@ -219,7 +219,7 @@
     },
     {
       "title": "TEST 9: Reply verbs and the overnight window",
-      "instructions": "Use the email from any open job. Reply with one word or phrase at a time. Check the Sheet after each.\n\n1. snooze 2d. The nudge_after cell moves two days out.\n2. waiting on Test Person. The status changes to awaiting_external.\n3. heavy. The status changes to scheduled. The run_after cell holds a time at or after 10pm in {{timezone}}.\n4. run now. The status returns to queued and run_after clears.\n5. close. The status changes to done.\n\nThe 10pm to 4am window uses the script time zone. If run_after shows the wrong hour, fix appsscript.json.",
+      "instructions": "Use the email from any open job. Reply with one word or phrase at a time. Check the Sheet after each.\n\n1. snooze 2d. The nudge_after cell moves two days out.\n2. waiting on Test Person. The status changes to awaiting_external.\n3. heavy. The status changes to scheduled. The run_after cell holds a time at or after 10pm in {{timezone}}. If it is already between 10pm and 4am, it holds the current time.\n4. run now. The status returns to queued and run_after clears.\n5. close. The status changes to done.\n\nThe 10pm to 4am window uses the script time zone. If run_after shows the wrong hour, fix appsscript.json.",
       "checkbox_label": "All five verbs worked and run_after is correct",
       "verify_hint": "Each verb adds a keyona entry on the history tab."
     },
