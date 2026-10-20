@@ -18,6 +18,11 @@ a{color:#0f766e}
 <h1>Version history</h1>
 <p>Use this page to see what changed and what to do to upgrade an existing install.</p>
 <div class="card">
+<h2>2026-10-20 (v2): settings move out of the code</h2>
+<p>Your values now live in Script Properties and a lanes tab on the Job Board. You no longer edit Code.gs, Lanes.gs or SmokeTest.gs. The overnight window is configurable. The track and untrack project verbs work. Template links are prefilled. New tests cover Idea Nurture and the build class. The deadline-tag email is removed from the docs because no code sends it.</p>
+<p><strong>To upgrade a v1 install:</strong> copy the new Apps Script template files Config.gs, Lanes.gs, Code.gs, Addon.gs, SmokeTest.gs and DeadLetter.gs over yours. Add the lanes tab to your Job Board. Add Script Properties (step 7). Run checkConfig, then refreshLanes. Run installTriggers again.</p>
+</div>
+<div class="card">
 <h2>2026-10-20: first version</h2>
 <p>Covers the full current system: Job Board, Apps Script, Gmail add-on, Dashboard, lanes, attachments, follow-up and verification, dead-letter and silent-parking guards, overnight window, meeting flow and Cowork.</p>
 <p><strong>To upgrade an older install:</strong> compare your Apps Script file list to the 13 files in step 6. Add any missing file. Check that your jobs tab has 17 columns, ending in time_estimate, run_after and lane. Deploy the Dashboard (step 11). Install the Gmail add-on (step 12). Run installTriggers again (step 13) so releaseHeavyJobs is listed.</p>

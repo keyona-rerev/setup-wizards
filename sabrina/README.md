@@ -17,4 +17,4 @@ Serve this folder as a static site (Netlify). `index.html` loads `steps.json` fr
 - The identifiers in `Code.gs` (CFG) and the lanes in `Lanes.gs` are still in the code. The wizard gives copy blocks for them. Move them to Script Properties and the legend tab, then shorten steps 7 and 8.
 - The template links (Job Board, Apps Script, Client Update doc) are entered by the installer. Replace them with fixed links once the templates are final.
 
-Install guide: https://proposals-server-production.up.railway.app/proposals/sabrina-install-guide-1020.html
+Install guide: https://sabrina-install.netlify.app/guide.html

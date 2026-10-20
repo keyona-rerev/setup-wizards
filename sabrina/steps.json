@@ -2,110 +2,305 @@
   "title": "Sabrina Setup Wizard",
   "intro": "Install Sabrina, the chief-of-staff agent, on one Google account. About 20 to 30 steps. You enter each value once. The wizard reuses it in later steps. The last part is the installation test.",
   "variables": [
-    {"key": "client_name", "label": "Client or business name", "placeholder": "Example Co", "help": "Used in names and labels only."},
-    {"key": "owner_email", "label": "Owner email", "placeholder": "name@yourdomain.com", "help": "The Google account that runs Sabrina. Gmail or Google Workspace. Not Microsoft 365.", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", "pattern_error": "Enter one email address."},
-    {"key": "domain", "label": "Email domain", "placeholder": "yourdomain.com", "help": "The part after the @ in the owner email.", "pattern": "^[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", "pattern_error": "Enter the domain only, for example yourdomain.com."},
-    {"key": "timezone", "label": "Time zone (IANA name)", "placeholder": "America/Chicago", "help": "Nudges, deadlines and the overnight window all use this time zone.", "pattern": "^[A-Za-z_]+/[A-Za-z_]+(/[A-Za-z_]+)?$", "pattern_error": "Use the IANA name, for example America/Chicago."},
-    {"key": "job_board_template_url", "label": "Job Board template link", "placeholder": "https://docs.google.com/spreadsheets/d/...", "help": "ReRev Labs sends this link.", "pattern": "^https://docs\\.google\\.com/spreadsheets/.+", "pattern_error": "Paste the Google Sheets link."},
-    {"key": "script_template_url", "label": "Apps Script template link", "placeholder": "https://script.google.com/d/.../edit", "help": "ReRev Labs sends this link.", "pattern": "^https://script\\.google\\.com/.+", "pattern_error": "Paste the Apps Script link."},
-    {"key": "update_template_url", "label": "Client Update doc template link", "placeholder": "https://docs.google.com/document/d/...", "help": "ReRev Labs sends this link.", "pattern": "^https://docs\\.google\\.com/document/.+", "pattern_error": "Paste the Google Docs link."},
-    {"key": "agent_alias", "label": "Sabrina's sending address", "placeholder": "sabrina@yourdomain.com", "help": "Worked out for you from your domain. Change it only if you want a different name.", "derive": "sabrina@{{domain}}", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", "pattern_error": "Enter one email address."},
-    {"key": "extra_addresses", "label": "Other addresses that may start a job", "placeholder": "you@other.org", "help": "Optional. One address, or several separated by commas. Every address you send from must be here.", "optional": true},
-    {"key": "sheet_id", "label": "Job Board Sheet ID", "placeholder": "1AbC...", "help": "The long ID in the Sheet address bar, between /d/ and /edit.", "pattern": "^[A-Za-z0-9_-]{25,60}$", "pattern_error": "This does not look like a Sheet ID."},
-    {"key": "calendar_name", "label": "Task Calendar name", "default": "Task Calendar", "help": "Keep the default unless the client already has a calendar for this.", "pattern": "^.{2,60}$", "pattern_error": "Enter a name."},
-    {"key": "calendar_id", "label": "Task Calendar ID", "placeholder": "abc123@group.calendar.google.com", "help": "Calendar settings, Integrate calendar, Calendar ID.", "pattern": "^[A-Za-z0-9_.-]+@group\\.calendar\\.google\\.com$", "pattern_error": "The ID must end in @group.calendar.google.com."},
-    {"key": "update_template_id", "label": "Client Update template doc ID", "placeholder": "1AbC...", "help": "The long ID in the doc address bar, between /d/ and /edit.", "pattern": "^[A-Za-z0-9_-]{25,60}$", "pattern_error": "This does not look like a doc ID."},
-    {"key": "lane1", "label": "Lane 1", "placeholder": "Your main business", "help": "A lane is one area of work. Use short names. Each lane also becomes a Gmail label.", "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Use 2 to 40 characters. No quote marks."},
-    {"key": "lane2", "label": "Lane 2", "placeholder": "Personal", "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Use 2 to 40 characters. No quote marks."},
-    {"key": "lane3", "label": "Lane 3", "optional": true, "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Use 2 to 40 characters. No quote marks."},
-    {"key": "lane4", "label": "Lane 4", "optional": true, "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Use 2 to 40 characters. No quote marks."},
-    {"key": "lane5", "label": "Lane 5", "optional": true, "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Use 2 to 40 characters. No quote marks."},
-    {"key": "lane6", "label": "Lane 6", "optional": true, "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Use 2 to 40 characters. No quote marks."},
-    {"key": "domain_lane", "label": "Lane for your own domain", "placeholder": "Same as one lane above", "help": "Mail to or from your own domain goes to this lane when no label says otherwise. Type the lane name exactly.", "pattern": "^[^'\"\\\\]{2,40}$", "pattern_error": "Type one lane name exactly."},
-    {"key": "dashboard_url", "label": "Dashboard web app URL", "placeholder": "https://script.google.com/.../exec", "help": "You get this in the dashboard step.", "pattern": "^https://script\\.google\\.com/.+/exec$", "pattern_error": "The URL must end in /exec."},
-    {"key": "note_taker", "label": "Meeting note-taker", "placeholder": "Gemini notes in Google Meet", "help": "Optional. Gemini notes need no extra setup. Any other tool needs one extra step.", "optional": true}
+    {
+      "key": "client_name",
+      "label": "Client or business name",
+      "placeholder": "Example Co",
+      "help": "Used in names and labels only."
+    },
+    {
+      "key": "owner_email",
+      "label": "Owner email",
+      "placeholder": "name@yourdomain.com",
+      "help": "The Google account that runs Sabrina. Gmail or Google Workspace. Not Microsoft 365.",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter one email address."
+    },
+    {
+      "key": "domain",
+      "label": "Email domain",
+      "placeholder": "yourdomain.com",
+      "help": "The part after the @ in the owner email.",
+      "pattern": "^[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+      "pattern_error": "Enter the domain only, for example yourdomain.com."
+    },
+    {
+      "key": "timezone",
+      "label": "Time zone (IANA name)",
+      "placeholder": "America/Chicago",
+      "help": "Nudges, deadlines and the overnight window all use this time zone.",
+      "pattern": "^[A-Za-z_]+/[A-Za-z_]+(/[A-Za-z_]+)?$",
+      "pattern_error": "Use the IANA name, for example America/Chicago."
+    },
+    {
+      "key": "job_board_template_url",
+      "label": "Job Board template link",
+      "placeholder": "https://docs.google.com/spreadsheets/d/...",
+      "help": "ReRev Labs sends this link.",
+      "default": "https://docs.google.com/spreadsheets/d/1eXuBtrkfD9CC2UDDYYrbobms4-CwCKvljkreqBIKx3Q/copy"
+    },
+    {
+      "key": "script_template_url",
+      "label": "Apps Script template link",
+      "placeholder": "https://script.google.com/d/.../edit",
+      "help": "ReRev Labs sends this link.",
+      "default": "https://script.google.com/d/1EVkPNgX8QDuF8cKMtD7l2_SnKdOpZW_fYD_wB8smAv_ms3s0_-tWJgjR/edit"
+    },
+    {
+      "key": "update_template_url",
+      "label": "Client Update doc template link",
+      "placeholder": "https://docs.google.com/document/d/...",
+      "help": "ReRev Labs sends this link.",
+      "default": "https://docs.google.com/document/d/1PjxeibFNgSr2467YOUOCNUpu5NJchUi_aor74lUEl3E/copy"
+    },
+    {
+      "key": "agent_alias",
+      "label": "Sabrina's sending address",
+      "placeholder": "sabrina@yourdomain.com",
+      "help": "Worked out for you from your domain. Change it only if you want a different name.",
+      "derive": "sabrina@{{domain}}",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter one email address."
+    },
+    {
+      "key": "extra_addresses",
+      "label": "Other addresses that may start a job",
+      "placeholder": "you@other.org",
+      "help": "Optional. One address, or several separated by commas. Every address you send from must be here.",
+      "optional": true
+    },
+    {
+      "key": "sheet_id",
+      "label": "Job Board Sheet ID",
+      "placeholder": "1AbC...",
+      "help": "The long ID in the Sheet address bar, between /d/ and /edit.",
+      "pattern": "^[A-Za-z0-9_-]{25,60}$",
+      "pattern_error": "This does not look like a Sheet ID."
+    },
+    {
+      "key": "calendar_name",
+      "label": "Task Calendar name",
+      "default": "Task Calendar",
+      "help": "Keep the default unless the client already has a calendar for this.",
+      "pattern": "^.{2,60}$",
+      "pattern_error": "Enter a name."
+    },
+    {
+      "key": "calendar_id",
+      "label": "Task Calendar ID",
+      "placeholder": "abc123@group.calendar.google.com",
+      "help": "Calendar settings, Integrate calendar, Calendar ID.",
+      "pattern": "^[A-Za-z0-9_.-]+@group\\.calendar\\.google\\.com$",
+      "pattern_error": "The ID must end in @group.calendar.google.com."
+    },
+    {
+      "key": "update_template_id",
+      "label": "Client Update template doc ID",
+      "placeholder": "1AbC...",
+      "help": "The long ID in the doc address bar, between /d/ and /edit.",
+      "pattern": "^[A-Za-z0-9_-]{25,60}$",
+      "pattern_error": "This does not look like a doc ID.",
+      "default": "1PjxeibFNgSr2467YOUOCNUpu5NJchUi_aor74lUEl3E"
+    },
+    {
+      "key": "lane1",
+      "label": "Lane 1",
+      "placeholder": "Your main business",
+      "help": "A lane is one area of work. Use short names. Each lane also becomes a Gmail label.",
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Use 2 to 40 characters. No quote marks."
+    },
+    {
+      "key": "lane2",
+      "label": "Lane 2",
+      "placeholder": "Personal",
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Use 2 to 40 characters. No quote marks."
+    },
+    {
+      "key": "lane3",
+      "label": "Lane 3",
+      "optional": true,
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Use 2 to 40 characters. No quote marks."
+    },
+    {
+      "key": "lane4",
+      "label": "Lane 4",
+      "optional": true,
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Use 2 to 40 characters. No quote marks."
+    },
+    {
+      "key": "lane5",
+      "label": "Lane 5",
+      "optional": true,
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Use 2 to 40 characters. No quote marks."
+    },
+    {
+      "key": "lane6",
+      "label": "Lane 6",
+      "optional": true,
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Use 2 to 40 characters. No quote marks."
+    },
+    {
+      "key": "domain_lane",
+      "label": "Lane for your own domain",
+      "placeholder": "Same as one lane above",
+      "help": "Mail to or from your own domain goes to this lane when no label says otherwise. Type the lane name exactly.",
+      "pattern": "^[^'\"\\\\]{2,40}$",
+      "pattern_error": "Type one lane name exactly."
+    },
+    {
+      "key": "dashboard_url",
+      "label": "Dashboard web app URL",
+      "placeholder": "https://script.google.com/.../exec",
+      "help": "You get this in the dashboard step.",
+      "pattern": "^https://script\\.google\\.com/.+/exec$",
+      "pattern_error": "The URL must end in /exec."
+    },
+    {
+      "key": "note_taker",
+      "label": "Meeting note-taker",
+      "placeholder": "Gemini notes in Google Meet",
+      "help": "Optional. Gemini notes need no extra setup. Any other tool needs one extra step.",
+      "optional": true
+    }
   ],
   "steps": [
     {
       "title": "Before you start",
-      "instructions": "You need five things.\n1. A Gmail or Google Workspace account. Not Microsoft 365.\n2. A Claude plan that has Cowork.\n3. Three template links from ReRev Labs: the Job Board, the Apps Script project, and the Client Update doc.\n4. About 30 minutes for the install and 30 more for the test.\n5. A second browser tab for this wizard.\n\nEnter the values below. The wizard keeps them in this browser only.",
-      "collect": ["client_name", "owner_email", "domain", "timezone", "job_board_template_url", "script_template_url", "update_template_url"],
+      "instructions": "You need five things.\n1. A Gmail or Google Workspace account. Not Microsoft 365.\n2. A Claude plan that has Cowork.\n3. The three template links. They are filled in for you below. They are private to ReRev Labs, so ask ReRev Labs to share them with {{owner_email}} first.\n4. About 30 minutes for the install and 30 more for the test.\n5. A second browser tab for this wizard.\n\nEnter the values below. The wizard keeps them in this browser only.",
+      "collect": [
+        "client_name",
+        "owner_email",
+        "domain",
+        "timezone",
+        "job_board_template_url",
+        "script_template_url",
+        "update_template_url"
+      ],
       "checkbox_label": "I have the account, the Cowork plan and the three links",
       "verify_hint": "All seven fields show no red message."
     },
     {
       "title": "Create Sabrina's sending address",
       "instructions": "Sabrina sends every email from her own address. Make it an alias on {{owner_email}}.\n\n1. Open Gmail.\n2. Open Settings, then See all settings, then Accounts and Import.\n3. Next to Send mail as, choose Add another email address.\n4. Enter {{agent_alias}}. Keep Treat as an alias on.\n5. Confirm the address.\n\nOn Google Workspace, an admin may first need to add the alias to the user in the Admin console.",
-      "collect": ["agent_alias", "extra_addresses"],
+      "collect": [
+        "agent_alias",
+        "extra_addresses"
+      ],
       "checkbox_label": "The alias is confirmed",
       "verify_hint": "{{agent_alias}} appears under Send mail as with no Verify link next to it."
     },
     {
       "title": "Copy the Job Board",
       "instructions": "The Job Board is Sabrina's only memory. Copy it first. You need its real ID before the script step.\n\n1. Open {{job_board_template_url}}.\n2. Choose File, then Make a copy.\n3. Name the copy 'Sabrina - Job Board - {{client_name}}'.\n4. Save it in {{owner_email}}'s Drive.\n5. Copy the Sheet ID from the address bar of the new copy.",
-      "collect": ["sheet_id"],
+      "collect": [
+        "sheet_id"
+      ],
       "copy": [
-        {"label": "Name for the copy", "text": "Sabrina - Job Board - {{client_name}}"}
+        {
+          "label": "Name for the copy",
+          "text": "Sabrina - Job Board - {{client_name}}"
+        }
       ],
       "checkbox_label": "I copied the Sheet and saved its ID",
-      "verify_hint": "The copy has five tabs: jobs, history, deliverables, attachments, projects. The jobs tab has 17 columns in row 1. Column 15 is time_estimate, column 16 is run_after and column 17 is lane. If your copy has a column named due_at, or the order differs, stop and ask ReRev Labs for a fresh template."
+      "verify_hint": "The copy has these tabs: jobs, history, deliverables, projects, lanes. The jobs tab has 17 columns in row 1. Column 15 is time_estimate, column 16 is run_after and column 17 is lane. The lanes tab has two example rows. If the order differs, stop and ask ReRev Labs for a fresh template."
     },
     {
       "title": "Create the Task Calendar",
       "instructions": "Sabrina reads events from one calendar that only holds her tasks. Keep it apart from real events.\n\n1. Open Google Calendar on {{owner_email}}.\n2. Next to Other calendars, choose Add, then Create new calendar.\n3. Name it {{calendar_name}}.\n4. Open the calendar's settings.\n5. Under Integrate calendar, copy the Calendar ID.",
-      "collect": ["calendar_name", "calendar_id"],
+      "collect": [
+        "calendar_name",
+        "calendar_id"
+      ],
       "checkbox_label": "The calendar exists and I saved its ID",
       "verify_hint": "The Calendar ID ends in @group.calendar.google.com."
     },
     {
       "title": "Copy the Client Update doc template",
       "instructions": "Each client gets one living Client Update doc. This is the template for it.\n\n1. Open {{update_template_url}}.\n2. Choose File, then Make a copy.\n3. Name it 'Client Update Template'.\n4. Do not share it with anyone. The doc is client-visible later, so Sabrina asks before she shares it.\n5. Copy the doc ID from the address bar.",
-      "collect": ["update_template_id"],
+      "collect": [
+        "update_template_id"
+      ],
       "checkbox_label": "The template is copied, private, and I saved its ID",
       "verify_hint": "The sharing button shows Restricted."
     },
     {
       "title": "Copy the Apps Script project",
-      "instructions": "1. Open {{script_template_url}}.\n2. Choose the Overview page, then Make a copy.\n3. Open the copy. It lives in {{owner_email}}'s Drive.\n4. Name it 'Sabrina - Task Agent'.\n5. Open Project Settings. Turn on Show appsscript.json manifest file.\n6. Open appsscript.json. Set the time zone line as shown below.\n7. Save.\n\nThe script reads its time zone from this file. If it is wrong, deadlines, nudges and the overnight window all run at the wrong hour.\n\nIf the project has a file named QueueCourses, delete that file. It is a one-off for ReRev Labs.",
+      "instructions": "1. Open {{script_template_url}}.\n2. Choose the Overview page, then Make a copy.\n3. Open the copy. It lives in {{owner_email}}'s Drive.\n4. Name it 'Sabrina - Task Agent'.\n5. Open Project Settings. Turn on Show appsscript.json manifest file.\n6. Open appsscript.json. Set the time zone line as shown below.\n7. Save.\n\nThe script reads its time zone from this file. If it is wrong, deadlines, nudges and the overnight window all run at the wrong hour.\n\nThe template holds no ReRev Labs values. You set yours in the next two steps, in Script Properties, not in the code.",
       "copy": [
-        {"label": "appsscript.json, time zone line", "text": "\"timeZone\": \"{{timezone}}\","}
+        {
+          "label": "appsscript.json, time zone line",
+          "text": "\"timeZone\": \"{{timezone}}\","
+        }
       ],
       "checkbox_label": "The project is copied and the time zone is set",
-      "verify_hint": "The file list shows 13 files: appsscript, Code, Followup, SmokeTest, Email, Attachments, DeadLetter, Lanes, DashboardData, DashboardHtml, Bounce, Addon, AddonHome. No QueueCourses."
+      "verify_hint": "The file list shows: appsscript, Code, Config, Followup, SmokeTest, Email, Attachments, DeadLetter, Lanes, DashboardData, DashboardHtml, Bounce, Addon, AddonHome, LiveSeed, QueueCourses. LiveSeed and QueueCourses hold only a comment."
     },
     {
-      "title": "Set the identifiers in Code.gs",
-      "instructions": "Open Code.gs. Find the block that starts with const CFG. Replace the values with the ones below.\n\nThis step edits code. Edit only the lines shown. Leave PRIORITY_LANES empty.\n\nAlso open SmokeTest.gs. Find SMOKE_DOC_ID. Replace its value with the Client Update template doc ID.",
+      "title": "Set Script Properties",
+      "instructions": "Your values live in Script Properties, not in the code. You never edit Code.gs.\n\n1. In the editor, choose Project Settings (the gear icon).\n2. Scroll to Script Properties. Choose Add script property.\n3. Add each row below. Name on the left, value on the right.\n4. Save script properties.\n\nBOARD_ID, OWNER and SEND_AS are required. The rest are optional. Leave PRIORITY_LANES and PRIORITY_UNTIL out.\n\nHeavy jobs run overnight. HEAVY_START_HOUR and HEAVY_END_HOUR set that window in the script time zone, on a 24-hour clock. The defaults are 22 and 4 (10pm to 4am).",
       "copy": [
-        {"label": "Code.gs, inside CFG", "text": "BOARD_ID: '{{sheet_id}}',\nCALENDAR_NAME: '{{calendar_name}}',\nOWNER: '{{owner_email}}',\nSEND_AS: '{{agent_alias}}',\nDASHBOARD_URL: '',"},
-        {"label": "Code.gs, ALLOWLIST", "text": "ALLOWLIST: [\n  '{{owner_email}}'\n  // one more line per extra address, with a comma: ,'{{extra_addresses}}'\n],"},
-        {"label": "Code.gs, priority star off", "text": "PRIORITY_LANES: [],\nPRIORITY_UNTIL: '',"},
-        {"label": "SmokeTest.gs", "text": "const SMOKE_DOC_ID = '{{update_template_id}}';"}
+        {
+          "label": "Required properties (name, then value)",
+          "text": "BOARD_ID\t{{sheet_id}}\nOWNER\t{{owner_email}}\nSEND_AS\t{{agent_alias}}"
+        },
+        {
+          "label": "Allowlist (comma-separated; owner first)",
+          "text": "ALLOWLIST\t{{owner_email}},{{extra_addresses}}"
+        },
+        {
+          "label": "Calendar name",
+          "text": "CALENDAR_NAME\t{{calendar_name}}"
+        },
+        {
+          "label": "Optional: overnight window",
+          "text": "HEAVY_START_HOUR\t22\nHEAVY_END_HOUR\t4"
+        }
       ],
-      "checkbox_label": "CFG and SMOKE_DOC_ID are set and saved",
-      "verify_hint": "No line in CFG still shows the ReRev Labs sheet, calendar, or email values. The DASHBOARD_URL line is empty for now."
+      "checkbox_label": "The Script Properties are saved",
+      "verify_hint": "Run checkConfig in the editor. It lists any missing or wrong property and prints the overnight window in words. Fix every line it flags. If extra_addresses is empty, remove the trailing comma from ALLOWLIST."
     },
     {
-      "title": "Set the lanes in Lanes.gs",
-      "instructions": "A lane is one area of work. Sabrina tags every job with a lane. The Dashboard groups work by lane.\n\nThe lane names are in the code. If you skip this step, the Dashboard shows another business's lanes on your data.\n\nIn Lanes.gs, replace these four items: LANE_CANON, LANE_GROUPS, LANE_ALIASES and LANE_DOMAINS. Use the blocks below. Delete any line that still shows a name in angle brackets.\n\nLANE_GROUPS stays empty. Every lane then stands alone.",
-      "collect": ["lane1", "lane2", "lane3", "lane4", "lane5", "lane6", "domain_lane"],
-      "copy": [
-        {"label": "Lanes.gs, LANE_CANON", "text": "const LANE_CANON = [\n  '{{lane1}}', '{{lane2}}', '{{lane3}}',\n  '{{lane4}}', '{{lane5}}', '{{lane6}}'\n];"},
-        {"label": "Lanes.gs, LANE_GROUPS", "text": "const LANE_GROUPS = {};"},
-        {"label": "Lanes.gs, LANE_DOMAINS", "text": "const LANE_DOMAINS = {\n  '{{domain}}': '{{domain_lane}}'\n};"},
-        {"label": "Lanes.gs, LANE_ALIASES (keep short)", "text": "const LANE_ALIASES = {\n  'personal': 'Personal'\n};"}
+      "title": "Fill the lanes tab",
+      "instructions": "A lane is one area of work. Sabrina tags every job with a lane. The Dashboard groups work by lane.\n\nLanes live on the lanes tab of your Job Board. They are not in the code.\n\n1. Open your Job Board copy. Open the lanes tab.\n2. Row 1 holds the headers: lane, group, aliases, domains. Delete the two example rows.\n3. Add one row per lane, from the block below.\n4. group: leave empty. Every lane then stands alone.\n5. aliases: short names people type, comma-separated. Optional.\n6. domains: email domains that belong to this lane, comma-separated. Put {{domain}} on the lane {{domain_lane}}.\n7. In the Apps Script editor, run refreshLanes. The script caches the tab for 10 minutes. This clears it.\n\nA lane name must match exactly everywhere you use it, including the Gmail label.",
+      "collect": [
+        "lane1",
+        "lane2",
+        "lane3",
+        "lane4",
+        "lane5",
+        "lane6",
+        "domain_lane"
       ],
-      "checkbox_label": "The four lane items are replaced and saved",
-      "verify_hint": "Search Lanes.gs for the previous owner's lane names. None remain in these four items."
+      "copy": [
+        {
+          "label": "lanes tab, one lane per row (lane, group, aliases, domains)",
+          "text": "{{lane1}}\t\t\t\n{{lane2}}\t\tpersonal\t\n{{lane3}}\t\t\t\n{{lane4}}\t\t\t\n{{lane5}}\t\t\t\n{{lane6}}\t\t\t"
+        },
+        {
+          "label": "Domain row to add to the domains cell",
+          "text": "{{domain}}"
+        }
+      ],
+      "checkbox_label": "The lanes tab is filled and refreshLanes ran",
+      "verify_hint": "The lanes tab shows only your lanes. Delete any row with a blank lane name. No example rows remain."
     },
     {
-      "title": "Create the Gmail labels",
-      "instructions": "Create these labels in Gmail on {{owner_email}}.\n\n1. Agent. This is the trigger label. Name it exactly Agent.\n2. One label per lane. Each name must match the lane name exactly.\n\nA label that matches a lane name tells Sabrina which lane a thread belongs to. Skip any line that shows a name in angle brackets.",
+      "title": "Create the Gmail labels and calendar",
+      "instructions": "The script can create these for you.\n\n1. In the Apps Script editor, pick setupBoard in the function list.\n2. Choose Run. Approve the permission screen if Google asks.\n3. It creates any missing board tab, the Agent Gmail label, and the Task Calendar.\n\nThen add one Gmail label per lane, in Gmail on {{owner_email}}. Each name must match the lane name exactly. A label that matches a lane name tells Sabrina which lane a thread belongs to. Skip any line that shows a name in angle brackets.",
       "copy": [
-        {"label": "Labels to create", "text": "Agent\n{{lane1}}\n{{lane2}}\n{{lane3}}\n{{lane4}}\n{{lane5}}\n{{lane6}}"}
+        {
+          "label": "Labels to create",
+          "text": "Agent\n{{lane1}}\n{{lane2}}\n{{lane3}}\n{{lane4}}\n{{lane5}}\n{{lane6}}"
+        }
       ],
       "checkbox_label": "The Agent label and the lane labels exist",
-      "verify_hint": "The label list shows Agent and each lane name."
+      "verify_hint": "The label list shows Agent and each lane name. Calendar shows the calendar {{calendar_name}}. If you made the calendar in an earlier step, setupBoard leaves it alone."
     },
     {
       "title": "Authorize the script and send the first test email",
@@ -115,12 +310,17 @@
     },
     {
       "title": "Deploy the Dashboard",
-      "instructions": "The Dashboard is a web page that shows all work by lane. Every Sabrina email links to it.\n\n1. In the editor, choose Deploy, then New deployment.\n2. Choose type Web app.\n3. Description: Sabrina Dashboard v1.\n4. Execute as: Me.\n5. Who has access: Only myself.\n6. Choose Deploy.\n7. Copy the Web app URL. It ends in /exec.\n8. Paste it below.\n9. Put the same URL in CFG, in the DASHBOARD_URL line. Save.\n\nKeep the deployment name the same on every install. After any code change, use Deploy, then Manage deployments, then Edit, then New version. A new deployment makes a new URL.",
-      "collect": ["dashboard_url"],
-      "copy": [
-        {"label": "Code.gs, inside CFG", "text": "DASHBOARD_URL: '{{dashboard_url}}',"}
+      "instructions": "The Dashboard is a web page that shows all work by lane. Every Sabrina email links to it.\n\n1. In the editor, choose Deploy, then New deployment.\n2. Choose type Web app.\n3. Description: Sabrina Dashboard v1.\n4. Execute as: Me.\n5. Who has access: Only myself.\n6. Choose Deploy.\n7. Copy the Web app URL. It ends in /exec.\n8. Paste it below.\n9. Add a Script Property named DASHBOARD_URL. Paste the same URL as the value. Save script properties.\n\nKeep the deployment name the same on every install. After any code change, use Deploy, then Manage deployments, then Edit, then New version. A new deployment makes a new URL.",
+      "collect": [
+        "dashboard_url"
       ],
-      "checkbox_label": "The Dashboard is deployed and the URL is in CFG",
+      "copy": [
+        {
+          "label": "Script Properties (name, then value)",
+          "text": "DASHBOARD_URL\t{{dashboard_url}}"
+        }
+      ],
+      "checkbox_label": "The Dashboard is deployed and the URL is in Script Properties",
       "verify_hint": "Open {{dashboard_url}}. The page loads and shows your lane names. It shows no ReRev Labs lanes."
     },
     {
@@ -144,7 +344,9 @@
     {
       "title": "Choose the meeting note-taker",
       "instructions": "After a call, Sabrina reads the transcript. Google Meet with Gemini notes works with no extra setup.\n\nAny other note-taker needs one extra step. A function in the same Apps Script must land its transcripts in one Drive folder. Ask ReRev Labs for that step before the test.\n\nDecide now. The meeting test needs a real transcript.",
-      "collect": ["note_taker"],
+      "collect": [
+        "note_taker"
+      ],
       "checkbox_label": "The note-taker is decided",
       "verify_hint": "Write the tool name above. If it is not Gemini notes, tell ReRev Labs."
     },
@@ -156,12 +358,15 @@
     },
     {
       "title": "Set up the Cowork skill",
-      "instructions": "The skill holds the rules Cowork follows on every run.\n\n1. Open the Cowork runtime skill template from ReRev Labs.\n2. Open the identifiers table in the skill. Replace each value with the ones below.\n3. Compress the skill folder into one zip file.\n4. In Claude, open Settings, then Customize, then Skills.\n5. Upload the zip.\n\nClaude takes a zip. It does not take a folder.",
+      "instructions": "The skill holds the rules Cowork follows on every run.\n\n1. Download the runtime skill zip: https://sabrina-install.netlify.app/sabrina-runtime-skill.zip\n2. Unzip it. Open task-agent-runtime/SKILL.md.\n3. Find each placeholder in angle brackets (for example <<JOB_BOARD_ID>>). Replace each with the matching value below. Use Find and replace.\n4. Compress the task-agent-runtime folder into one zip file.\n5. In Claude, open Settings, then Customize, then Skills.\n6. Upload the zip.\n\nClaude takes a zip. It does not take a folder.",
       "copy": [
-        {"label": "Values for the skill identifiers table", "text": "Owner email: {{owner_email}}\nAgent alias: {{agent_alias}}\nJob Board Sheet ID: {{sheet_id}}\nTask Calendar name: {{calendar_name}}\nTask Calendar ID: {{calendar_id}}\nClient Update template doc ID: {{update_template_id}}\nTime zone: {{timezone}}\nLanes: {{lane1}}, {{lane2}}, {{lane3}}, {{lane4}}, {{lane5}}, {{lane6}}\nDashboard URL: {{dashboard_url}}"}
+        {
+          "label": "Placeholder values",
+          "text": "<<JOB_BOARD_ID>> = {{sheet_id}}\n<<CLIENT_UPDATE_TEMPLATE_ID>> = {{update_template_id}}\n<<TASK_CALENDAR_ID>> = {{calendar_id}}\n<<AGENT_ALIAS>> = {{agent_alias}}\n<<OWNER_ADDRESSES>> = {{owner_email}}"
+        }
       ],
       "checkbox_label": "The skill is uploaded",
-      "verify_hint": "The skill shows in Settings, Customize, Skills. No ReRev Labs ID is left in the table."
+      "verify_hint": "The skill shows in Settings, Customize, Skills. Search SKILL.md for << . Nothing is left."
     },
     {
       "title": "Create the Cowork scheduled task",
@@ -219,8 +424,8 @@
     },
     {
       "title": "TEST 9: Reply verbs and the overnight window",
-      "instructions": "Use the email from any open job. Reply with one word or phrase at a time. Check the Sheet after each.\n\n1. snooze 2d. The nudge_after cell moves two days out.\n2. waiting on Test Person. The status changes to awaiting_external.\n3. heavy. The status changes to scheduled. The run_after cell holds a time at or after 10pm in {{timezone}}. If it is already between 10pm and 4am, it holds the current time.\n4. run now. The status returns to queued and run_after clears.\n5. close. The status changes to done.\n\nThe 10pm to 4am window uses the script time zone. If run_after shows the wrong hour, fix appsscript.json.",
-      "checkbox_label": "All five verbs worked and run_after is correct",
+      "instructions": "Use the email from any open job. Reply with one word or phrase at a time. Check the Sheet after each.\n\n1. snooze 2d. The nudge_after cell moves two days out.\n2. waiting on Test Person. The status changes to awaiting_external.\n3. heavy. The status changes to scheduled. The run_after cell holds a time at or after HEAVY_START_HOUR in {{timezone}}. If it is already inside the window, it holds the current time.\n4. run now. The status returns to queued and run_after clears.\n5. close. The status changes to done.\n\nNow test the project verbs.\n6. On a lane's email, reply 'track {{lane1}} Test project'. A row appears on the projects tab. The reply is acknowledged.\n7. Reply 'untrack {{lane1}} Test project'. The row is marked inactive.\n\nThe overnight window comes from HEAVY_START_HOUR and HEAVY_END_HOUR, in the script time zone. If run_after shows the wrong hour, check appsscript.json and the two HEAVY properties.",
+      "checkbox_label": "All verbs worked and run_after is correct",
       "verify_hint": "Each verb adds a keyona entry on the history tab."
     },
     {
@@ -236,8 +441,20 @@
       "verify_hint": "Open the doc's sharing settings before you reply yes. It must show Restricted."
     },
     {
+      "title": "TEST 12: Idea Nurture",
+      "instructions": "An idea is kept alive, not closed.\n\n1. Email {{agent_alias}} a loose idea. Start the subject with 'idea:'.\n2. Wait for the job row. job_class is idea. status is nurturing.\n3. Wait for the next Cowork run. You get one short email. It states where the idea stands and asks exactly ONE question.\n4. The row stays nurturing. It is never awaiting_human. The deliverables tab has no row for it.\n5. Reply with an answer. The row goes to queued, then Cowork rewrites end_goal with your answer and asks the next question.\n6. Reply 'mature'. The row is re-typed and re-queued as real work.\n\nTo test the four-day timer without waiting, set nudge_after on the row to a past time. The next sendPending run re-queues it.",
+      "checkbox_label": "The idea asked one question, took my answer, and matured",
+      "verify_hint": "If the email has six blocks or the status is awaiting_human, the Cowork skill is out of date. Re-upload the skill."
+    },
+    {
+      "title": "TEST 13: Build class gate",
+      "instructions": "A build job runs in three gated phases: Design, Build, Test.\n\n1. On the jobs tab, add a row. Set job_class to build. Set status to queued. Put 'Add a one-line comment to a test file' in end_goal.\n2. Wait for the next Cowork run. The deliverables tab gets three rows: -d1, -d2, -d3. All are manual.\n3. You get a design plan email. Only -d1 is worked. -d2 and -d3 stay open.\n4. Reply 'confirm <job_id>-d1'. Cowork runs the Build phase on the next run, and only that phase.\n5. Confirm -d2. Cowork runs the Test phase.\n6. Confirm -d3. The job closes to done by itself.\n\nSkipping a phase is a failure.",
+      "checkbox_label": "The three phases ran in order and the job closed",
+      "verify_hint": "If two phases ran in one pass, the Cowork skill is out of date. Re-upload the skill."
+    },
+    {
       "title": "Done: record this install",
-      "instructions": "The install is complete when every test box is checked.\n\n1. Choose Copy my values at the top of this page.\n2. Email the values to ReRev Labs. They log the install and its version.\n3. Keep the Job Board and the Apps Script project. The Apps Script copy is the only place your code runs.\n\nNeeds a human, not covered by this test: the Idea Nurture flow, the build class, and the deadline-tag email. Test them when you first use them.",
+      "instructions": "The install is complete when every test box is checked.\n\n1. Choose Copy my values at the top of this page.\n2. Email the values to ReRev Labs. They log the install and its version.\n3. Keep the Job Board and the Apps Script project. The Apps Script copy is the only place your code runs.",
       "checkbox_label": "I sent my values to ReRev Labs",
       "verify_hint": "ReRev Labs confirms the install is logged."
     }
