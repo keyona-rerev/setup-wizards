@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sabrina Setup Wizard: Version history</title>
+<style>
+body{margin:0;background:#f7f5f0;color:#14213d;font:16px/1.6 Inter,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 64px}
+h1{font-family:Newsreader,Georgia,serif}
+.card{background:#fff;border:1px solid #d9d4c7;border-radius:10px;padding:20px;margin-bottom:16px}
+a{color:#0f766e}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">Back to the wizard</a></p>
+<h1>Version history</h1>
+<p>Use this page to see what changed and what to do to upgrade an existing install.</p>
+<div class="card">
+<h2>2026-10-20: first version</h2>
+<p>Covers the full current system: Job Board, Apps Script, Gmail add-on, Dashboard, lanes, attachments, follow-up and verification, dead-letter and silent-parking guards, overnight window, meeting flow and Cowork.</p>
+<p><strong>To upgrade an older install:</strong> compare your Apps Script file list to the 13 files in step 6. Add any missing file. Check that your jobs tab has 17 columns, ending in time_estimate, run_after and lane. Deploy the Dashboard (step 11). Install the Gmail add-on (step 12). Run installTriggers again (step 13) so releaseHeavyJobs is listed.</p>
+</div>
+</main>
+</body>
+</html>
