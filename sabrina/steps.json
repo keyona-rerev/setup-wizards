@@ -368,7 +368,7 @@
     },
     {
       "title": "Set up the Cowork skill",
-      "instructions": "The skill holds the rules Cowork follows on every run.\n\n1. Fill in the values you saved in earlier steps. Use the step menu to go back if a value is missing.\n2. Choose Download finished skill below. The wizard puts your values into the skill and gives you a zip.\n3. In Claude, open Settings, then Customize, then Skills.\n4. Upload the zip.\n\nThe download button warns you if a value is still missing. Claude takes a zip. It does not take a folder.\n\nManual route: download https://sabrina-install.netlify.app/sabrina-runtime-skill.zip and replace each placeholder in angle brackets by hand.",
+      "instructions": "The skill holds the rules Cowork follows on every run.\n\n1. Fill in the values you saved in earlier steps. Use the step menu to go back if a value is missing.\n2. Choose Download finished skill below. The wizard puts your values into the skill and gives you a zip.\n3. In Claude, open Settings, then Customize, then Skills.\n4. Upload the zip.\n\nThe download button warns you if a value is still missing. Claude takes a zip. It does not take a folder.\n\nManual route: download https://sabrina-install.netlify.app/sabrina-runtime-skill.zip and replace each placeholder in angle brackets by hand. <<AGENT_NAME>> = {{agent_name}}.",
       "copy": [
         {
           "label": "Placeholder values",

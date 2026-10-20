@@ -114,7 +114,7 @@ td:first-child{width:38%;color:#4b5563}
     w4(0x04034b50);w2(20);w2(0x800);w2(0);w2(0);w2(0x21);w4(c);w4(bytes.length);w4(bytes.length);w2(nb.length);w2(0);u.set(nb,p);p+=nb.length;u.set(bytes,p);p+=bytes.length;
     var cd=p;w4(0x02014b50);w2(20);w2(20);w2(0x800);w2(0);w2(0);w2(0x21);w4(c);w4(bytes.length);w4(bytes.length);w2(nb.length);w2(0);w2(0);w2(0);w2(0);w4(0);w4(0);u.set(nb,p);p+=nb.length;
     var cl=p-cd;w4(0x06054b50);w2(0);w2(0);w2(1);w2(1);w4(cl);w4(cd);w2(0);return u;}
-  var SKILLMAP={JOB_BOARD_ID:'sheet_id',CLIENT_UPDATE_TEMPLATE_ID:'update_template_id',TASK_CALENDAR_ID:'calendar_id',AGENT_ALIAS:'agent_alias',OWNER_ADDRESSES:'owner_email'};
+  var SKILLMAP={AGENT_NAME:'agent_name',JOB_BOARD_ID:'sheet_id',CLIENT_UPDATE_TEMPLATE_ID:'update_template_id',TASK_CALENDAR_ID:'calendar_id',AGENT_ALIAS:'agent_alias',OWNER_ADDRESSES:'owner_email'};
   function buildSkill(){
     var msg=document.getElementById('skmsg');
     fetch('skill-template.md').then(function(r){return r.text();}).then(function(t){
