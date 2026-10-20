@@ -387,13 +387,13 @@
     },
     {
       "title": "TEST 1: The first email",
-      "instructions": "This checks the Google side with no agent involved.\n\n1. Run selfTest again.\n2. Open the email from {{agent_alias}}.\n\nCheck each item:\n1. The subject starts with [5 min] and ends with a job ID in brackets.\n2. The email has blocks: what I know, end goal, deliverables, direction, why, to start.\n3. The footer shows a Dashboard button and a Job Board link.\n4. Both links open.\n5. The job row shows on the jobs tab, and the history tab shows a Sent email entry.",
+      "instructions": "This checks the Google side with no agent involved.\n\n1. Run checkConfig. It lists any missing Script Property. Fix each one first.\n2. Run selfTest again.\n3. Open the email from {{agent_alias}}.\n\nCheck each item:\n1. The subject starts with [5 min] and ends with a job ID in brackets.\n2. The email has blocks: what I know, end goal, deliverables, direction, why, to start.\n3. The footer shows a Dashboard button and a Job Board link.\n4. Both links open.\n5. The job row shows on the jobs tab, and the history tab shows a Sent email entry.",
       "checkbox_label": "All five checks pass",
-      "verify_hint": "If the footer has no Dashboard button, CFG.DASHBOARD_URL is empty. Fix it, save, and run again."
+      "verify_hint": "If the footer has no Dashboard button, the DASHBOARD_URL Script Property is empty. Set it, save, and run again."
     },
     {
       "title": "TEST 2: Follow-up and verification",
-      "instructions": "This proves nudges and deliverable checks in ten minutes. You do not wait two days.\n\nRun these in the editor, in order:\n1. smokeTestSetup. An email arrives. The board has a test job with two deliverables.\n2. verifyDeliverables. Deliverable d1 changes to verified.\n3. smokeTestNudge. A nudge arrives as a reply on the same thread.\n4. smokeTestCleanup. The test job closes.\n\nnudgeSweep does nothing on Saturday and Sunday. Run this test on a weekday.",
+      "instructions": "This proves nudges and deliverable checks in ten minutes. You do not wait two days.\n\nRun these in the editor, in order:\n1. smokeTestSetup. An email arrives. The board has a test job with two deliverables.\n2. verifyDeliverables. Deliverable d1 changes to verified.\n3. smokeTestNudge. A nudge arrives as a reply on the same thread.\n4. smokeTestCleanup. The test job closes.\n\nThe test works on your own Job Board. It adds a test row and removes it. It needs no other file.\n\nnudgeSweep does nothing on Saturday and Sunday. Run this test on a weekday.",
       "checkbox_label": "Setup, verify, nudge and cleanup all worked",
       "verify_hint": "In the deliverables tab, d1 is verified and d2 is waived after cleanup."
     },
