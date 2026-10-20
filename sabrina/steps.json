@@ -53,7 +53,7 @@
       "label": "Apps Script template link",
       "placeholder": "https://script.google.com/d/.../edit",
       "help": "ReRev Labs sends this link.",
-      "default": "https://script.google.com/d/1EVkPNgX8QDuF8cKMtD7l2_SnKdOpZW_fYD_wB8smAv_ms3s0_-tWJgjR/edit"
+      "default": "https://script.google.com/d/1-Vs5Rh5B0D5UMjeSCpSf7ua18hroWtcnv-0Fh8p4QPfDTIzdUusj2wgY/edit"
     },
     {
       "key": "update_template_url",
@@ -253,11 +253,11 @@
     },
     {
       "title": "Set Script Properties",
-      "instructions": "Your values live in Script Properties, not in the code. You never edit Code.gs.\n\n1. In the editor, choose Project Settings (the gear icon).\n2. Scroll to Script Properties. Choose Add script property.\n3. Add each row below. Name on the left, value on the right.\n4. Save script properties.\n\nBOARD_ID, OWNER and SEND_AS are required. The rest are optional. Leave PRIORITY_LANES and PRIORITY_UNTIL out.\n\nHeavy jobs run overnight. HEAVY_START_HOUR and HEAVY_END_HOUR set that window in the script time zone, on a 24-hour clock. The defaults are 22 and 4 (10pm to 4am).",
+      "instructions": "Your values live in Script Properties, not in the code. You never edit Code.gs.\n\n1. In the editor, choose Project Settings (the gear icon).\n2. Scroll to Script Properties. Choose Add script property.\n3. Add each row below. Name on the left, value on the right.\n4. Save script properties.\n\nBOARD_ID, OWNER and SEND_AS are required. AGENT_NAME is the name you chose in step 1. It shows on the Gmail add-on, the Dashboard and the sender name of every email. The rest are optional. Leave PRIORITY_LANES and PRIORITY_UNTIL out.\n\nHeavy jobs run overnight. HEAVY_START_HOUR and HEAVY_END_HOUR set that window in the script time zone, on a 24-hour clock. The defaults are 22 and 4 (10pm to 4am).",
       "copy": [
         {
           "label": "Required properties (name, then value)",
-          "text": "BOARD_ID\t{{sheet_id}}\nOWNER\t{{owner_email}}\nSEND_AS\t{{agent_alias}}"
+          "text": "BOARD_ID\t{{sheet_id}}\nOWNER\t{{owner_email}}\nSEND_AS\t{{agent_alias}}\nAGENT_NAME\t{{agent_name}}"
         },
         {
           "label": "Allowlist (comma-separated; owner first)",
@@ -387,7 +387,7 @@
     },
     {
       "title": "TEST 1: The first email",
-      "instructions": "This checks the Google side with no agent involved.\n\n1. Run checkConfig. It lists any missing Script Property. Fix each one first.\n2. Run selfTest again.\n3. Open the email from {{agent_alias}}.\n\nCheck each item:\n1. The subject starts with [5 min] and ends with a job ID in brackets.\n2. The email has blocks: what I know, end goal, deliverables, direction, why, to start.\n3. The footer shows a Dashboard button and a Job Board link.\n4. Both links open.\n5. The job row shows on the jobs tab, and the history tab shows a Sent email entry.",
+      "instructions": "This checks the Google side with no agent involved.\n\n1. Run checkConfig. It lists any missing Script Property. Fix each one first.\n2. Run selfTest again.\n3. Open the email from {{agent_alias}}.\n\nCheck each item:\n1. The subject starts with [5 min] and ends with a job ID in brackets.\n2. The email has blocks: what I know, end goal, deliverables, direction, why, to start.\n3. The footer shows a Dashboard button and a Job Board link.\n4. Both links open.\n5. The job row shows on the jobs tab, and the history tab shows a Sent email entry.\n\nName check: the email's sender name is {{agent_name}}. If it shows another name, check the AGENT_NAME Script Property.",
       "checkbox_label": "All five checks pass",
       "verify_hint": "If the footer has no Dashboard button, the DASHBOARD_URL Script Property is empty. Set it, save, and run again."
     },
@@ -417,13 +417,13 @@
     },
     {
       "title": "TEST 6: Gmail add-on",
-      "instructions": "1. Open any email that is not from Sabrina.\n2. Open the Sabrina panel.\n3. Write a direction. Choose a lane. Choose Send to Sabrina.\n4. A notice says Sent to Sabrina, with a job ID.\n5. The panel now shows a job card with status and buttons.\n6. Choose Snooze 2d. The card confirms.\n7. Open the panel home. It shows 'Right now' with four numbers.\n\nCheck that a button and a typed reply do the same thing. Reply close to the job's email thread, on another job. It closes the same way.",
+      "instructions": "1. Open any email that is not from Sabrina.\n2. Open the {{agent_name}} panel.\n3. Write a direction. Choose a lane. Choose Send to Sabrina.\n4. A notice says Sent to Sabrina, with a job ID.\n5. The panel now shows a job card with status and buttons.\n6. Choose Snooze 2d. The card confirms.\n7. Open the panel home. It shows 'Right now' with four numbers.\n\nCheck that a button and a typed reply do the same thing. Reply close to the job's email thread, on another job. It closes the same way.",
       "checkbox_label": "The panel sent a job and the buttons worked",
       "verify_hint": "The jobs tab shows the new row with the lane you chose in column 17, and the history tab shows 'Direction from Gmail add-on'."
     },
     {
       "title": "TEST 7: Dashboard and lanes",
-      "instructions": "1. Open {{dashboard_url}}.\n2. The KPI row shows counts.\n3. The lane list shows your lanes: {{lane1}}, {{lane2}}.\n4. It shows no lane names from another business.\n5. Open a lane. Its items show.\n6. Find the job from Test 4. It sits in {{lane1}}.\n\nNow test the Gmail label route.\n7. Put the label {{lane2}} on an email in your inbox.\n8. Send that email to {{agent_alias}}.\n9. The new job's lane is {{lane2}}.",
+      "instructions": "1. Open {{dashboard_url}}.\n2. The KPI row shows counts.\n3. The lane list shows your lanes: {{lane1}}, {{lane2}}.\n4. It shows no lane names from another business.\n5. Open a lane. Its items show.\n6. Find the job from Test 4. It sits in {{lane1}}.\n\nNow test the Gmail label route.\n7. Put the label {{lane2}} on an email in your inbox.\n8. Send that email to {{agent_alias}}.\n9. The new job's lane is {{lane2}}.\n10. The page title and the top-left name show {{agent_name}}.",
       "checkbox_label": "The Dashboard shows my lanes and the lane routes work",
       "verify_hint": "A lane that resolves wrong usually means a label name that does not match the lane name exactly."
     },
