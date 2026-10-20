@@ -90,7 +90,7 @@ td:first-child{width:38%;color:#4b5563}
   function sub(text,html){
     return String(text==null?'':text).replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g,function(m,k){
       var v=val(k);
-      if(html)return v?'<span class="v">'+esc(v)+'</span>':'<span class="v empty">'+esc('<'+(def(k).label||k)+'>')+'</span>';
+      if(html)return v?(/^https?:\/\//.test(v)?'<a class="v" target="_blank" rel="noopener" href="'+esc(v)+'">'+esc(v)+'</a>':'<span class="v">'+esc(v)+'</span>'):'<span class="v empty">'+esc('<'+(def(k).label||k)+'>')+'</span>';
       return v||('<'+k+'>');
     });
   }
@@ -116,18 +116,18 @@ td:first-child{width:38%;color:#4b5563}
   function render(){
     var s=data.steps[i],n=data.steps.length,c=Object.keys(done).filter(function(k){return done[k];}).length;
     document.getElementById('fill').style.width=Math.round(c/n*100)+'%';
-    document.getElementById('meta').textContent='Step '+(i+1)+' of '+n+' · '+c+' done';
-    var h='<h2>'+esc(s.title)+'</h2><div class="instr">'+sub(esc(s.instructions).replace(/\{\{/g,'{{'),true)+'</div>';
+    document.getElementById('meta').innerHTML='Step '+(i+1)+' of '+n+' · '+c+' done · <select id="jump" aria-label="Jump to step">'+data.steps.map(function(x,j){return '<option value="'+j+'"'+(j===i?' selected':'')+'>'+(j+1)+'. '+esc(sub(x.title,false))+(done[j]?' ✓':'')+'</option>';}).join('')+'</select>';document.getElementById('jump').onchange=function(e){i=+e.target.value;save();render();};
+    var h='<h2>'+esc(sub(s.title,false))+'</h2><div class="instr">'+sub(esc(s.instructions).replace(/\{\{/g,'{{'),true)+'</div>';
     (s.collect||[]).forEach(function(k){
       var d=def(k);
       h+='<div class="field"><label for="f_'+k+'">'+esc(d.label||k)+'</label>'+(d.help?'<small>'+esc(d.help)+'</small>':'')+
-         '<input id="f_'+k+'" data-k="'+k+'" autocomplete="off" spellcheck="false" placeholder="'+esc(d.placeholder||'')+'" value="'+esc(vals[k]||'')+'"><div class="err" id="e_'+k+'"></div></div>';
+         '<input id="f_'+k+'" data-k="'+k+'" autocomplete="off" spellcheck="false" placeholder="'+esc(d.placeholder||'')+'" value="'+esc(vals[k]||d.default||'')+'"><div class="err" id="e_'+k+'"></div></div>';
     });
     (s.copy||[]).forEach(function(b,bi){
       h+='<div class="copy"><span class="lbl">'+esc(b.label||'Copy')+'</span><span id="cp'+bi+'">'+sub(esc(b.text),true)+'</span><button data-cp="'+bi+'">Copy</button></div>';
     });
     if(s.verify_hint)h+='<div class="hint">How to check: '+sub(esc(s.verify_hint),true)+'</div>';
-    h+='<label class="chk"><input type="checkbox" id="ck"'+(done[i]?' checked':'')+(stepReady(s)?'':' disabled')+'> '+esc(s.checkbox_label||'I did this step')+'</label>';
+    h+='<label class="chk"><input type="checkbox" id="ck"'+(done[i]?' checked':'')+'> '+esc(s.checkbox_label||'I did this step')+'</label>';
     document.getElementById('card').innerHTML=h;
     document.getElementById('ck').onchange=function(e){done[i]=e.target.checked;save();render();};
     var inputs=document.querySelectorAll('#card input[data-k]');
@@ -137,7 +137,7 @@ td:first-child{width:38%;color:#4b5563}
         document.getElementById('e_'+k).textContent=msg;el.className=msg?'bad':'';
         if(msg){delete vals[k];}else if(v){vals[k]=v;}else{delete vals[k];}
         save();renderVals();
-        var ck=document.getElementById('ck');ck.disabled=!stepReady(s);if(ck.disabled){done[i]=false;ck.checked=false;}
+        
         (s.copy||[]).forEach(function(b,bi){document.getElementById('cp'+bi).innerHTML=sub(esc(b.text),true);});
       };
     });

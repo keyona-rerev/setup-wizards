@@ -3,6 +3,15 @@
   "intro": "Install Sabrina, the chief-of-staff agent, on one Google account. About 20 to 30 steps. You enter each value once. The wizard reuses it in later steps. The last part is the installation test.",
   "variables": [
     {
+      "key": "agent_name",
+      "label": "Name you chose for the agent",
+      "default": "Sabrina",
+      "placeholder": "Sabrina",
+      "help": "Used in the wizard text and for the display name of the sending address. Change it if you picked another name.",
+      "pattern": "^[^'\"\\\\<>]{2,30}$",
+      "pattern_error": "Use 2 to 30 characters. No quote marks."
+    },
+    {
       "key": "client_name",
       "label": "Client or business name",
       "placeholder": "Example Co",
@@ -172,8 +181,9 @@
   "steps": [
     {
       "title": "Before you start",
-      "instructions": "You need five things.\n1. A Gmail or Google Workspace account. Not Microsoft 365.\n2. A Claude plan that has Cowork.\n3. The three template links. They are filled in for you below. They are private to ReRev Labs, so ask ReRev Labs to share them with {{owner_email}} first.\n4. About 30 minutes for the install and 30 more for the test.\n5. A second browser tab for this wizard.\n\nEnter the values below. The wizard keeps them in this browser only.",
+      "instructions": "You need five things.\n1. A Gmail or Google Workspace account. Not Microsoft 365.\n2. A Claude plan that has Cowork.\n3. The three template links. Open each one now:\n   Job Board: {{job_board_template_url}}\n   Apps Script project: {{script_template_url}}\n   Client Update doc: {{update_template_url}}\n   They are private to ReRev Labs. Ask ReRev Labs to share them with {{owner_email}} first.\n4. About 30 minutes for the install and 30 more for the test.\n5. A second browser tab for this wizard.\n\nChoose the agent's name first. The wizard uses it in later steps. You can skip any field and fill it in later. Use the step menu at the top to jump to any step.",
       "collect": [
+        "agent_name",
         "client_name",
         "owner_email",
         "domain",
@@ -183,11 +193,11 @@
         "update_template_url"
       ],
       "checkbox_label": "I have the account, the Cowork plan and the three links",
-      "verify_hint": "All seven fields show no red message."
+      "verify_hint": "The agent name and the three links show in the table at the bottom."
     },
     {
-      "title": "Create Sabrina's sending address",
-      "instructions": "Sabrina sends every email from her own address. Make it an alias on {{owner_email}}.\n\n1. Open Gmail.\n2. Open Settings, then See all settings, then Accounts and Import.\n3. Next to Send mail as, choose Add another email address.\n4. Enter {{agent_alias}}. Keep Treat as an alias on.\n5. Confirm the address.\n\nOn Google Workspace, an admin may first need to add the alias to the user in the Admin console.",
+      "title": "Create {{agent_name}}'s sending address",
+      "instructions": "{{agent_name}} sends every email from its own address. Make it an alias on {{owner_email}}.\n\n1. Open Gmail.\n2. Open Settings, then See all settings, then Accounts and Import.\n3. Next to Send mail as, choose Add another email address.\n4. Enter {{agent_alias}}. Keep Treat as an alias on.\n5. Set the name to {{agent_name}}. Confirm the address.\n\nOn Google Workspace, an admin may first need to add the alias to the user in the Admin console.",
       "collect": [
         "agent_alias",
         "extra_addresses"
