@@ -21,7 +21,7 @@
       "key": "owner_email",
       "label": "Owner email",
       "placeholder": "name@yourdomain.com",
-      "help": "The Google account that runs Sabrina. Gmail or Google Workspace. Not Microsoft 365.",
+      "help": "The Google account that runs the agent. Gmail or Google Workspace. Not Microsoft 365.",
       "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
       "pattern_error": "Enter one email address."
     },
@@ -64,7 +64,7 @@
     },
     {
       "key": "agent_alias",
-      "label": "Sabrina's sending address",
+      "label": "The agent's sending address",
       "placeholder": "sabrina@yourdomain.com",
       "help": "Worked out for you from your domain. Change it only if you want a different name.",
       "derive": "sabrina@{{domain}}",
@@ -77,6 +77,31 @@
       "placeholder": "you@other.org",
       "help": "Optional. One address, or several separated by commas. Every address you send from must be here.",
       "optional": true
+    },
+    {
+      "key": "allowlist",
+      "label": "Allowlist (worked out)",
+      "help": "Owner first, then any other addresses. Built for you.",
+      "join": [
+        "owner_email",
+        "extra_addresses"
+      ]
+    },
+    {
+      "key": "heavy_start_hour",
+      "label": "Overnight window starts (hour, 0-23)",
+      "default": "22",
+      "help": "Heavy jobs wait until this hour in the client's time zone.",
+      "pattern": "^([0-9]|1[0-9]|2[0-3])$",
+      "pattern_error": "Enter an hour from 0 to 23."
+    },
+    {
+      "key": "heavy_end_hour",
+      "label": "Overnight window ends (hour, 0-23)",
+      "default": "4",
+      "help": "Heavy jobs stop releasing at this hour.",
+      "pattern": "^([0-9]|1[0-9]|2[0-3])$",
+      "pattern_error": "Enter an hour from 0 to 23."
     },
     {
       "key": "sheet_id",
@@ -207,14 +232,14 @@
     },
     {
       "title": "Copy the Job Board",
-      "instructions": "The Job Board is Sabrina's only memory. Copy it first. You need its real ID before the script step.\n\n1. Open {{job_board_template_url}}.\n2. Choose File, then Make a copy.\n3. Name the copy 'Sabrina - Job Board - {{client_name}}'.\n4. Save it in {{owner_email}}'s Drive.\n5. Copy the Sheet ID from the address bar of the new copy.",
+      "instructions": "The Job Board is {{agent_name}}'s only memory. Copy it first. You need its real ID before the script step.\n\n1. Open {{job_board_template_url}}.\n2. Choose File, then Make a copy.\n3. Name the copy '{{agent_name}} - Job Board - {{client_name}}'.\n4. Save it in {{owner_email}}'s Drive.\n5. Copy the Sheet ID from the address bar of the new copy.",
       "collect": [
         "sheet_id"
       ],
       "copy": [
         {
           "label": "Name for the copy",
-          "text": "Sabrina - Job Board - {{client_name}}"
+          "text": "{{agent_name}} - Job Board - {{client_name}}"
         }
       ],
       "checkbox_label": "I copied the Sheet and saved its ID",
@@ -222,7 +247,7 @@
     },
     {
       "title": "Create the Task Calendar",
-      "instructions": "Sabrina reads events from one calendar that only holds her tasks. Keep it apart from real events.\n\n1. Open Google Calendar on {{owner_email}}.\n2. Next to Other calendars, choose Add, then Create new calendar.\n3. Name it {{calendar_name}}.\n4. Open the calendar's settings.\n5. Under Integrate calendar, copy the Calendar ID.",
+      "instructions": "{{agent_name}} reads events from one calendar that only holds her tasks. Keep it apart from real events.\n\n1. Open Google Calendar on {{owner_email}}.\n2. Next to Other calendars, choose Add, then Create new calendar.\n3. Name it {{calendar_name}}.\n4. Open the calendar's settings.\n5. Under Integrate calendar, copy the Calendar ID.",
       "collect": [
         "calendar_name",
         "calendar_id"
@@ -232,7 +257,7 @@
     },
     {
       "title": "Copy the Client Update doc template",
-      "instructions": "Each client gets one living Client Update doc. This is the template for it.\n\n1. Open {{update_template_url}}.\n2. Choose File, then Make a copy.\n3. Name it 'Client Update Template'.\n4. Do not share it with anyone. The doc is client-visible later, so Sabrina asks before she shares it.\n5. Copy the doc ID from the address bar.",
+      "instructions": "Each client gets one living Client Update doc. This is the template for it.\n\n1. Open {{update_template_url}}.\n2. Choose File, then Make a copy.\n3. Name it 'Client Update Template'.\n4. Do not share it with anyone. The doc is client-visible later, so {{agent_name}} asks before she shares it.\n5. Copy the doc ID from the address bar.",
       "collect": [
         "update_template_id"
       ],
@@ -241,7 +266,7 @@
     },
     {
       "title": "Copy the Apps Script project",
-      "instructions": "1. Open {{script_template_url}}.\n2. Choose the Overview page, then Make a copy.\n3. Open the copy. It lives in {{owner_email}}'s Drive.\n4. Name it 'Sabrina - Task Agent'.\n5. Open Project Settings. Turn on Show appsscript.json manifest file.\n6. Open appsscript.json. Set the time zone line as shown below.\n7. Save.\n\nThe script reads its time zone from this file. If it is wrong, deadlines, nudges and the overnight window all run at the wrong hour.\n\nThe template holds no ReRev Labs values. You set yours in the next two steps, in Script Properties, not in the code.",
+      "instructions": "1. Open {{script_template_url}}.\n2. Choose the Overview page, then Make a copy.\n3. Open the copy. It lives in {{owner_email}}'s Drive.\n4. Name it '{{agent_name}} - Task Agent'.\n5. Open Project Settings. Turn on Show appsscript.json manifest file.\n6. Open appsscript.json. Set the time zone line as shown below.\n7. Save.\n\nThe script reads its time zone from this file. If it is wrong, deadlines, nudges and the overnight window all run at the wrong hour.\n\nThe template holds no ReRev Labs values. You set yours in the next two steps, in Script Properties, not in the code.",
       "copy": [
         {
           "label": "appsscript.json, time zone line",
@@ -261,7 +286,7 @@
         },
         {
           "label": "Allowlist (comma-separated; owner first)",
-          "text": "ALLOWLIST\t{{owner_email}},{{extra_addresses}}"
+          "text": "ALLOWLIST\t{{allowlist}}"
         },
         {
           "label": "Calendar name",
@@ -269,15 +294,19 @@
         },
         {
           "label": "Optional: overnight window",
-          "text": "HEAVY_START_HOUR\t22\nHEAVY_END_HOUR\t4"
+          "text": "HEAVY_START_HOUR\t{{heavy_start_hour}}\nHEAVY_END_HOUR\t{{heavy_end_hour}}"
         }
       ],
       "checkbox_label": "The Script Properties are saved",
-      "verify_hint": "Run checkConfig in the editor. It lists any missing or wrong property and prints the overnight window in words. Fix every line it flags. If extra_addresses is empty, remove the trailing comma from ALLOWLIST."
+      "verify_hint": "Run checkConfig in the editor. It lists any missing or wrong property and prints the overnight window in words. Fix every line it flags.",
+      "collect": [
+        "heavy_start_hour",
+        "heavy_end_hour"
+      ]
     },
     {
       "title": "Fill the lanes tab",
-      "instructions": "A lane is one area of work. Sabrina tags every job with a lane. The Dashboard groups work by lane.\n\nLanes live on the lanes tab of your Job Board. They are not in the code.\n\n1. Open your Job Board copy. Open the lanes tab.\n2. Row 1 holds the headers: lane, group, aliases, domains. Delete the two example rows.\n3. Add one row per lane, from the block below.\n4. group: leave empty. Every lane then stands alone.\n5. aliases: short names people type, comma-separated. Optional.\n6. domains: email domains that belong to this lane, comma-separated. Put {{domain}} on the lane {{domain_lane}}.\n7. In the Apps Script editor, run refreshLanes. The script caches the tab for 10 minutes. This clears it.\n\nA lane name must match exactly everywhere you use it, including the Gmail label.",
+      "instructions": "A lane is one area of work. {{agent_name}} tags every job with a lane. The Dashboard groups work by lane.\n\nLanes live on the lanes tab of your Job Board. They are not in the code.\n\n1. Open your Job Board copy. Open the lanes tab.\n2. Row 1 holds the headers: lane, group, aliases, domains. Delete the two example rows.\n3. Add one row per lane, from the block below.\n4. group: leave empty. Every lane then stands alone.\n5. aliases: short names people type, comma-separated. Optional.\n6. domains: email domains that belong to this lane, comma-separated. Put {{domain}} on the lane {{domain_lane}}.\n7. In the Apps Script editor, run refreshLanes. The script caches the tab for 10 minutes. This clears it.\n\nA lane name must match exactly everywhere you use it, including the Gmail label.",
       "collect": [
         "lane1",
         "lane2",
@@ -302,7 +331,7 @@
     },
     {
       "title": "Create the Gmail labels and calendar",
-      "instructions": "The script can create these for you.\n\n1. In the Apps Script editor, pick setupBoard in the function list.\n2. Choose Run. Approve the permission screen if Google asks.\n3. It creates any missing board tab, the Agent Gmail label, and the Task Calendar.\n\nThen add one Gmail label per lane, in Gmail on {{owner_email}}. Each name must match the lane name exactly. A label that matches a lane name tells Sabrina which lane a thread belongs to. Skip any line that shows a name in angle brackets.",
+      "instructions": "The script can create these for you.\n\n1. In the Apps Script editor, pick setupBoard in the function list.\n2. Choose Run. Approve the permission screen if Google asks.\n3. It creates any missing board tab, the Agent Gmail label, and the Task Calendar.\n\nThen add one Gmail label per lane, in Gmail on {{owner_email}}. Each name must match the lane name exactly. A label that matches a lane name tells {{agent_name}} which lane a thread belongs to. Skip any line that shows a name in angle brackets.",
       "copy": [
         {
           "label": "Labels to create",
@@ -314,13 +343,13 @@
     },
     {
       "title": "Authorize the script and send the first test email",
-      "instructions": "1. In the Apps Script editor, pick selfTest in the function list.\n2. Choose Run.\n3. Google asks for permission. Choose Review permissions.\n4. Choose your account. Choose Advanced, then Go to the project. Choose Allow.\n5. Run selfTest again if the first run stopped at the permission screen.\n\nThe warning screen is normal. The script is yours. It is not published.\n\nThe script asks for mail, calendar, Drive, Sheets and Gmail add-on access. Sabrina needs all of them.",
+      "instructions": "1. In the Apps Script editor, pick selfTest in the function list.\n2. Choose Run.\n3. Google asks for permission. Choose Review permissions.\n4. Choose your account. Choose Advanced, then Go to the project. Choose Allow.\n5. Run selfTest again if the first run stopped at the permission screen.\n\nThe warning screen is normal. The script is yours. It is not published.\n\nThe script asks for mail, calendar, Drive, Sheets and Gmail add-on access. {{agent_name}} needs all of them.",
       "checkbox_label": "selfTest ran with no error",
       "verify_hint": "An email arrives in {{owner_email}} from {{agent_alias}}. The subject starts with [5 min]. If no email arrives, open Executions in the editor and read the error."
     },
     {
       "title": "Deploy the Dashboard",
-      "instructions": "The Dashboard is a web page that shows all work by lane. Every Sabrina email links to it.\n\n1. In the editor, choose Deploy, then New deployment.\n2. Choose type Web app.\n3. Description: Sabrina Dashboard v1.\n4. Execute as: Me.\n5. Who has access: Only myself.\n6. Choose Deploy.\n7. Copy the Web app URL. It ends in /exec.\n8. Paste it below.\n9. Add a Script Property named DASHBOARD_URL. Paste the same URL as the value. Save script properties.\n\nKeep the deployment name the same on every install. After any code change, use Deploy, then Manage deployments, then Edit, then New version. A new deployment makes a new URL.",
+      "instructions": "The Dashboard is a web page that shows all work by lane. Every {{agent_name}} email links to it.\n\n1. In the editor, choose Deploy, then New deployment.\n2. Choose type Web app.\n3. Description: {{agent_name}} Dashboard v1.\n4. Execute as: Me.\n5. Who has access: Only myself.\n6. Choose Deploy.\n7. Copy the Web app URL. It ends in /exec.\n8. Paste it below.\n9. Add a Script Property named DASHBOARD_URL. Paste the same URL as the value. Save script properties.\n\nKeep the deployment name the same on every install. After any code change, use Deploy, then Manage deployments, then Edit, then New version. A new deployment makes a new URL.",
       "collect": [
         "dashboard_url"
       ],
@@ -335,9 +364,9 @@
     },
     {
       "title": "Install the Gmail add-on",
-      "instructions": "The add-on puts Sabrina in the Gmail side panel. You can hand an email to her, answer her, and close jobs with buttons.\n\n1. In the editor, choose Deploy, then Test deployments.\n2. Next to Application type, choose Gmail add-on. Choose Install.\n3. Reload Gmail.\n4. Look for the Sabrina icon in the right side panel. Open it.\n\nA test deployment installs for the account that runs it. Each person who wants the panel must install it from their own copy.",
-      "checkbox_label": "The Sabrina panel shows in Gmail",
-      "verify_hint": "The panel shows 'Right now' with four numbers and a Dashboard button. Open any email. The panel shows a form with a Send to Sabrina button."
+      "instructions": "The add-on puts {{agent_name}} in the Gmail side panel. You can hand an email to her, answer her, and close jobs with buttons.\n\n1. In the editor, choose Deploy, then Test deployments.\n2. Next to Application type, choose Gmail add-on. Choose Install.\n3. Reload Gmail.\n4. Look for the {{agent_name}} icon in the right side panel. Open it.\n\nA test deployment installs for the account that runs it. Each person who wants the panel must install it from their own copy.",
+      "checkbox_label": "The {{agent_name}} panel shows in Gmail",
+      "verify_hint": "The panel shows 'Right now' with four numbers and a Dashboard button. Open any email. The panel shows a form with a Send to {{agent_name}} button."
     },
     {
       "title": "Turn on the timers",
@@ -346,14 +375,14 @@
       "verify_hint": "Triggers shows 8 rows: watchCalendar every 15 minutes, watchGmailLabel every 5, sendPending every 5, watchReplies every 5, watchdog every hour, verifyDeliverables every 2 hours, nudgeSweep daily near 9am, releaseHeavyJobs every 15 minutes."
     },
     {
-      "title": "Send mail to the alias into Sabrina",
-      "instructions": "Mail sent or forwarded to {{agent_alias}} must get the Agent label. A Gmail filter does this. Make it on the main account first. Each extra inbox sends work to Sabrina by email too. It does not get its own script.\n\nOn the main account, then on each extra account:\n1. Open Gmail settings, then Filters and Blocked Addresses.\n2. Create a filter. In To, enter {{agent_alias}}.\n3. Choose Apply the label, and pick Agent.\n\nThen add each extra account's sending address to ALLOWLIST in Code.gs. Sabrina reads only the main mailbox. A job from another inbox cannot be checked automatically. Its deliverables must be type manual.",
+      "title": "Send mail to the alias into {{agent_name}}",
+      "instructions": "Mail sent or forwarded to {{agent_alias}} must get the Agent label. A Gmail filter does this. Make it on the main account first. Each extra inbox sends work to {{agent_name}} by email too. It does not get its own script.\n\nOn the main account, then on each extra account:\n1. Open Gmail settings, then Filters and Blocked Addresses.\n2. Create a filter. In To, enter {{agent_alias}}.\n3. Choose Apply the label, and pick Agent.\n\nThen add each extra account's sending address to ALLOWLIST in Code.gs. {{agent_name}} reads only the main mailbox. A job from another inbox cannot be checked automatically. Its deliverables must be type manual.",
       "checkbox_label": "The filter exists on the main account and on each extra inbox",
       "verify_hint": "Every sending address is in ALLOWLIST. The main account and every extra inbox have the filter."
     },
     {
       "title": "Choose the meeting note-taker",
-      "instructions": "After a call, Sabrina reads the transcript. Google Meet with Gemini notes works with no extra setup.\n\nAny other note-taker needs one extra step. A function in the same Apps Script must land its transcripts in one Drive folder. Ask ReRev Labs for that step before the test.\n\nDecide now. The meeting test needs a real transcript.",
+      "instructions": "After a call, {{agent_name}} reads the transcript. Google Meet with Gemini notes works with no extra setup.\n\nAny other note-taker needs one extra step. A function in the same Apps Script must land its transcripts in one Drive folder. Ask ReRev Labs for that step before the test.\n\nDecide now. The meeting test needs a real transcript.",
       "collect": [
         "note_taker"
       ],
@@ -372,7 +401,7 @@
       "copy": [
         {
           "label": "Placeholder values",
-          "text": "<<JOB_BOARD_ID>> = {{sheet_id}}\n<<CLIENT_UPDATE_TEMPLATE_ID>> = {{update_template_id}}\n<<TASK_CALENDAR_ID>> = {{calendar_id}}\n<<AGENT_ALIAS>> = {{agent_alias}}\n<<OWNER_ADDRESSES>> = {{owner_email}}"
+          "text": "<<JOB_BOARD_ID>> = {{sheet_id}}\n<<CLIENT_UPDATE_TEMPLATE_ID>> = {{update_template_id}}\n<<TASK_CALENDAR_ID>> = {{calendar_id}}\n<<AGENT_ALIAS>> = {{agent_alias}}\n<<OWNER_ADDRESSES>> = {{allowlist}}"
         }
       ],
       "checkbox_label": "The skill is uploaded",
@@ -381,7 +410,7 @@
     },
     {
       "title": "Create the Cowork scheduled task",
-      "instructions": "1. In Cowork, create a scheduled task.\n2. Cadence: hourly.\n3. Status: Active.\n4. Point it at the Sabrina runtime skill.\n5. Keep the prompt to three lines. The skill holds the rules.\n\nStart hourly. Make it faster only after the full test passes.",
+      "instructions": "1. In Cowork, create a scheduled task.\n2. Cadence: hourly.\n3. Status: Active.\n4. Point it at the {{agent_name}} runtime skill.\n5. Keep the prompt to three lines. The skill holds the rules.\n\nStart hourly. Make it faster only after the full test passes.",
       "checkbox_label": "The task is Active and hourly",
       "verify_hint": "The scheduled tasks list shows the task as Active with an hourly cadence."
     },
@@ -399,7 +428,7 @@
     },
     {
       "title": "TEST 3: Cowork smoke test",
-      "instructions": "Open a Cowork chat that has the Sabrina skill. Ask it to do these three things.\n1. Read one cell on the Job Board.\n2. Write one cell on the Job Board.\n3. Answer a question that only your account memory can answer. Use something that is not in the Sheet or Calendar, for example a saved writing-style preference.\n\nIf Cowork can read but cannot write, stop. The design needs both.",
+      "instructions": "Open a Cowork chat that has the {{agent_name}} skill. Ask it to do these three things.\n1. Read one cell on the Job Board.\n2. Write one cell on the Job Board.\n3. Answer a question that only your account memory can answer. Use something that is not in the Sheet or Calendar, for example a saved writing-style preference.\n\nIf Cowork can read but cannot write, stop. The design needs both.",
       "checkbox_label": "Cowork read, wrote and answered from memory",
       "verify_hint": "Open the Sheet. The cell you asked Cowork to write now holds the new value. Clear it afterward."
     },
@@ -417,7 +446,7 @@
     },
     {
       "title": "TEST 6: Gmail add-on",
-      "instructions": "1. Open any email that is not from Sabrina.\n2. Open the {{agent_name}} panel.\n3. Write a direction. Choose a lane. Choose Send to Sabrina.\n4. A notice says Sent to Sabrina, with a job ID.\n5. The panel now shows a job card with status and buttons.\n6. Choose Snooze 2d. The card confirms.\n7. Open the panel home. It shows 'Right now' with four numbers.\n\nCheck that a button and a typed reply do the same thing. Reply close to the job's email thread, on another job. It closes the same way.",
+      "instructions": "1. Open any email that is not from {{agent_name}}.\n2. Open the {{agent_name}} panel.\n3. Write a direction. Choose a lane. Choose Send to {{agent_name}}.\n4. A notice says Sent to {{agent_name}}, with a job ID.\n5. The panel now shows a job card with status and buttons.\n6. Choose Snooze 2d. The card confirms.\n7. Open the panel home. It shows 'Right now' with four numbers.\n\nCheck that a button and a typed reply do the same thing. Reply close to the job's email thread, on another job. It closes the same way.",
       "checkbox_label": "The panel sent a job and the buttons worked",
       "verify_hint": "The jobs tab shows the new row with the lane you chose in column 17, and the history tab shows 'Direction from Gmail add-on'."
     },
@@ -435,9 +464,9 @@
     },
     {
       "title": "TEST 9: Reply verbs and the overnight window",
-      "instructions": "Use the email from any open job. Reply with one word or phrase at a time. Check the Sheet after each.\n\n1. snooze 2d. The nudge_after cell moves two days out.\n2. waiting on Test Person. The status changes to awaiting_external.\n3. heavy. The status changes to scheduled. The run_after cell holds a time at or after HEAVY_START_HOUR in {{timezone}}. If it is already inside the window, it holds the current time.\n4. run now. The status returns to queued and run_after clears.\n5. close. The status changes to done.\n\nNow test the project verbs.\n6. On a lane's email, reply 'track {{lane1}} Test project'. A row appears on the projects tab. The reply is acknowledged.\n7. Reply 'untrack {{lane1}} Test project'. The row is marked inactive.\n\nThe overnight window comes from HEAVY_START_HOUR and HEAVY_END_HOUR, in the script time zone. If run_after shows the wrong hour, check appsscript.json and the two HEAVY properties.",
+      "instructions": "Use the email from any open job. Reply with one word or phrase at a time. Check the Sheet after each.\n\n1. snooze 2d. The nudge_after cell moves two days out.\n2. waiting on Test Person. The status changes to awaiting_external.\n3. heavy. The status changes to scheduled. The run_after cell holds a time at or after {{heavy_start_hour}}:00 in {{timezone}}. If it is already inside the window, it holds the current time.\n4. run now. The status returns to queued and run_after clears.\n5. close. The status changes to done.\n\nNow test the project verbs.\n6. On a lane's email, reply 'track {{lane1}} Test project'. A row appears on the projects tab. The reply is acknowledged.\n7. Reply 'untrack {{lane1}} Test project'. The row is marked inactive.\n\nThe overnight window comes from HEAVY_START_HOUR and HEAVY_END_HOUR, in the script time zone. If run_after shows the wrong hour, check appsscript.json and the two HEAVY properties.",
       "checkbox_label": "All verbs worked and run_after is correct",
-      "verify_hint": "Each verb adds a keyona entry on the history tab."
+      "verify_hint": "Each verb adds an owner entry on the history tab."
     },
     {
       "title": "TEST 10: Nothing dies quietly",
@@ -447,7 +476,7 @@
     },
     {
       "title": "TEST 11: A real call",
-      "instructions": "Run one real call transcript through the meeting flow.\n\n1. Hold a short call with a recurring invite. Use the note-taker you chose: {{note_taker}}.\n2. After the call, wait for the next Cowork run.\n3. The board shows one meeting_item row for each action item that belongs to the owner.\n4. Items Claude can do are queued. Items that need the owner are awaiting_human, each with an email.\n5. The client's Client Update doc now exists. It is still private.\n6. An approval ticket asks the owner to reply yes to share it.\n7. Reply yes. The doc attaches to the recurring invite.\n8. The client got no calendar or share email you did not expect.\n\nSabrina sends no recap. Google already sends one.",
+      "instructions": "Run one real call transcript through the meeting flow.\n\n1. Hold a short call with a recurring invite. Use the note-taker you chose: {{note_taker}}.\n2. After the call, wait for the next Cowork run.\n3. The board shows one meeting_item row for each action item that belongs to the owner.\n4. Items Claude can do are queued. Items that need the owner are awaiting_human, each with an email.\n5. The client's Client Update doc now exists. It is still private.\n6. An approval ticket asks the owner to reply yes to share it.\n7. Reply yes. The doc attaches to the recurring invite.\n8. The client got no calendar or share email you did not expect.\n\n{{agent_name}} sends no recap. Google already sends one.",
       "checkbox_label": "The meeting flow passed all eight checks",
       "verify_hint": "Open the doc's sharing settings before you reply yes. It must show Restricted."
     },

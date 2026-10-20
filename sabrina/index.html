@@ -81,6 +81,7 @@ td:first-child{width:38%;color:#4b5563}
   function val(k,depth){
     if(vals[k]!=null&&vals[k]!=='')return vals[k];
     var d=def(k);
+    if(d.join){return d.join.map(function(x){return val(x,(depth||0)+1);}).filter(Boolean).join(',');}
     if(d.derive&&!(depth>3)){
       var miss=false,out=String(d.derive).replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g,function(m,x){var v=val(x,(depth||0)+1);if(!v)miss=true;return v;});
       return miss?'':out;
@@ -114,7 +115,7 @@ td:first-child{width:38%;color:#4b5563}
     w4(0x04034b50);w2(20);w2(0x800);w2(0);w2(0);w2(0x21);w4(c);w4(bytes.length);w4(bytes.length);w2(nb.length);w2(0);u.set(nb,p);p+=nb.length;u.set(bytes,p);p+=bytes.length;
     var cd=p;w4(0x02014b50);w2(20);w2(20);w2(0x800);w2(0);w2(0);w2(0x21);w4(c);w4(bytes.length);w4(bytes.length);w2(nb.length);w2(0);w2(0);w2(0);w2(0);w4(0);w4(0);u.set(nb,p);p+=nb.length;
     var cl=p-cd;w4(0x06054b50);w2(0);w2(0);w2(1);w2(1);w4(cl);w4(cd);w2(0);return u;}
-  var SKILLMAP={AGENT_NAME:'agent_name',JOB_BOARD_ID:'sheet_id',CLIENT_UPDATE_TEMPLATE_ID:'update_template_id',TASK_CALENDAR_ID:'calendar_id',AGENT_ALIAS:'agent_alias',OWNER_ADDRESSES:'owner_email'};
+  var SKILLMAP={AGENT_NAME:'agent_name',JOB_BOARD_ID:'sheet_id',CLIENT_UPDATE_TEMPLATE_ID:'update_template_id',TASK_CALENDAR_ID:'calendar_id',AGENT_ALIAS:'agent_alias',OWNER_ADDRESSES:'allowlist'};
   function buildSkill(){
     var msg=document.getElementById('skmsg');
     fetch('skill-template.md').then(function(r){return r.text();}).then(function(t){
@@ -180,7 +181,7 @@ td:first-child{width:38%;color:#4b5563}
     var t=document.getElementById('impBox').value.trim(),o={},ok=0,skip=[];
     try{if(t.charAt(0)==='{')o=JSON.parse(t);else t.split(/\r?\n/).forEach(function(l){var m=l.match(/^\s*([a-zA-Z0-9_]+)\s*[=:]\s*(.*)$/);if(m)o[m[1]]=m[2].replace(/^["']|["']$/g,'').trim();});}catch(e){document.getElementById('impMsg').textContent='Could not read that text.';return;}
     Object.keys(o).forEach(function(k){
-      var known=(data.variables||[]).some(function(v){return v.key===k&&!v.derive;}),v=String(o[k]==null?'':o[k]).trim();
+      var known=(data.variables||[]).some(function(v){return v.key===k&&!v.derive&&!v.join;}),v=String(o[k]==null?'':o[k]).trim();
       if(!known||!v){return;}
       if(check(k,v)){skip.push(k);return;}
       vals[k]=v;ok++;

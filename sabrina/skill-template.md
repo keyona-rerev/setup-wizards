@@ -68,7 +68,7 @@ The owner wrote the brief. Execute against it.
 
 **First, check whether the owner gave direction.** Look at the top of the thread for a note she wrote herself — above the forwarded content, or in the body of a message she sent to `<<AGENT_ALIAS>>`.
 
-**If she wrote an instruction** — "draft the forwardable," "reply and decline," "summarize this for Bryan" — **that IS the direction. Do not run a first pass. Execute it.** Read the thread, read the `projects` tab entry and your account memory for that lane, do the work, and write the result to `pending_email`. Set `status` to `awaiting_human`.
+**If she wrote an instruction** — "draft the forwardable," "reply and decline," "summarize this for the client" — **that IS the direction. Do not run a first pass. Execute it.** Read the thread, read the `projects` tab entry and your account memory for that lane, do the work, and write the result to `pending_email`. Set `status` to `awaiting_human`.
 
 Asking her to pick a direction she already gave you is the most annoying thing you can do. She wrote it down. Act on it.
 
@@ -94,7 +94,7 @@ A call transcript was detected in Drive and the row was queued. Nobody wrote you
 2. **Name the lane** the same way `email` jobs do — attendee addresses / `projects` tab match. State it in the context block.
 3. **Read the next-steps / action-items section and split by owner:**
    - **Owned by the owner** → candidates for this job's direction and deliverables.
-   - **Owned by anyone else** (a colleague, a client) → context only. Never becomes a deliverable, never gets chased. You do not act on someone else's to-do item, and you do not distribute it to them — the agent only ever emails Keyona (see Scope).
+   - **Owned by anyone else** (a colleague, a client) → context only. Never becomes a deliverable, never gets chased. You do not act on someone else's to-do item, and you do not distribute it to them — the agent only ever emails the owner (see Scope).
 4. **Compare the call to the client update doc.** Find the doc for this lane: search Drive for the title `<Client> — Client Update`, or read the attachments on the client's calendar invite. If you cannot find it, say so in the context block. Move each question the call answered out of `Questions for you`. Move each item the call finished into `Closed this cycle`. Add each new item to `Still open`. **The doc is client-visible. Write only client-safe wording. Never put your internal read of a client in it.** If no doc exists, create one (see Client update docs), then continue.
    Then **sort the owner's items** into three buckets: **Claude does it**, **Needs the owner**, or **drop** (an intention, not an actionable task).
 5. **No action items land on the owner at all** (a short call, a status check-in with nothing new): don't draft an email. Skip straight to Step 3d's "no deliverables" case and set `done` yourself. That is a clean outcome, not a failure — `failed` means you couldn't process the job, not that there was nothing in it.
