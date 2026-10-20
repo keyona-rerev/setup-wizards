@@ -106,6 +106,25 @@ td:first-child{width:38%;color:#4b5563}
     for(var j=0;j<c.length;j++)if(check(c[j],val(c[j])))return false;
     return true;
   }
+
+  function crc32(b){var t=crc32.t;if(!t){t=crc32.t=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}}var r=-1;for(var j=0;j<b.length;j++)r=t[(r^b[j])&255]^(r>>>8);return(r^-1)>>>0;}
+  function zipOne(name,bytes){
+    var nb=new TextEncoder().encode(name),c=crc32(bytes),L=30+nb.length,o=new DataView(new ArrayBuffer(L+bytes.length+46+nb.length+22)),p=0,u=new Uint8Array(o.buffer);
+    function w2(v){o.setUint16(p,v,true);p+=2;}function w4(v){o.setUint32(p,v,true);p+=4;}
+    w4(0x04034b50);w2(20);w2(0x800);w2(0);w2(0);w2(0x21);w4(c);w4(bytes.length);w4(bytes.length);w2(nb.length);w2(0);u.set(nb,p);p+=nb.length;u.set(bytes,p);p+=bytes.length;
+    var cd=p;w4(0x02014b50);w2(20);w2(20);w2(0x800);w2(0);w2(0);w2(0x21);w4(c);w4(bytes.length);w4(bytes.length);w2(nb.length);w2(0);w2(0);w2(0);w2(0);w4(0);w4(0);u.set(nb,p);p+=nb.length;
+    var cl=p-cd;w4(0x06054b50);w2(0);w2(0);w2(1);w2(1);w4(cl);w4(cd);w2(0);return u;}
+  var SKILLMAP={JOB_BOARD_ID:'sheet_id',CLIENT_UPDATE_TEMPLATE_ID:'update_template_id',TASK_CALENDAR_ID:'calendar_id',AGENT_ALIAS:'agent_alias',OWNER_ADDRESSES:'owner_email'};
+  function buildSkill(){
+    var msg=document.getElementById('skmsg');
+    fetch('skill-template.md').then(function(r){return r.text();}).then(function(t){
+      var miss=[];
+      t=t.replace(/<<([A-Z_]+)>>/g,function(m,k){var v=SKILLMAP[k]&&val(SKILLMAP[k]);if(!v){if(miss.indexOf(k)<0)miss.push(k);return m;}return v;});
+      var z=zipOne('task-agent-runtime/SKILL.md',new TextEncoder().encode(t)),a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([z],{type:'application/zip'}));a.download='task-agent-runtime.zip';document.body.appendChild(a);a.click();a.remove();
+      msg.textContent=miss.length?'Downloaded, but these values are missing: '+miss.join(', ')+'. Fill them in, then download again.':'Downloaded. Every placeholder is filled.';
+    }).catch(function(){msg.textContent='Could not build the zip. Use the manual route above.';});
+  }
   function renderVals(){
     var ks=(data.variables||[]).map(function(v){return v.key;});
     var filled=ks.filter(function(k){return val(k);}).length;
@@ -126,6 +145,7 @@ td:first-child{width:38%;color:#4b5563}
     (s.copy||[]).forEach(function(b,bi){
       h+='<div class="copy"><span class="lbl">'+esc(b.label||'Copy')+'</span><span id="cp'+bi+'">'+sub(esc(b.text),true)+'</span><button data-cp="'+bi+'">Copy</button></div>';
     });
+    if(s.download_skill)h+='<div class="copy"><span class="lbl">Skill zip</span><span id="skmsg">Fills in your values for you.</span><button id="skbtn">Download finished skill</button></div>';
     if(s.verify_hint)h+='<div class="hint">How to check: '+sub(esc(s.verify_hint),true)+'</div>';
     h+='<label class="chk"><input type="checkbox" id="ck"'+(done[i]?' checked':'')+'> '+esc(s.checkbox_label||'I did this step')+'</label>';
     document.getElementById('card').innerHTML=h;
@@ -145,6 +165,7 @@ td:first-child{width:38%;color:#4b5563}
       b.onclick=function(){var t=sub(s.copy[+b.getAttribute('data-cp')].text,false);
         try{navigator.clipboard.writeText(t);b.textContent='Copied';setTimeout(function(){b.textContent='Copy';},1200);}catch(e){}};
     });
+    var sb=document.getElementById('skbtn');if(sb)sb.onclick=buildSkill;
     document.getElementById('back').disabled=i===0;
     document.getElementById('next').disabled=i===n-1;
     renderVals();
