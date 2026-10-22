@@ -35,7 +35,7 @@ Upgrade steps page for Insight Forge: https://insight-forge-setup-wizard.netlify
 
 | Product | Version found | Behind current? |
 |---|---|---|
-| Insight Forge (repo `keyona-rerev/knowledge-loom-prismm`, Supabase `bzykoqpjbzaojpbroelu`) | 2026-06-13 (VERIFY) | yes (database upgrade 2026-09-02 not applied) |
+| Insight Forge (repo `keyona-rerev/knowledge-loom-prismm`, Prismm's own Supabase project) | 2026-06-13 (VERIFY) | yes (database upgrade 2026-09-02 not applied) |
 | Prismm Sequence Review (repo `keyona-rerev/prismm-sequence-review`) | 2026-07-17 (VERIFY, from commit dates) | no |
 | OR Booking Engine (repo `keyona-rerev/template-fork-custom-prismm-booking-`) | unknown: check the Apps Script deployment descriptions and the repo newest commit | unknown |
 
