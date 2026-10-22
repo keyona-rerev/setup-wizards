@@ -1,0 +1,145 @@
+{
+  "title": "Set up Wayfinder (project dashboard and Tool Registry)",
+  "intro": "Wayfinder is a dashboard that tracks your software projects. Each project has a Session Log, Build Diary, Rubric, Architecture Map, Consideration Mode, Tech Stack and Deep Test. A Kanban board shows each project as Building, Live, Parked or Blocked. The Tool Registry is the list of all your projects and their tools. Wayfinder is a static web page. It reads and writes a Supabase database directly. It has no server of its own. You will make your own copy of the code, your own Supabase project and your own web page. You do not get any of ReRev Labs data.",
+  "variables": [
+    {"key": "business_name", "label": "Your business or team name", "help": "Used only to name things in your own accounts.", "placeholder": "Acme Studio", "pattern": "^.{2,80}$", "pattern_error": "Enter 2 to 80 characters."},
+    {"key": "github_username", "label": "Your GitHub username", "help": "Your own GitHub user or organization name. It is in the address of your GitHub profile.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only (up to 39 characters)."},
+    {"key": "repo_name", "label": "Name of your Wayfinder repository", "help": "The name your fork will have. The default is wayfinder.", "placeholder": "wayfinder", "default": "wayfinder", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "supabase_project_ref", "label": "Your Supabase project reference", "help": "A 20-letter code. Find it in Supabase under Project Settings, then General, then Reference ID.", "placeholder": "abcdefghijklmnopqrst", "pattern": "^[a-z]{20}$", "pattern_error": "The reference is exactly 20 lowercase letters."},
+    {"key": "supabase_url", "label": "Your Supabase project URL", "help": "Built from your project reference.", "derive": "https://{{supabase_project_ref}}.supabase.co"},
+    {"key": "dashboard_url", "label": "Your dashboard web address", "help": "Built from your GitHub username and repository name.", "derive": "https://{{github_username}}.github.io/{{repo_name}}/"},
+    {"key": "first_project_repo", "label": "Repository of your first project to track", "help": "Use the form owner/repo. This is a repository you already own.", "placeholder": "your-github-name/your-first-project", "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$", "pattern_error": "Use the form owner/repo."},
+    {"key": "first_project_id", "label": "Project id that Wayfinder gave your first project", "help": "Wayfinder makes the id from the repository name in lowercase letters with hyphens. You see it after you add the project.", "placeholder": "your-first-project", "pattern": "^[a-z0-9][a-z0-9-_]{0,80}$", "pattern_error": "Use lowercase letters, numbers, hyphens and underscores."}
+  ],
+  "steps": [
+    {
+      "title": "Know what you need",
+      "instructions": "Read this list first. You need a free GitHub account. You need a free Supabase account. You need a computer with Git and Python 3 installed. You need one repository of your own to track as your first project. Enter the name of your business or team below. The wizard keeps it for later steps.\n\nThe setup takes about 45 minutes. You do the work in your own accounts.\n\nWayfinder has no login. Anyone who has your dashboard address can read and change your data. Step 5 explains this.",
+      "collect": ["business_name"],
+      "checkbox_label": "I have a GitHub account, a Supabase account, Git and Python 3.",
+      "verify_hint": "Type git --version and python3 --version (on Windows use python --version) in a terminal. Both must print a version number."
+    },
+    {
+      "title": "Fork the Wayfinder code",
+      "instructions": "Sign in to GitHub. Open the Wayfinder repository from ReRev Labs: keyona-rerev/wayfinder. Choose Fork, then Create a new fork. Choose your own account as the owner.\n\nEnter your GitHub username and the name you chose for the fork below. The default name is wayfinder. If you want another name, type it in the Repository name box on the fork page and below.",
+      "collect": ["github_username", "repo_name"],
+      "copy": [
+        {"label": "Source repository (the one you fork)", "text": "https://github.com/keyona-rerev/wayfinder"},
+        {"label": "Your fork address", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "My fork exists in my own GitHub account.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You must see index.html, assets, scripts and supabase in the file list."
+    },
+    {
+      "title": "Create your Supabase project",
+      "instructions": "Sign in to Supabase. Choose New project. Name it {{business_name}} Wayfinder. Choose a region near you. Set a database password and save it in your own password manager. Do not type the password into this wizard.\n\nWait until the project is ready. Open Project Settings, then General. Copy the Reference ID. Enter it below.",
+      "collect": ["supabase_project_ref"],
+      "checkbox_label": "My Supabase project is ready and I entered the reference.",
+      "verify_hint": "Open {{supabase_url}}/rest/v1/ in a browser. A short message about a missing API key is normal. A page that does not load means the reference is wrong."
+    },
+    {
+      "title": "Apply the database schema",
+      "instructions": "The schema file is in your fork. It makes 14 tables and turns on row level security.\n\n1. Open the file in your fork at the address below.\n2. Choose the Raw button. Select all text and copy it.\n3. In Supabase, open SQL Editor and choose New query.\n4. Paste the text. Choose Run.\n\nThe first lines of the file are a comment from the original author. They mention another project. Ignore them. Do not change anything else.\n\nDo not run any other SQL. Do not run scripts/migrate_tool_registry.py. That script holds the ReRev Labs project list, not yours.",
+      "copy": [
+        {"label": "Schema file in your fork", "text": "https://github.com/{{github_username}}/{{repo_name}}/blob/main/supabase/schema.sql"}
+      ],
+      "checkbox_label": "The SQL Editor said Success and I see the new tables.",
+      "verify_hint": "Open Table Editor in Supabase. You must see 14 tables, for example projects, rubric_lenses, diary_entries, github_repos and deep_test_items. If the run shows an error, the file may be partly applied. Ask ReRev Labs before you run it again."
+    },
+    {
+      "title": "Understand who can use your data",
+      "instructions": "Wayfinder uses the public anon API value of your Supabase project in the web page. The schema gives the anon role full read and write access to all 14 tables. This is by design. Wayfinder has no login.\n\nThis means: anyone who knows your dashboard address can read and change your Wayfinder data. Do not share the address. Do not put secrets, passwords or client data in Wayfinder. Use project names, notes and links only.\n\nIf you need real access control, add Supabase Auth and new row level security policies later. The code does not include this. VERIFY with ReRev Labs before you share the dashboard with other people.",
+      "checkbox_label": "I understand that the dashboard has no login.",
+      "verify_hint": "You must be able to say: whoever has my dashboard address can edit my data."
+    },
+    {
+      "title": "Find your anon public API value",
+      "instructions": "In Supabase, open Project Settings, then API. Find the value named anon public (it is a long text that starts with eyJ). Keep that page open. Do NOT copy the service_role value. Do NOT paste any of these values into this wizard.\n\nYou paste the anon public value only into your own config.js file in the next step.",
+      "checkbox_label": "I found the anon public value and I will not use the service_role value.",
+      "verify_hint": "The Project URL on that page must read {{supabase_url}}."
+    },
+    {
+      "title": "Point the dashboard at your Supabase project",
+      "instructions": "Your fork still holds the ReRev Labs settings in assets/config.js. You must replace them. If you skip this step, your dashboard shows ReRev Labs data and your scripts write to the wrong database.\n\n1. Open assets/config.js in your fork on GitHub. Choose the pencil icon.\n2. Replace the whole file with the text below.\n3. Replace PASTE_YOUR_OWN_ANON_PUBLIC_VALUE_HERE with your own anon public value from the previous step.\n4. Choose Commit changes.\n\nKeep the single quotes in place. The scripts read this file with a pattern that needs single quotes.",
+      "copy": [
+        {"label": "Address of the file to edit", "text": "https://github.com/{{github_username}}/{{repo_name}}/edit/main/assets/config.js"},
+        {"label": "New content of assets/config.js", "text": "window.WAYFINDER_CONFIG = {\n  SUPABASE_URL: '{{supabase_url}}',\n  SUPABASE_ANON_KEY: 'PASTE_YOUR_OWN_ANON_PUBLIC_VALUE_HERE'\n};\n"}
+      ],
+      "checkbox_label": "I committed my own config.js.",
+      "verify_hint": "Open the file in your fork. It must show {{supabase_url}} and your own long value. It must not show any other project address."
+    },
+    {
+      "title": "Turn on GitHub Pages",
+      "instructions": "In your fork, open Settings, then Pages. Under Build and deployment, set Source to Deploy from a branch. Set Branch to main and folder to / (root). Choose Save.\n\nThe repository must be public for free Pages on most plans. Wait 1 to 3 minutes for the first publish.",
+      "copy": [
+        {"label": "Pages settings address", "text": "https://github.com/{{github_username}}/{{repo_name}}/settings/pages"},
+        {"label": "Your dashboard address", "text": "{{dashboard_url}}"}
+      ],
+      "checkbox_label": "GitHub Pages says my site is live.",
+      "verify_hint": "Open {{dashboard_url}}. The Wayfinder page must load."
+    },
+    {
+      "title": "Test the empty dashboard",
+      "instructions": "Open {{dashboard_url}}. The Wayfinder Interface must load with no error message. An empty board is correct. The board shows only projects whose Architecture Map analysis is complete. You have none yet.\n\nOpen the browser console if you see a red error bar. A 401 or 404 error means config.js has a wrong URL or a wrong anon public value. Fix config.js and reload.",
+      "checkbox_label": "The dashboard loads and shows an empty board.",
+      "verify_hint": "In Supabase, open the Table Editor and the projects table. It must be empty. If it has rows, you are reading the wrong database."
+    },
+    {
+      "title": "Install the local tools",
+      "instructions": "The scripts run on your computer. They add your repositories and project maps to your Supabase project.\n\n1. Clone your fork to your computer.\n2. Install the map tool code-review-graph with pip.\n\nThe scripts read the Supabase address and anon public value from assets/config.js in the clone. Pull your fork again after step 7 so the clone has your own config.js.",
+      "copy": [
+        {"label": "Clone your fork", "text": "git clone https://github.com/{{github_username}}/{{repo_name}}.git"},
+        {"label": "Go into the folder", "text": "cd {{repo_name}}"},
+        {"label": "Install the map tool", "text": "pip install code-review-graph"}
+      ],
+      "checkbox_label": "The clone exists and pip finished without errors.",
+      "verify_hint": "Open assets/config.js in your clone. It must show {{supabase_url}}."
+    },
+    {
+      "title": "Sync your GitHub repositories",
+      "instructions": "This script copies the list of your GitHub repositories into the github_repos table. The dashboard uses that list for the Awaiting Analysis page.\n\n1. In GitHub, open Settings, Developer settings, Personal access tokens. Make a token that can read your repositories.\n2. Set the token as an environment variable in your own terminal only. Replace PASTE_YOUR_OWN_VALUE_HERE with your token. Never put it in a file, in config.js or in this wizard.\n3. Run the sync script from the repository folder.\n4. Delete the token when you finish if you do not need it again.",
+      "copy": [
+        {"label": "Set the variable (Windows PowerShell)", "text": "$env:GITHUB_TOKEN = \"PASTE_YOUR_OWN_VALUE_HERE\""},
+        {"label": "Set the variable (Mac or Linux)", "text": "export GITHUB_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"},
+        {"label": "Run the sync", "text": "python3 scripts/sync_github_repos.py --owner-type owner"}
+      ],
+      "checkbox_label": "The script printed how many repositories it synced.",
+      "verify_hint": "In Supabase, open the github_repos table. It must hold your repositories. On Windows, use python in place of python3 if python3 is not found."
+    },
+    {
+      "title": "Add your first project",
+      "instructions": "1. Open {{dashboard_url}}.\n2. Open the Awaiting Analysis page (the repository icon in the left rail).\n3. Find your first project repository in the list.\n4. Choose Add to Wayfinder.\n\nWayfinder makes a project with a default four-lens Rubric, status Building and venture Unassigned. The project id comes from the repository name. Wayfinder opens the new project page. Read the id from the project record in the Supabase projects table (column id).\n\nEnter the repository and the id below.",
+      "collect": ["first_project_repo", "first_project_id"],
+      "checkbox_label": "My project exists in the projects table with status Building.",
+      "verify_hint": "In Supabase, the projects table must show one row with id {{first_project_id}} and repo_full_name {{first_project_repo}}. The project stays on the Awaiting Analysis page until step 13."
+    },
+    {
+      "title": "Run the Architecture Map for the project",
+      "instructions": "The board lists a project only after its analysis is complete. This script builds the map and sets the status.\n\n1. Clone the project repository next to your Wayfinder folder.\n2. Go back to the Wayfinder folder.\n3. Run the import script.\n\nThe script runs code-review-graph on the project and loads the file graph into your Supabase project. It sets the status to running, then complete. A repository that is mostly HTML gives a thin map, because the tool cannot read inside HTML files.",
+      "copy": [
+        {"label": "Clone the project (run in the parent folder)", "text": "git clone https://github.com/{{first_project_repo}}.git"},
+        {"label": "Run the import (run in the Wayfinder folder)", "text": "python3 scripts/import_architecture_graph.py --repo ../PROJECT_FOLDER_NAME --project-id {{first_project_id}}"}
+      ],
+      "checkbox_label": "The import finished and the project shows on the board.",
+      "verify_hint": "Reload {{dashboard_url}}. Your project must appear on the Kanban board. Replace PROJECT_FOLDER_NAME with the folder name that git clone made. If the status shows failed, read the error text in the projects table, column analysis_error."
+    },
+    {
+      "title": "Use Wayfinder every day",
+      "instructions": "Open your project page. Use the modules like this.\n\n- Session Log: save a link and bullet notes for each work session.\n- Build Diary: write process notes and feature ideas.\n- Rubric: run it before you push. Check your change against the four lenses.\n- Consideration Mode: pick a file you want to change. See what else it affects.\n- Tech Stack: add a link for each service the project uses.\n- Deep Test: run it at a milestone. A project earns Live only after it passes.\n\nThe Build Diary form shows the author name Keyona Meeks as the default for Keyona entries. This name is in the original code. Use the client source option, or edit index.html in your fork. VERIFY with ReRev Labs.\n\nTo log the blast radius of a change, run the command below in the Wayfinder folder.",
+      "copy": [
+        {"label": "Log a Consideration", "text": "python3 scripts/log_consideration.py --project-id {{first_project_id}} --file PATH/TO/FILE_IN_PROJECT --label \"Short description of the change\""}
+      ],
+      "checkbox_label": "I opened every module on my first project.",
+      "verify_hint": "Add one Build Diary entry. It must show on the project page after you reload."
+    },
+    {
+      "title": "Update Wayfinder later",
+      "instructions": "ReRev Labs lists each change on the version history page. Open it and compare it with your fork. Your version is the date of the newest commit that your fork has from keyona-rerev/wayfinder.\n\nTo update: on your fork page, choose Sync fork, then Update branch. Check that assets/config.js still holds your own values. Sync fork keeps your own change if the upstream file did not change. Apply any database step that the history page lists. Back up your data first (Supabase, Database, Backups).",
+      "copy": [
+        {"label": "Your fork page", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "I know where the version history is and how to sync my fork.",
+      "verify_hint": "Open the version history page of this wizard (history.html). It lists the newest version and its upgrade steps."
+    }
+  ]
+}
