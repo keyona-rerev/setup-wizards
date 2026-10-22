@@ -9,5 +9,5 @@ product_repo: keyona-rerev/gas-dev-mcp (default branch master, no README, no tag
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (README created on master, commit 1902d4c)
-- [ ] 10 history lines logged
+- [x] 10 history lines logged
 notes: Audit facts: index.mjs v2.2.0 (Streamable HTTP, /mcp and /health), env GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, PORT; get-token.mjs one-time OAuth on localhost:3456; scopes script.projects, script.deployments, drive.readonly. Gaps: /mcp has no auth; node_modules committed; no README.
