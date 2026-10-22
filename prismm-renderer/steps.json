@@ -1,0 +1,88 @@
+{
+  "title": "Prismm Renderer: setup wizard",
+  "intro": "Prismm Renderer is a small web service. It turns a block of HTML into a PNG picture. A content tool sends HTML to the service. The service opens the HTML in a headless Chrome browser (Puppeteer) and takes a screenshot. It sends the picture back as base64 text. The default size is 1200 by 627 pixels, which fits a LinkedIn post. The caller can ask for other sizes. The service has two routes: POST /render and GET /health. A secret header protects /render. You run the service on your own host (Railway in this wizard). Plan for about 20 minutes.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "Used only to label things in this wizard.", "placeholder": "Acme Studio", "optional": true},
+    {"key": "github_username", "label": "Your GitHub username", "help": "The GitHub account that will own your copy of the code.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]{1,39}$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "repo_name", "label": "Name for your copy of the repo", "help": "Any name you like.", "placeholder": "prismm-renderer", "default": "prismm-renderer", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "railway_project_name", "label": "Railway project name", "help": "The name of the Railway project you will create.", "placeholder": "renderer", "default": "renderer"},
+    {"key": "app_url", "label": "Your public service URL", "help": "Railway shows this after you generate a domain. It starts with https://.", "placeholder": "https://renderer-production.up.railway.app", "pattern": "^https://[^\\s/]+$", "pattern_error": "Enter the URL with https:// and no slash at the end."},
+    {"key": "render_url", "label": "Render address", "derive": "{{app_url}}/render"},
+    {"key": "health_url", "label": "Health address", "derive": "{{app_url}}/health"}
+  ],
+  "steps": [
+    {
+      "title": "Know what you are building",
+      "instructions": "You will make your own copy of the Prismm Renderer code. You will run it on Railway. You will protect it with a secret value that only you know. Then you will test it. Your content tool will call POST /render with a JSON body. The body holds html and, if you want, width and height. The service answers with success, image (base64 text) and mimeType (image/png). This service has no connection to Claude. Your own content tool or automation calls it.",
+      "checkbox_label": "I understand what I will build."
+    },
+    {
+      "title": "Get your accounts ready",
+      "instructions": "You need two accounts. A GitHub account holds the code. A Railway account (railway.com) runs the service. Railway is a paid host. Check its current pricing before you start. Never share any password or secret with ReRev Labs.",
+      "checkbox_label": "My accounts are ready."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Fill in the fields below. The wizard reuses them in later steps. These are public names. Do not enter any password or secret here.",
+      "collect": ["business_name", "github_username", "repo_name", "railway_project_name"],
+      "checkbox_label": "I filled in my names."
+    },
+    {
+      "title": "Copy the code to your GitHub",
+      "instructions": "Open https://github.com/keyona-rerev/prismm-renderer in your browser. Click Fork. Choose your account {{github_username}}. Name the copy {{repo_name}}. The code must live in your own account so that you control updates. The main branch is named main.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see three files: Dockerfile, index.js and package.json.",
+      "checkbox_label": "My copy of the repo exists."
+    },
+    {
+      "title": "Make a secret value for your service",
+      "instructions": "The service is public on the internet. A secret value keeps strangers out. Without it, anyone could use your service to run Chrome. Use a password manager to make 40 or more random characters. Keep the value safe. You will paste it into Railway in a later step. Your content tool will send it in the x-api-key header. Do not paste it into this wizard. Do not put it in GitHub.",
+      "checkbox_label": "I made a secret value and saved it in my password manager."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "Sign in to Railway. Click New Project. Choose Deploy from GitHub repo. Allow Railway to see your repos if it asks. Choose {{github_username}}/{{repo_name}}. Open the project settings. Rename the project to {{railway_project_name}}. The repo has a Dockerfile. Railway uses it to build the service. The Dockerfile starts from the official Puppeteer image, which already has Chrome. The first build can run before you add the variable. That is fine.",
+      "copy": [
+        {"label": "Start command that the Dockerfile already sets (for your information)", "text": "node index.js"}
+      ],
+      "checkbox_label": "The Railway project is created and linked to my repo."
+    },
+    {
+      "title": "Add the variable in Railway",
+      "instructions": "Open your service in Railway. Click Variables. Add the variable below. Replace the placeholder with the secret value you made. Enter the value only inside Railway. Do not add PORT. Railway sets PORT by itself. Without this variable, the service refuses every render request.",
+      "copy": [
+        {"label": "Required variable", "text": "RENDER_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "checkbox_label": "I added RENDER_API_KEY in Railway."
+    },
+    {
+      "title": "Deploy and open a public address",
+      "instructions": "In Railway, open the service. Click Settings, then Networking. Click Generate Domain. Wait for the deploy to finish. The first build can take several minutes because the image is large. Copy the https address that Railway shows. Paste it below with no slash at the end.",
+      "collect": ["app_url"],
+      "verify_hint": "Open {{health_url}} in your browser. You see {\"status\":\"ok\"}.",
+      "checkbox_label": "The health address shows status ok."
+    },
+    {
+      "title": "Test a render",
+      "instructions": "Run the command below in a terminal. Replace the placeholder with your secret value. The command sends a small HTML page to {{render_url}}. A good answer starts with {\"success\":true. The image field holds a long base64 text. A wrong or missing secret gives {\"error\":\"Unauthorized\"}. A missing html field gives {\"error\":\"No HTML provided\"}.",
+      "copy": [
+        {"label": "Test render command", "text": "curl -s -X POST {{render_url}} -H \"Content-Type: application/json\" -H \"x-api-key: PASTE_YOUR_OWN_VALUE_HERE\" -d '{\"html\":\"<html><body style=\\\"margin:0;background:#0b3d91;color:#fff;font:64px sans-serif;display:flex;align-items:center;justify-content:center;height:100vh\\\">Hello</body></html>\",\"width\":1200,\"height\":627}' | head -c 120"},
+        {"label": "Request body fields (for your content tool)", "text": "{\"html\": \"<full HTML page as text>\", \"width\": 1200, \"height\": 627}"}
+      ],
+      "verify_hint": "The answer starts with {\"success\":true,\"image\":\"iVBOR (iVBOR is how a PNG starts in base64).",
+      "checkbox_label": "The test render returned success true."
+    },
+    {
+      "title": "Connect your content tool",
+      "instructions": "Your content tool must call {{render_url}} with a POST request. It must send the header x-api-key with your secret value. It must send a JSON body with html, and with width and height if you want a size other than 1200 by 627. Store the secret value inside your content tool's own secure settings. Decode the image field from base64 to get the PNG file. Set a time limit of at least 60 seconds on the call. The first render after a quiet period can be slow. Keep each HTML page self-contained. The service waits until the network is idle, so external fonts and pictures load if they are public.",
+      "checkbox_label": "My content tool calls the service and saves the PNG."
+    },
+    {
+      "title": "Keep it safe and up to date",
+      "instructions": "Never share the secret value or put it in a repo. Change it in Railway and in your content tool at the same time if you think it leaked. To update the service, open the version history page of this wizard. Compare the commit date on GitHub for your copy with the newest entry. If your copy is behind, use Sync fork on GitHub. Railway redeploys by itself after the sync.",
+      "copy": [
+        {"label": "Version history page", "text": "history.html (next to this wizard page)"}
+      ],
+      "checkbox_label": "I know how to check for updates."
+    }
+  ]
+}
