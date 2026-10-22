@@ -1,0 +1,290 @@
+{
+  "title": "Install Online Report Card",
+  "intro": "Online Report Card is a web tool for your business. A visitor enters a name, an email and a website. The tool searches the web and gives a graded report card of how that person shows up online. It saves the lead in your database. It emails the visitor a link to a shareable card. The tool has one web page, one share page and Netlify Functions. It stores data in a Postgres database that you host on Railway. You install it on your own accounts. You need about 60 minutes. You need a GitHub account, a Netlify account, a Railway account, a Cloudflare account, a Resend account and an Anthropic account with API access. The tool uses paid services. Each report card makes one Anthropic call with web search. You set a daily limit to control cost.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your business name",
+      "help": "This name goes on your copy of the tool.",
+      "placeholder": "Acme Consulting",
+      "pattern": "^[^<>{}]{2,80}$",
+      "pattern_error": "Use 2 to 80 characters. Do not use angle brackets."
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The GitHub account that will own your copy of the code.",
+      "placeholder": "your-username",
+      "pattern": "^[A-Za-z0-9-]{1,39}$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your GitHub repository",
+      "help": "You can keep the original name.",
+      "placeholder": "online-report-card",
+      "default": "online-report-card",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Name for your Railway project",
+      "help": "Railway holds your database. Pick any name.",
+      "placeholder": "report-card-backend",
+      "default": "report-card-backend",
+      "pattern": "^[A-Za-z0-9 _-]{1,60}$",
+      "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only."
+    },
+    {
+      "key": "postgrest_url",
+      "label": "Public URL of your PostgREST service",
+      "help": "Railway shows this URL after you add a public domain. Do not add a slash at the end.",
+      "placeholder": "https://your-postgrest.up.railway.app",
+      "pattern": "^https://[A-Za-z0-9.-]+$",
+      "pattern_error": "Start with https:// and do not end with a slash."
+    },
+    {
+      "key": "turnstile_site_id",
+      "label": "Turnstile site ID (public)",
+      "help": "Cloudflare shows two values. This is the public one called Site key. Do NOT enter the secret one here.",
+      "placeholder": "0x4AAAAAAAxxxxxxxxxxxxxx",
+      "pattern": "^0x[A-Za-z0-9_-]{10,60}$",
+      "pattern_error": "The public ID starts with 0x."
+    },
+    {
+      "key": "from_email",
+      "label": "Sender address for report emails",
+      "help": "Use an address on a domain that you verified in Resend. For a test, use onboarding@resend.dev.",
+      "placeholder": "reports@yourdomain.com",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a valid email address."
+    },
+    {
+      "key": "reply_to_email",
+      "label": "Reply-to address",
+      "help": "Visitors who reply to the report email write to this address.",
+      "placeholder": "you@yourdomain.com",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a valid email address."
+    },
+    {
+      "key": "contact_link",
+      "label": "Link for your Talk with me button",
+      "help": "The page shows a button near the bottom. Enter your own booking or contact page.",
+      "placeholder": "https://yourdomain.com/book",
+      "pattern": "^https://[^\\s]+$",
+      "pattern_error": "Start with https://"
+    },
+    {
+      "key": "daily_cap",
+      "label": "Maximum report cards per day",
+      "help": "This number limits your Anthropic cost. Start low, for example 20.",
+      "placeholder": "20",
+      "default": "20",
+      "pattern": "^[0-9]{1,5}$",
+      "pattern_error": "Enter a whole number."
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Name for your Netlify site",
+      "help": "This name becomes your web address. Use lowercase letters, numbers and hyphens.",
+      "placeholder": "my-report-card",
+      "pattern": "^[a-z0-9-]{3,60}$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "app_url",
+      "label": "Your tool address",
+      "help": "Built from your Netlify site name.",
+      "derive": "https://{{netlify_site_name}}.netlify.app"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check accounts and enter your names",
+      "instructions": "Open each service below and sign in. Create an account if you have none.\n\n1. GitHub: github.com\n2. Railway: railway.com\n3. Cloudflare: cloudflare.com (the free plan is enough)\n4. Resend: resend.com\n5. Netlify: netlify.com\n6. Anthropic Console: console.anthropic.com. Add billing there.\n\nThen enter your business name and GitHub username below. The wizard saves them in this browser only.",
+      "collect": [
+        "business_name",
+        "github_username"
+      ],
+      "checkbox_label": "I have all six accounts.",
+      "verify_hint": "You can sign in to all six services."
+    },
+    {
+      "title": "Copy the code to your GitHub",
+      "instructions": "The code is public. Fork it so that you own a copy.\n\n1. Open https://github.com/keyona-rerev/online-report-card\n2. Select Fork.\n3. Set the owner to {{github_username}}.\n4. Enter the repository name below and select Create fork.\n\nYour copy has these parts: index.html (the tool page), report.html (the share page), three Netlify Functions in netlify/functions, and schema.sql (the database).\n\nAlso choose the name of your Netlify site below. Step 6 and step 9 use it. Use lowercase letters, numbers and hyphens.",
+      "collect": [
+        "repo_name",
+        "netlify_site_name"
+      ],
+      "copy": [
+        {
+          "label": "Your fork address",
+          "text": "https://github.com/{{github_username}}/{{repo_name}}"
+        }
+      ],
+      "checkbox_label": "My fork exists on GitHub.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the files index.html, report.html and netlify.toml."
+    },
+    {
+      "title": "Create the database project on Railway",
+      "instructions": "The tool stores leads and reports in Postgres. A service named PostgREST gives the Netlify Functions web access to that database.\n\n1. In Railway, select New Project.\n2. Name the project with the name below.\n3. Add a Postgres service. Use the Postgres database option.\n4. Add a second service from the Docker image postgrest/postgrest.\n5. In the PostgREST service, open Variables and add the variables from the copy blocks. Use the Postgres connection URL from the Postgres service for the connection line. Paste the connection value only inside Railway.\n6. Redeploy the PostgREST service.",
+      "collect": [
+        "railway_project_name"
+      ],
+      "copy": [
+        {
+          "label": "PostgREST variable: connection",
+          "text": "PGRST_DB_URI=PASTE_YOUR_OWN_POSTGRES_CONNECTION_URL_HERE"
+        },
+        {
+          "label": "PostgREST variable: schema",
+          "text": "PGRST_DB_SCHEMAS=public"
+        },
+        {
+          "label": "PostgREST variable: role",
+          "text": "PGRST_DB_ANON_ROLE=postgres"
+        },
+        {
+          "label": "PostgREST variable: port",
+          "text": "PGRST_SERVER_PORT=3000"
+        }
+      ],
+      "checkbox_label": "The Postgres and PostgREST services both run in {{railway_project_name}}.",
+      "verify_hint": "Both services show Active in the Railway project {{railway_project_name}}. VERIFY: the original project uses a ready-made Railway template named postgrest-railway. You can use that template instead of the manual steps."
+    },
+    {
+      "title": "Create the database tables",
+      "instructions": "Run the schema file in your Postgres service.\n\n1. Open your copy of schema.sql on GitHub. Copy all of it.\n2. In Railway, open the Postgres service and select the Data tab.\n3. Paste the SQL into the query box and run it.\n\nThe tool uses the table report_cards. The file also creates four other tables. The other four are not needed for this tool.",
+      "copy": [
+        {
+          "label": "Address of schema.sql",
+          "text": "https://github.com/{{github_username}}/{{repo_name}}/blob/main/schema.sql"
+        }
+      ],
+      "checkbox_label": "The SQL ran with no error.",
+      "verify_hint": "In the Data tab you see the table report_cards."
+    },
+    {
+      "title": "Open the PostgREST service to the web",
+      "instructions": "The Netlify Functions call PostgREST over the web.\n\n1. Open the PostgREST service in Railway.\n2. Open Settings, then Networking.\n3. Select Generate Domain.\n4. Set the port to 3000 if Railway asks for a port.\n5. Copy the public URL. Enter it below with no slash at the end.\n\nSecurity note: this setup lets anyone who knows the URL read and write the tables. Keep the URL private. Never put it in a page that visitors can read. Only the Netlify Functions use it. Ask a developer to add a limited database role if you store sensitive data.",
+      "collect": [
+        "postgrest_url"
+      ],
+      "copy": [
+        {
+          "label": "Test address",
+          "text": "{{postgrest_url}}/report_cards?limit=1"
+        }
+      ],
+      "checkbox_label": "The test address opens and shows [] in the browser.",
+      "verify_hint": "Open {{postgrest_url}}/report_cards?limit=1. You see [] (an empty list)."
+    },
+    {
+      "title": "Set up the Cloudflare Turnstile bot check",
+      "instructions": "Turnstile stops bots from using up your budget.\n\n1. In Cloudflare, open Turnstile.\n2. Select Add widget.\n3. Add your tool address as the domain. Use the address in the copy block below, without https://.\n4. Create the widget.\n5. Cloudflare shows a Site key (public) and a Secret key. Enter the public Site key below. Keep the secret key in Cloudflare until step 9.\n\nThen edit index.html in your GitHub fork. Find the text data-sitekey in the line with class cf-turnstile. Replace the old value with your public Site key.",
+      "collect": [
+        "turnstile_site_id"
+      ],
+      "copy": [
+        {
+          "label": "Domain for the widget",
+          "text": "{{netlify_site_name}}.netlify.app"
+        },
+        {
+          "label": "The line to edit in index.html",
+          "text": "<div class=\"cf-turnstile\" data-sitekey=\"{{turnstile_site_id}}\" data-theme=\"dark\"></div>"
+        }
+      ],
+      "checkbox_label": "index.html now holds my own Turnstile site key.",
+      "verify_hint": "In GitHub, open index.html in your fork. Search for data-sitekey. The value is {{turnstile_site_id}}."
+    },
+    {
+      "title": "Set up Resend for the report email",
+      "instructions": "Resend sends the report email. The email step is optional. The tool works without it.\n\n1. In Resend, open Domains and add your sending domain.\n2. Add the DNS records that Resend shows to your domain provider.\n3. Wait until Resend shows the domain as Verified.\n4. Open API Keys and create a key. Keep the key in Resend until step 9.\n\nFor a test, use onboarding@resend.dev as the sender. That sender only delivers to your own Resend account address.",
+      "collect": [
+        "from_email",
+        "reply_to_email"
+      ],
+      "checkbox_label": "My domain shows Verified in Resend, or I chose the test sender.",
+      "verify_hint": "Resend shows your domain as Verified. The sender is {{from_email}}."
+    },
+    {
+      "title": "Replace the original branding",
+      "instructions": "The original code has the name and links of the original owner. Change them to yours.\n\n1. In your fork, open index.html. Find the button with the text Talk with Keyona. Change the button text. Set its link (the href) to the contact address below.\n2. In index.html, search for ReRev and Keyona. Change the page copy to match {{business_name}}.\n3. Open netlify/functions/report.js. Find the email text. It ends with a signature line and the label ReRev Labs. Change both to {{business_name}}.\n4. Open report.html. Search for Keyona and ReRev. Change them the same way. VERIFY: the audit read index.html and report.js. It did not read report.html in full.\n\nCommit each change to the main branch.",
+      "collect": [
+        "contact_link"
+      ],
+      "copy": [
+        {
+          "label": "Your contact link",
+          "text": "{{contact_link}}"
+        }
+      ],
+      "checkbox_label": "I changed the branding in the files that I checked.",
+      "verify_hint": "The page and the email no longer show the original names."
+    },
+    {
+      "title": "Create the Netlify site and add settings",
+      "instructions": "1. In Netlify, select Add new project, then Import an existing project.\n2. Choose GitHub and select {{github_username}}/{{repo_name}}.\n3. Netlify reads the build settings from netlify.toml. Do not change them.\n4. Before you deploy, set the site name to {{netlify_site_name}} in Project configuration, then General. Enter your daily limit below.\n5. Open Project configuration, then Environment variables. Add each variable from the copy blocks.\n\nEnter the secret values only inside Netlify. Do not paste them in this wizard or in any file in GitHub.",
+      "collect": [
+        "daily_cap"
+      ],
+      "copy": [
+        {
+          "label": "Variable: Anthropic access",
+          "text": "ANTHROPIC_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "Variable: database address",
+          "text": "POSTGREST_URL={{postgrest_url}}"
+        },
+        {
+          "label": "Variable: Turnstile secret",
+          "text": "TURNSTILE_SECRET=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "Variable: daily limit",
+          "text": "DAILY_CAP={{daily_cap}}"
+        },
+        {
+          "label": "Variable: Resend access",
+          "text": "RESEND_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "Variable: sender",
+          "text": "EMAIL_FROM={{business_name}} <{{from_email}}>"
+        },
+        {
+          "label": "Variable: reply-to",
+          "text": "EMAIL_REPLY_TO={{reply_to_email}}"
+        }
+      ],
+      "checkbox_label": "All seven variables are saved in Netlify.",
+      "verify_hint": "Netlify, Environment variables, lists ANTHROPIC_API_KEY, POSTGREST_URL, TURNSTILE_SECRET, DAILY_CAP, RESEND_API_KEY, EMAIL_FROM and EMAIL_REPLY_TO. Your address is {{app_url}}."
+    },
+    {
+      "title": "Deploy and run a first test",
+      "instructions": "A variable change only takes effect on a new deploy.\n\n1. In Netlify, open Deploys and select Trigger deploy, then Deploy site.\n2. Wait until the deploy shows Published.\n3. Open your tool address.\n4. Enter a test name, an email address that you own, a website and a primary job. Complete the Turnstile check and run the report card.\n5. Wait up to one minute. A graded card appears.\n6. Open the share link under the card. The share page shows the same card.\n7. Check your inbox for the report email. Check your database: the table report_cards holds one new row.\n\nThe tool saves the same card for 30 days for the same email and the same jobs. To test again, use a different email address.",
+      "copy": [
+        {
+          "label": "Your tool address",
+          "text": "{{app_url}}"
+        },
+        {
+          "label": "Function check",
+          "text": "{{app_url}}/api/get-report?t=test"
+        }
+      ],
+      "checkbox_label": "A test report card ran and the share page opened.",
+      "verify_hint": "The address {{app_url}}/api/get-report?t=test shows Report not found. This means the functions and the database both answer. If it shows Not configured, check POSTGREST_URL and deploy again."
+    },
+    {
+      "title": "Update later",
+      "instructions": "The original code changes over time. To get a newer version:\n\n1. Open the version history page of this wizard. Find the newest version.\n2. Find your own version. Open your fork on GitHub and read the date of the newest commit.\n3. Compare the two. Follow the upgrade steps for each version that is newer than yours.\n4. In your fork, select Sync fork, then Update branch. Netlify deploys the change by itself.\n\nSync fork can overwrite your branding changes from step 8. Check index.html, report.html and report.js after each sync.",
+      "checkbox_label": "I know where to find the version history.",
+      "verify_hint": "You can open history.html in this wizard."
+    }
+  ]
+}
