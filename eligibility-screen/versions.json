@@ -1,0 +1,18 @@
+{
+  "product": "Eligibility Screen",
+  "current": "2026-10-22",
+  "how_to_find": "Open your copy of the repository on GitHub. Look at the date of the newest commit on the main branch. Compare it with the commit dates named in each version below. The database table is the same in every version listed here, so no database check is needed.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The product code in keyona-rerev/eligibility-screen has not changed since commit a2a80dc (2026-06-16, T033: full README). That commit is the newest one seen on the main branch. No git tags or releases were checked, so the version label is VERIFY.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Setup wizard for installing the Eligibility Screen on your own GitHub, Supabase, Netlify, Cloudflare and Resend accounts." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
