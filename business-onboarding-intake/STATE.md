@@ -9,5 +9,5 @@ product_repo: keyona-rerev/business-onboarding-intake
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit d3cb001c8da05f4bdbc2e7f975c01d9774b1e02d)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (Sheets MCP returned 'Server not initialized' 4 times; retry later)
 notes: Netlify functions + Supabase router table + per-business Railway Postgres. Router table DDL inferred from code (VERIFY).
