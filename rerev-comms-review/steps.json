@@ -1,0 +1,75 @@
+{
+  "title": "Set up ReRev Comms Review",
+  "intro": "ReRev Comms Review is a small web page that shows your marketing campaigns, audiences and content ideas in one place. It is a static site. It has no server and no database. The page reads JSON data files from your own GitHub repository. It is hosted on GitHub Pages. A shared password screen guards the page. This wizard helps you copy the tool to your own GitHub account and make it use your own data. The tool starts with sample data from ReRev Labs. You must replace that data with your own.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "The name that you want to show for your team.", "placeholder": "Acme Studio", "pattern": "^.{2,80}$", "pattern_error": "Enter 2 to 80 characters."},
+    {"key": "github_username", "label": "Your GitHub username", "help": "The name in your GitHub profile address.", "placeholder": "acme-studio", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters."},
+    {"key": "repo_name", "label": "New repository name", "help": "The name for your copy of the tool.", "placeholder": "comms-review", "default": "comms-review", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "pages_url", "label": "Your site address", "help": "GitHub Pages builds this address from your username and repository name.", "derive": "https://{{github_username}}.github.io/{{repo_name}}"},
+    {"key": "raw_url", "label": "Your data address", "help": "The page reads data files from this address.", "derive": "https://raw.githubusercontent.com/{{github_username}}/{{repo_name}}/main"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need one free GitHub account. You need a web browser. You do not need to pay for anything. You do not need to install software. Read the first paragraph of this page again if you want to know what the tool does. Then tick the box.",
+      "checkbox_label": "I have a GitHub account.",
+      "verify_hint": "Open github.com and confirm that you are signed in."
+    },
+    {
+      "title": "Enter your public values",
+      "instructions": "Enter your business name. Enter your GitHub username. Choose a name for your new repository. This wizard shows these values in later steps so that you do not type them again. Do not enter a password here.",
+      "collect": ["business_name", "github_username", "repo_name"],
+      "checkbox_label": "I entered my three values.",
+      "verify_hint": "The site address will be {{pages_url}}."
+    },
+    {
+      "title": "Get your own copy of the code",
+      "instructions": "Open the template repository link that ReRev Labs sent you. Click the green button named Use this template, or click Fork. Choose your account as the owner. Enter {{repo_name}} as the name. Make the repository Public. GitHub Pages needs a public repository on a free account. Click Create repository.",
+      "checkbox_label": "My new repository exists.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You must see the files index.html and campaigns.json."
+    },
+    {
+      "title": "Turn on GitHub Pages",
+      "instructions": "In your repository, click Settings. Click Pages in the left menu. Under Build and deployment, set Source to Deploy from a branch. Set Branch to main and the folder to / (root). Click Save. Wait one to two minutes for the first build.",
+      "checkbox_label": "GitHub Pages is on.",
+      "verify_hint": "Open {{pages_url}}. You must see a password screen."
+    },
+    {
+      "title": "Point the page to your own data",
+      "instructions": "The page file has two address lines and one password line. They still point to the ReRev Labs copy. Change them now. In your repository, open index.html. Click the pencil icon to edit. Use Ctrl+F to find the lines that start with const REPO_RAW and const PAGES_BASE. Replace the address inside the quotes with the values below. Keep the quotes.",
+      "copy": [
+        {"label": "REPO_RAW line", "text": "const REPO_RAW   = '{{raw_url}}';"},
+        {"label": "PAGES_BASE line", "text": "const PAGES_BASE = '{{pages_url}}';"}
+      ],
+      "checkbox_label": "I changed both address lines.",
+      "verify_hint": "Search index.html for keyona-rerev. Some links, such as the feedback link, may still use the old name. Replace each with {{github_username}}/{{repo_name}}. Do not commit yet."
+    },
+    {
+      "title": "Set your own page password",
+      "instructions": "The page has a built-in password. It is a shared gate only. It is not strong security. Anyone who views the page source can read it. Do not use it to protect private or sensitive data. Do not reuse a password from another account. In index.html, find the line that starts with const SITE_PASSWORD. Replace the text inside the quotes with a new password that you choose. Never share this password in a public place. Then scroll down and click Commit changes.",
+      "copy": [
+        {"label": "SITE_PASSWORD line", "text": "const SITE_PASSWORD = 'CHOOSE_YOUR_OWN_PASSWORD_HERE';"}
+      ],
+      "checkbox_label": "I set my own password and committed the change.",
+      "verify_hint": "Wait one minute. Open {{pages_url}}. Enter your new password. The old password must not work."
+    },
+    {
+      "title": "Remove the sample data",
+      "instructions": "The data files hold ReRev Labs sample content. Replace each file with your own content. Open each file in your repository and click the pencil icon. The files are campaigns.json, audiences.json, initiatives.json, content_formats.json, pipeline.json and rejections.json. Keep the same structure of each file. Change only the values. Delete the folder named assets if you do not need the sample email template. Commit each change. Remember that your repository is public. Do not put private contact details in these files.",
+      "checkbox_label": "I replaced the sample data with my own.",
+      "verify_hint": "Open each file. You must not see any ReRev Labs names or contacts."
+    },
+    {
+      "title": "Run your first test",
+      "instructions": "Open {{pages_url}}. Enter your password. Check that the Home, Campaigns, Audiences and Initiatives tabs load. Check that your own data shows. If you see an error or empty lists, press Ctrl+Shift+R to reload. Then check that the data files in your repository are valid JSON.",
+      "checkbox_label": "My data shows on the page.",
+      "verify_hint": "{{business_name}} data must show in the tabs. The page must not show any ReRev Labs data."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "To change your content, edit the JSON data files in your repository. The page reads the newest data each time that it loads. To get new versions of the tool, open the version history page. Compare your version with the newest version. Follow the upgrade steps that the history page shows. Keep your own address lines and password when you update index.html.",
+      "checkbox_label": "I know where to find the version history.",
+      "verify_hint": "Open the history link on this wizard. You must see a list of versions."
+    }
+  ]
+}
