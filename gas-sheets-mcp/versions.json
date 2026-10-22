@@ -1,0 +1,33 @@
+{
+  "product": "GAS Sheets MCP",
+  "current": "2026-04-22",
+  "how_to_find": "Open your fork on GitHub and look at the date of the newest commit in the master branch. Match it to the versions below. VERIFY: the repository has no tags or releases that the tools could list, and package.json still says version 1.0.0.",
+  "versions": [
+    {
+      "id": "2026-04-22",
+      "date": "2026-04-22",
+      "title": "Streamable HTTP transport",
+      "summary": "Commit 62c778c: the server moved from SSE to Streamable HTTP, because Claude deprecated SSE in April 2026. VERIFY: the version name is inferred from the commit date and message.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Changed", "text": "The MCP address is now your Railway URL followed by /mcp, using Streamable HTTP instead of SSE."},
+        {"kind": "Added", "text": "A /health address that returns status ok. VERIFY: it exists in the current code; the exact commit that added it is not confirmed."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "On GitHub, open your fork and choose Sync fork. Railway redeploys by itself."},
+        {"title": "Change the connector address in Claude", "text": "Open Settings, then Connectors. Edit the connector. Set the address to your Railway URL followed by /mcp. Remove any old SSE address."}
+      ]
+    },
+    {
+      "id": "2026-03-14",
+      "date": "2026-03-14",
+      "title": "First commit",
+      "summary": "Commit a62953e: first version of the Node.js server that sends requests to an Apps Script web app, using SSE transport. VERIFY: the version name and contents are inferred from the commit date.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "Spreadsheet tools for Claude: list, create, read, write, find, update and delete."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
