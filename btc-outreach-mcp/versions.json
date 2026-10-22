@@ -1,0 +1,60 @@
+{
+  "product": "BTC Outreach MCP",
+  "current": "2026-10-13",
+  "how_to_find": "Open your fork on GitHub and read the date of the newest commit on the main page. Compare it with the dates below. You can also call the /health address of your Railway service. It shows a version number. VERIFY: the health version is hard-coded in server.js and package.json still shows 1.0.0.",
+  "versions": [
+    {
+      "id": "2026-10-13",
+      "date": "2026-10-13",
+      "title": "Read, search, label and draft-management tools (v1.3.0)",
+      "summary": "Newest commit 8b1368d on 2026-10-13. The commit message names v1.3.0. The create_draft tool is unchanged. The Apps Script file gas/McpActions.gs was added in commit 8f61f15 on the same day.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Tools search_threads, get_thread, get_message, list_labels, list_drafts, get_draft, update_draft, delete_draft, create_reply_draft and label_thread."},
+        {"kind": "Added", "text": "Apps Script file gas/McpActions.gs. It needs a Script Property named MCP_SECRET."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "On GitHub, open your fork and choose Sync fork. Railway redeploys by itself."},
+        {"title": "Update Apps Script", "text": "Add the new McpActions.gs content to your project. Set MCP_SECRET. Run mcpAuthorize once. Deploy a new version of your existing deployment."}
+      ]
+    },
+    {
+      "id": "2026-08-26",
+      "date": "2026-08-26",
+      "title": "More create_draft fields",
+      "summary": "Commit 6e16199 on 2026-08-26 exposed htmlBody, cc, bcc, replyTo and sender name on create_draft. VERIFY: date taken from the commit date only.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "create_draft accepts htmlBody, cc, bcc, replyTo and name."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "Sync your fork on GitHub. Railway redeploys. The Apps Script create_draft handler must read the new fields. VERIFY with ReRev Labs."}
+      ]
+    },
+    {
+      "id": "2026-04-21",
+      "date": "2026-04-21",
+      "title": "Label option on create_draft",
+      "summary": "Commit c37bdbd on 2026-04-21 added an optional label parameter. VERIFY: date taken from the commit date only.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Optional label on create_draft. A missing label is created."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "Sync your fork on GitHub. Railway redeploys. The Apps Script handler must apply the label. VERIFY with ReRev Labs."}
+      ]
+    },
+    {
+      "id": "2026-04-11",
+      "date": "2026-04-11",
+      "title": "First version with streamable HTTP",
+      "summary": "Initial commit d1efa9c and commit 5d2ad74 (switch to streamable HTTP transport) both dated 2026-04-11. VERIFY: date taken from the commit date only.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "Node.js MCP server with create_draft, forwarding to an Apps Script web app."},
+        {"kind": "Changed", "text": "Transport changed to streamable HTTP."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
