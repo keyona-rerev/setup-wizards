@@ -1,0 +1,131 @@
+{
+  "title": "Google Tasks MCP for Claude: setup wizard",
+  "intro": "This tool lets Claude read and change your Google Tasks. Claude can list your task lists, list tasks, create tasks, edit tasks, complete tasks and delete tasks. The tool has two parts. The first part is a small Google Apps Script web app in your own Google account. It talks to Google Tasks. The second part is a small server on Railway. It speaks MCP to Claude and calls your Apps Script web app. A password token that only you know protects the link between the two parts. Plan for about 30 minutes.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "Used only to label things in this wizard.", "placeholder": "Acme Studio", "optional": true},
+    {"key": "github_username", "label": "Your GitHub username", "help": "The GitHub account that will own your copy of the server code.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]{1,39}$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "repo_name", "label": "Name for your copy of the repo", "help": "Any name you like.", "placeholder": "gas-tasks-mcp", "default": "gas-tasks-mcp", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "railway_project_name", "label": "Railway project name", "help": "The name of the Railway project you will create.", "placeholder": "google-tasks-mcp", "default": "google-tasks-mcp"},
+    {"key": "connector_name", "label": "Name for the connector in Claude", "help": "The label you will see inside Claude.", "placeholder": "Google Tasks", "default": "Google Tasks"},
+    {"key": "gas_web_app_url", "label": "Your Apps Script web app URL", "help": "Google shows this after you deploy the web app. It ends with /exec.", "placeholder": "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec", "pattern": "^https://script\\.google\\.com/.+/exec$", "pattern_error": "Enter the full web app URL. It starts with https://script.google.com and ends with /exec."},
+    {"key": "app_url", "label": "Your public Railway server URL", "help": "Railway shows this after you generate a domain. It starts with https://.", "placeholder": "https://google-tasks-mcp-production.up.railway.app", "pattern": "^https://[^\\s/]+$", "pattern_error": "Enter the URL with https:// and no slash at the end."},
+    {"key": "mcp_url", "label": "MCP address", "derive": "{{app_url}}/mcp"},
+    {"key": "health_url", "label": "Health check address", "derive": "{{app_url}}/health"}
+  ],
+  "steps": [
+    {
+      "title": "Know what you are building",
+      "instructions": "You will build two parts. Part one is an Apps Script web app in your Google account. It reads and writes your Google Tasks. Part two is an MCP server that runs on Railway. Claude connects to part two. Part two calls part one. You will make one secret token. You will type the same token in two places. Both places are inside your own accounts. The tools Claude gets are: tasks_list_tasklists, tasks_list, tasks_create, tasks_update, tasks_complete and tasks_delete.",
+      "checkbox_label": "I understand what I will build."
+    },
+    {
+      "title": "Get your accounts ready",
+      "instructions": "You need three accounts. You need a Google account that holds the Google Tasks you want Claude to use. You need a GitHub account (github.com) to hold your copy of the server code. You need a Railway account (railway.com) to run the server. You also need a Claude plan that lets you add custom connectors. Sign in to all of them now. Railway may charge a small monthly fee. Check the Railway price page before you start.",
+      "checkbox_label": "I am signed in to Google, GitHub, Railway and Claude."
+    },
+    {
+      "title": "Choose your names",
+      "instructions": "Enter the values below. The wizard will fill them into the later steps for you. You enter each value one time. The wizard keeps them in this browser only. Do not enter any password or token here.",
+      "collect": ["business_name", "github_username", "repo_name", "railway_project_name", "connector_name"],
+      "checkbox_label": "I entered my names."
+    },
+    {
+      "title": "Make your own copy of the Apps Script project",
+      "instructions": "Open the template project link that ReRev Labs sent you. Then choose File, Make a copy. Google makes a new project in your own Drive. Open your copy. You should see one code file named Tasksapi. You should also see the project settings file called appsscript.json if you turn on Show appsscript.json in Project Settings. In the left panel, find Services. The Google Tasks API service must be on. Its name in the code is Tasks, version v1. If it is not on, choose Add a service, pick Google Tasks API, pick v1 and choose Add.",
+      "verify_hint": "Your copy shows a file named Tasksapi. The Services list shows Tasks.",
+      "checkbox_label": "I have my own copy of the project, and the Tasks service is on."
+    },
+    {
+      "title": "Set your secret token in Script Properties",
+      "instructions": "Make a long random string. Use 40 or more letters and numbers. This is your token. Keep it private. Do not type it in this wizard. In your Apps Script copy, open Project Settings (the gear icon). Scroll to Script Properties. Choose Add script property. Enter the property name from the copy block. Paste your token as the value. Choose Save script properties. Keep the token in your password manager. You need it again in the Railway step.",
+      "copy": [
+        {"label": "Script property name", "text": "GAS_TOKEN"},
+        {"label": "Script property value (make your own)", "text": "PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "verify_hint": "Script Properties shows one row named GAS_TOKEN.",
+      "checkbox_label": "I saved the GAS_TOKEN script property and stored the token safely."
+    },
+    {
+      "title": "Allow the script to use your Google Tasks",
+      "instructions": "Google must ask you for permission one time. In the code editor, choose the function listTasklists in the function list at the top. Choose Run. A permission window opens. Choose Review permissions. Pick your Google account. Read what the script asks to access. It should ask to see and manage your Google Tasks. Choose Allow. If Google shows a warning that the app is not verified, choose Advanced and then continue. This is your own script in your own account. The run should finish without an error.",
+      "verify_hint": "The execution log shows Execution completed.",
+      "checkbox_label": "I allowed the script and the run finished."
+    },
+    {
+      "title": "Deploy the web app",
+      "instructions": "Choose Deploy, then New deployment. Click the gear icon next to Select type. Choose Web app. Set Execute as to Me. Set Who has access to Anyone. The token protects the app, so Anyone is needed so the server can reach it. Choose Deploy. Copy the Web app URL. It ends with /exec. Enter it below. Later, if you change the code, you must make a new version in Manage deployments. A save alone does not update the live web app.",
+      "collect": ["gas_web_app_url"],
+      "verify_hint": "You have a URL that starts with https://script.google.com and ends with /exec.",
+      "checkbox_label": "I deployed the web app and entered its URL."
+    },
+    {
+      "title": "Test the web app with a ping",
+      "instructions": "Run the command in the copy block in a terminal. Replace PASTE_YOUR_OWN_VALUE_HERE with your token. The web app answers with JSON. A good answer holds success true and pong true. If you see Unauthorized, the token does not match the GAS_TOKEN script property. If you see an HTML page, the access setting is not Anyone. Fix the setting and deploy a new version.",
+      "copy": [
+        {"label": "Ping command", "text": "curl -L -X POST \"{{gas_web_app_url}}\" -H \"Content-Type: application/json\" -d \"{\\\"token\\\":\\\"PASTE_YOUR_OWN_VALUE_HERE\\\",\\\"action\\\":\\\"ping\\\"}\""}
+      ],
+      "verify_hint": "The answer holds \"success\":true and \"pong\":true.",
+      "checkbox_label": "The ping worked."
+    },
+    {
+      "title": "Fork the server code on GitHub",
+      "instructions": "Open the source repo. Choose Fork. Set the owner to {{github_username}}. Set the repository name to {{repo_name}}. Choose Create fork. Your copy now holds the files index.mjs, package.json and env.example. Do not add real values to any file in the repo.",
+      "copy": [
+        {"label": "Source repo", "text": "https://github.com/keyona-rerev/gas-tasks-mcp"},
+        {"label": "Your copy will be at", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "verify_hint": "The page https://github.com/{{github_username}}/{{repo_name}} shows index.mjs.",
+      "checkbox_label": "I forked the repo."
+    },
+    {
+      "title": "Deploy the server on Railway",
+      "instructions": "Open Railway. Choose New Project. Choose Deploy from GitHub repo. Pick {{github_username}}/{{repo_name}}. Name the project {{railway_project_name}}. Open the service, then open the Variables tab. Add the two variables in the copy blocks. For TASKS_GAS_TOKEN, paste the same token you made in the Script Properties step. Type secret values only inside Railway. Railway sets the PORT variable for you, so do not add PORT. Railway reads package.json and runs npm start. Wait for the deploy to finish. Then open Settings, then Networking, and choose Generate Domain. Copy the domain. Enter it below with https:// in front.",
+      "collect": ["app_url"],
+      "copy": [
+        {"label": "Railway variable 1", "text": "TASKS_GAS_URL={{gas_web_app_url}}"},
+        {"label": "Railway variable 2", "text": "TASKS_GAS_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"},
+        {"label": "Start command (if Railway asks)", "text": "npm start"}
+      ],
+      "verify_hint": "The Railway deploy shows Active. The logs show: Google Tasks MCP (Streamable HTTP) running on port.",
+      "checkbox_label": "The server is deployed and I entered its public URL."
+    },
+    {
+      "title": "Check that the server is healthy",
+      "instructions": "Open the health address in a browser. You should see a short JSON answer. If the page does not load, open the Railway logs. The server stops at start if TASKS_GAS_URL or TASKS_GAS_TOKEN is missing. The log then shows FATAL. Add the missing variable and redeploy.",
+      "copy": [
+        {"label": "Health address", "text": "{{health_url}}"}
+      ],
+      "verify_hint": "The page shows status ok, service google-tasks-mcp and transport streamable-http.",
+      "checkbox_label": "The health check shows ok."
+    },
+    {
+      "title": "Add the server to Claude",
+      "instructions": "Open Claude. Go to Settings, then Connectors. Choose Add custom connector. Enter the name and the MCP address from the copy blocks. Leave any sign-in fields empty. Choose Add. The server has no sign-in of its own. Anyone who knows your MCP address can use your tasks. Keep the address private. Do not post it or send it to other people. If your MCP address leaks, delete the Railway domain and make a new one.",
+      "copy": [
+        {"label": "Connector name", "text": "{{connector_name}}"},
+        {"label": "MCP address", "text": "{{mcp_url}}"}
+      ],
+      "verify_hint": "The connector list shows {{connector_name}} with six tools.",
+      "checkbox_label": "I added the connector in Claude."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Open a new Claude chat. Turn on the connector. Send the first prompt. Claude should list your task lists. Then send the second prompt. Claude should create a test task. Check that the task appears in Google Tasks. Then send the third prompt to delete the test task.",
+      "copy": [
+        {"label": "Prompt 1", "text": "List my Google Task lists."},
+        {"label": "Prompt 2", "text": "Create a task called Wizard test in my first task list."},
+        {"label": "Prompt 3", "text": "Delete the task called Wizard test."}
+      ],
+      "verify_hint": "The test task appears in Google Tasks and then disappears.",
+      "checkbox_label": "The first test worked."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "Open the version history page to see what changed in each version. Find your own version with the how to find note on that page. To update the server, sync your fork on GitHub. Railway then deploys the new code. To update the Apps Script web app, copy the new code into your project. Then choose Deploy, Manage deployments, Edit, and pick New version. Keep your Script Properties and Railway variables as they are.",
+      "copy": [
+        {"label": "Version history page", "text": "history.html"}
+      ],
+      "checkbox_label": "I know where to find the version history."
+    }
+  ]
+}
