@@ -1,0 +1,38 @@
+{
+  "product": "I Have ADHD (Claude skill)",
+  "current": "2026-08-26",
+  "how_to_find": "Open the repo on GitHub. Read the version field in .claude-plugin/plugin.json. Also read the date of the newest commit on the main branch. The repo has no release tags that this wizard could confirm (VERIFY on the GitHub releases page).",
+  "versions": [
+    {
+      "id": "2026-08-26",
+      "date": "2026-08-26",
+      "title": "Hook, Pi config and docs updates after 0.2.0",
+      "summary": "Newest commit seen when this wizard was built: cbe69fb (2026-08-26) in keyona-rerev/i-have-adhd. The plugin.json version still reads 0.2.0. VERIFY: dates and changes come from commit messages, not from a release note.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Fixed", "text": "The SessionStart hook timeout is now 30 seconds (commit 43eeda8, 2026-08-18)." },
+        { "kind": "Added", "text": "A Pi config file with alwaysOn and hideStatus options (commit 04376f8, 2026-08-20)." },
+        { "kind": "Fixed", "text": "The alwaysOn option is declared for Pi (commit cf47132, 2026-08-26)." },
+        { "kind": "Added", "text": "Docs: contributing guide, agent repository guide and pull request template (2026-08-18)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Refresh the marketplace", "text": "Run the command, then restart Claude Code.", "copy": "claude plugin marketplace update i-have-adhd" }
+      ]
+    },
+    {
+      "id": "2026-08-17",
+      "date": "2026-08-17",
+      "title": "Version 0.2.0",
+      "summary": "Commit 7680ceb (2026-08-17) is titled version bump to 0.2.0. VERIFY: the older history before this date was not read in detail.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Added", "text": "OpenCode support was merged (pull request 110, 2026-08-17)." },
+        { "kind": "Fixed", "text": "The Codex SessionStart launcher was hardened (pull request 107, 2026-08-17)." },
+        { "kind": "Fixed", "text": "Hooks now fail open on context inspection errors (commit 75ee1c4, 2026-08-17)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Refresh the marketplace", "text": "Run the command, then restart Claude Code.", "copy": "claude plugin marketplace update i-have-adhd" }
+      ]
+    }
+  ]
+}
