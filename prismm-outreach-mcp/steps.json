@@ -1,0 +1,228 @@
+{
+  "title": "Set up Prismm Outreach MCP on your own accounts",
+  "intro": "Prismm Outreach MCP is a small server that lets Claude use one Gmail mailbox. Claude can create email drafts (plain text or HTML, with optional BCC). Claude can also search and read messages and threads. The server never sends email. You review each draft in Gmail and send it yourself. The server runs on your own Railway account. It uses your own Google Cloud project to reach Gmail. You add it to Claude as a custom connector. This wizard takes about 45 minutes. You need a GitHub account, a Railway account, a Google account for the mailbox, a Google Cloud project, and a Claude plan that supports custom connectors. Enter each secret only inside your own accounts. Never type a secret into this wizard.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your business name",
+      "help": "Used in names and labels in this wizard.",
+      "placeholder": "Acme Credit Union",
+      "pattern": "^.{2,80}$",
+      "pattern_error": "Enter 2 to 80 characters."
+    },
+    {
+      "key": "from_name",
+      "label": "Sender name for your drafts",
+      "help": "The name people see in the From line of each draft.",
+      "placeholder": "Jane Smith",
+      "pattern": "^[A-Za-z0-9 .,'-]{2,60}$",
+      "pattern_error": "Use letters, numbers, spaces and . , ' - only (2 to 60 characters)."
+    },
+    {
+      "key": "from_email",
+      "label": "Mailbox email address",
+      "help": "The Gmail or Google Workspace address Claude will use. You sign in with this address in step 8.",
+      "placeholder": "jane@yourcompany.com",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a full email address."
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The account that will own your copy of the code.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only (1 to 39 characters)."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name of your copy of the repository",
+      "help": "You can keep the default name.",
+      "placeholder": "outreach-mcp",
+      "default": "prismm-outreach-mcp",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Railway project name",
+      "help": "Any name you like. It only labels the project in Railway.",
+      "placeholder": "outreach-mcp",
+      "pattern": "^[A-Za-z0-9 _-]{2,60}$",
+      "pattern_error": "Use letters, numbers, spaces, hyphens and underscores (2 to 60 characters)."
+    },
+    {
+      "key": "app_url",
+      "label": "Your Railway public URL",
+      "help": "Railway shows it after you generate a domain in step 4. It starts with https:// and has no slash at the end.",
+      "placeholder": "https://your-app.up.railway.app",
+      "pattern": "^https://[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+      "pattern_error": "Enter the https:// URL with no path and no slash at the end."
+    },
+    {
+      "key": "redirect_uri",
+      "label": "Google redirect address",
+      "help": "Built from your Railway URL.",
+      "derive": "{{app_url}}/oauth/callback"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "Make sure you have these accounts before you start.\n\n1. A GitHub account.\n2. A Railway account (railway.com). Railway is a paid service. Check the current plan price on the Railway site.\n3. The Google or Google Workspace mailbox that Claude will use.\n4. A Google Cloud project (console.cloud.google.com). Use a project you own.\n5. A Claude plan that lets you add custom connectors.\n\nEnter the first three values below. The wizard fills them into later steps.",
+      "collect": ["business_name", "from_name", "from_email"],
+      "checkbox_label": "I have the accounts and I entered my values.",
+      "verify_hint": "You see {{business_name}} and {{from_email}} saved in this wizard."
+    },
+    {
+      "title": "Copy the code to your GitHub account",
+      "instructions": "Open the template repository link that ReRev Labs sent you. Choose Fork, or Use this template if the button exists. Pick your own GitHub account as the owner. Use the repository name you enter below. Keep the repository private.",
+      "collect": ["github_username", "repo_name"],
+      "checkbox_label": "My copy of the repository exists.",
+      "verify_hint": "You can open github.com/{{github_username}}/{{repo_name}} and you see server.js and package.json."
+    },
+    {
+      "title": "Set the sender name in the code",
+      "instructions": "The code writes the From line of every draft. The sender is fixed inside server.js. You must change it to your own details, or the drafts show the wrong sender.\n\n1. Open server.js in your repository on GitHub.\n2. Choose the pencil icon to edit.\n3. Find the line that starts with `From:` inside the `headers` list of the create_draft tool.\n4. Replace that whole line with the line below.\n5. Choose Commit changes.\n\nOptional: the server and tool texts also name the old mailbox owner. You can search server.js for the word Prismm and change those labels to {{business_name}}.",
+      "copy": [
+        {
+          "label": "Replacement From line",
+          "text": "`From: {{from_name}} <{{from_email}}>`,"
+        }
+      ],
+      "checkbox_label": "I changed the From line and committed.",
+      "verify_hint": "In server.js you see your own name and {{from_email}} on the From line. No other person's address is left there."
+    },
+    {
+      "title": "Create the Railway project and public URL",
+      "instructions": "1. Sign in to Railway.\n2. Choose New Project, then Deploy from GitHub repo.\n3. Allow Railway to read your repositories if it asks.\n4. Pick {{github_username}}/{{repo_name}}.\n5. Name the project {{railway_project_name}}.\n6. The first deploy will fail or stop. This is normal. The server refuses to start until you set a password variable in step 7.\n7. Open the service, then Settings, then Networking. Choose Generate Domain.\n8. Copy the URL that Railway shows. Enter it below. Do not add a slash at the end.\n\nRailway uses the `npm start` script from package.json. The server listens on the port that Railway gives it.",
+      "collect": ["railway_project_name", "app_url"],
+      "copy": [
+        {
+          "label": "Start command (Railway reads it from package.json)",
+          "text": "npm start"
+        }
+      ],
+      "checkbox_label": "My Railway project and public URL exist.",
+      "verify_hint": "Your URL is {{app_url}}. The service may show a crashed or failed deploy. You fix that in step 7."
+    },
+    {
+      "title": "Create the Google Cloud project settings",
+      "instructions": "1. Open console.cloud.google.com and pick your project.\n2. Open APIs and Services, then Library.\n3. Search for Gmail API and choose Enable.\n4. Open APIs and Services, then OAuth consent screen (or Google Auth Platform).\n5. If your mailbox is on Google Workspace and only your own company uses it, choose the Internal user type. Otherwise choose External.\n6. Enter an app name such as {{business_name}} Outreach. Enter your own support email.\n7. Add these two scopes. They allow draft creation and mailbox reading.\n8. If you chose External, add {{from_email}} as a test user.\n9. Save.\n\nWarning: an External app in Testing status can make Google expire the saved login after about 7 days. If you choose External, set the publishing status to In production after you finish. Google may then show an unverified app warning when you sign in. This is expected for your own use. VERIFY the current Google rules in the Google Cloud console before you choose.",
+      "copy": [
+        {
+          "label": "Scope 1 (create drafts)",
+          "text": "https://www.googleapis.com/auth/gmail.compose"
+        },
+        {
+          "label": "Scope 2 (read mail)",
+          "text": "https://www.googleapis.com/auth/gmail.readonly"
+        }
+      ],
+      "checkbox_label": "Gmail API is on and the consent screen is saved.",
+      "verify_hint": "The Gmail API page shows Enabled. The consent screen lists both scopes."
+    },
+    {
+      "title": "Create the Google OAuth client",
+      "instructions": "1. In Google Cloud, open APIs and Services, then Credentials.\n2. Choose Create Credentials, then OAuth client ID.\n3. Set Application type to Web application.\n4. Under Authorized redirect URIs, choose Add URI and paste the address below.\n5. Choose Create.\n6. Google shows a client ID and a client secret. Keep this window open, or download the JSON file and store it in your own password manager.\n\nDo not paste the client ID or the client secret into this wizard. You paste them into Railway in the next step.",
+      "copy": [
+        {
+          "label": "Authorized redirect URI",
+          "text": "{{redirect_uri}}"
+        }
+      ],
+      "checkbox_label": "I created the OAuth client and I have the client ID and client secret in a safe place.",
+      "verify_hint": "The Credentials page lists a Web application client. Its redirect URI is {{redirect_uri}}."
+    },
+    {
+      "title": "Set the variables in Railway",
+      "instructions": "1. Open your Railway service, then the Variables tab.\n2. Choose Raw Editor.\n3. Paste the block below.\n4. Replace each PASTE_YOUR_OWN_VALUE_HERE with your own value:\n   - MCP_AUTH_TOKEN: a long random password that you create. Make it at least 32 characters. Use the command below to make one. Save it in your password manager. You need it again in step 11.\n   - GOOGLE_CLIENT_ID: the client ID from step 6.\n   - GOOGLE_CLIENT_SECRET: the client secret from step 6.\n5. Keep GOOGLE_TOKENS as {} for now. You fill it in step 9.\n6. Save and let Railway deploy.\n\nThe server stops at start if MCP_AUTH_TOKEN is missing. This protects your mailbox.",
+      "copy": [
+        {
+          "label": "Command to make a random password (run it in a terminal that has Node.js)",
+          "text": "node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+        },
+        {
+          "label": "Railway variables (Raw Editor)",
+          "text": "MCP_AUTH_TOKEN=PASTE_YOUR_OWN_VALUE_HERE\nGOOGLE_CLIENT_ID=PASTE_YOUR_OWN_VALUE_HERE\nGOOGLE_CLIENT_SECRET=PASTE_YOUR_OWN_VALUE_HERE\nGOOGLE_REDIRECT_URI={{redirect_uri}}\nGOOGLE_TOKENS={}"
+        }
+      ],
+      "checkbox_label": "I saved the variables and Railway finished the deploy.",
+      "verify_hint": "Open {{app_url}}/health in a browser. You see the word OK."
+    },
+    {
+      "title": "Sign in to Gmail to authorize the server",
+      "instructions": "1. Open the address below in a browser.\n2. Sign in with the mailbox {{from_email}}. Use that exact account.\n3. Approve the two Gmail permissions.\n4. The browser shows: Auth complete. Copy the token from Railway deploy logs.\n\nIf Google shows an unverified app warning, choose Advanced and continue. This is your own app.\n\nIf you see an error, check that the redirect URI in Google Cloud is exactly {{redirect_uri}}.",
+      "copy": [
+        {
+          "label": "Authorization address",
+          "text": "{{app_url}}/oauth/start"
+        }
+      ],
+      "checkbox_label": "The browser said Auth complete.",
+      "verify_hint": "You see the text Auth complete in the browser."
+    },
+    {
+      "title": "Copy the Gmail login from the Railway logs",
+      "instructions": "The server writes your Gmail login to the Railway deploy logs one time. Treat it as a password.\n\n1. In Railway, open your service, then Deployments, then View logs for the active deployment.\n2. Find the line that starts with GOOGLE_TOKENS: followed by text in curly braces.\n3. Copy only the curly-brace text. It is one line of JSON. It must contain a refresh_token field.\n4. Open the Variables tab. Replace the value of GOOGLE_TOKENS with that text.\n5. Save. Railway deploys again.\n6. Do not share the logs with anyone. Do not paste this text anywhere else.\n\nIf the text has no refresh_token field, remove this app from your Google account permissions at myaccount.google.com/permissions. Then repeat step 8.",
+      "copy": [
+        {
+          "label": "Variable to update in Railway",
+          "text": "GOOGLE_TOKENS=PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "checkbox_label": "I saved GOOGLE_TOKENS and Railway deployed again.",
+      "verify_hint": "The Variables tab shows GOOGLE_TOKENS with a long value. {{app_url}}/health still shows OK."
+    },
+    {
+      "title": "Test that the server is locked",
+      "instructions": "Check that nobody can use the server without your password.\n\n1. Open the first address below in a browser. You must see Forbidden (error 403).\n2. Open the second address. Replace PASTE_YOUR_OWN_VALUE_HERE with your MCP_AUTH_TOKEN. You must see a short message with status ok.\n\nOnly do the second check on a private computer. The password is part of the address.",
+      "copy": [
+        {
+          "label": "Without password (must fail)",
+          "text": "{{app_url}}/mcp"
+        },
+        {
+          "label": "With password (must work)",
+          "text": "{{app_url}}/mcp?key=PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "checkbox_label": "The locked check and the open check both gave the right result.",
+      "verify_hint": "Without the password you see Forbidden. With it you see status ok and the name prismm-outreach."
+    },
+    {
+      "title": "Add the server to Claude",
+      "instructions": "1. Open Claude, then Settings, then Connectors.\n2. Choose Add custom connector.\n3. Name it {{business_name}} Outreach.\n4. Paste the address below. Replace PASTE_YOUR_OWN_VALUE_HERE with your MCP_AUTH_TOKEN.\n5. Save.\n6. In a chat, turn the connector on.\n\nThe connector gives Claude four tools: create_draft, search_messages, get_message and get_thread.",
+      "copy": [
+        {
+          "label": "Connector address",
+          "text": "{{app_url}}/mcp?key=PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "checkbox_label": "The connector is added and turned on in a chat.",
+      "verify_hint": "Claude lists the four tools for the {{business_name}} Outreach connector."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Run two tests. Both are safe. The server never sends email.\n\n1. Ask Claude to search the mailbox. Claude should list recent messages.\n2. Ask Claude to create a draft addressed to yourself.\n3. Open Gmail for {{from_email}} and look in Drafts. You see the draft. The From line shows {{from_name}}.\n4. Delete the test draft.\n\nIf Claude cannot reach the server, check the connector address and the password. If Gmail calls fail, check GOOGLE_TOKENS in Railway.",
+      "copy": [
+        {
+          "label": "Test message 1",
+          "text": "Search my outreach mailbox for messages from the last 2 days and list sender, subject and date."
+        },
+        {
+          "label": "Test message 2",
+          "text": "Create a draft email to {{from_email}} with the subject Outreach test and a two-line body."
+        }
+      ],
+      "checkbox_label": "I saw the draft in Gmail and I deleted it.",
+      "verify_hint": "The draft is in Drafts for {{from_email}}. Nothing was sent."
+    },
+    {
+      "title": "Know how to update later",
+      "instructions": "ReRev Labs lists each change to this product on the version history page of this wizard. Open it with the Version history link in the page header.\n\nTo find your version, look at the date of the newest commit on your repository on GitHub. Compare it to the version list.\n\nTo update:\n\n1. Read the upgrade steps of each newer version.\n2. On GitHub, choose Sync fork on your repository. Do this carefully. You changed the From line in step 3. Check that the From line is still yours after the sync.\n3. Railway deploys again by itself.\n4. Run the test in step 12 again.\n\nYou keep your Railway variables. You do not repeat the Google steps.",
+      "checkbox_label": "I know where to find the version history.",
+      "verify_hint": "You can open the version history page from the wizard header."
+    }
+  ]
+}
