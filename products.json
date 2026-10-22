@@ -1,0 +1,25 @@
+{
+  "schema": ["slug", "name", "product_repo", "wizard_url", "netlify_site_id", "readme_link_confirmed", "status", "last_verified"],
+  "products": [
+    {
+      "slug": "_template-preview",
+      "name": "Wizard template live preview",
+      "product_repo": "keyona-rerev/setup-wizards",
+      "wizard_url": "http://setup-wizards-test.netlify.app",
+      "netlify_site_id": "d0e2b0a5-1492-435d-bdb1-4e0e3a05f703",
+      "readme_link_confirmed": false,
+      "status": "live",
+      "last_verified": "2026-10-22"
+    },
+    {
+      "slug": "insight-forge",
+      "name": "Insight Forge",
+      "product_repo": "keyona-rerev/knowledge-loom-prismm",
+      "wizard_url": "https://insight-forge-setup-wizard.netlify.app",
+      "netlify_site_id": "e3a1c70f-7444-4916-8c5c-73da73d792e1",
+      "readme_link_confirmed": true,
+      "status": "live",
+      "last_verified": "2026-10-22"
+    }
+  ]
+}
