@@ -1,0 +1,39 @@
+{
+  "product": "Business Onboarding Intake",
+  "current": "2026-07-09",
+  "how_to_find": "Open your fork of the business-onboarding-intake repository on GitHub. Read the date of the newest commit that came from the product (keyona-rerev/business-onboarding-intake). The product has no known tags or releases (VERIFY).",
+  "versions": [
+    {
+      "id": "2026-07-09",
+      "date": "2026-07-09",
+      "title": "Paste-and-extract returns as a dashboard window",
+      "summary": "Newest product commit at wizard release: 56cdefe on 2026-07-09. This entry comes from commit dates and messages. VERIFY the grouping into versions with ReRev Labs.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Changed", "text": "The paste-and-extract intake opens as a window on the dashboard (commit c780b12)." },
+        { "kind": "Fixed", "text": "A bad push that replaced home.html with a placeholder is fixed. The full page is back (commit 56cdefe)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Sync your fork and redeploy", "text": "On GitHub, open your fork and select Sync fork. Netlify then builds a new deploy by itself. No database change is needed." }
+      ]
+    },
+    {
+      "id": "2026-07-07",
+      "date": "2026-07-07",
+      "title": "First build and day-one changes",
+      "summary": "The repository was created on 2026-07-07. The commits of that day add the four brand colors, three source address fields, a cached dashboard, logo upload and plain-language help boxes. This entry comes from commit dates and messages. VERIFY.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Added", "text": "Four named brand color fields: background, accent, highlight and sparing accent." },
+        { "kind": "Added", "text": "Three separate source address fields, checked as real web addresses." },
+        { "kind": "Added", "text": "Cache-first dashboard, so the page loads fast after login." },
+        { "kind": "Added", "text": "Plain-language help box in every section." },
+        { "kind": "Changed", "text": "Option lists for formats, time zones and posting cadence. Editing moves into the dashboard." }
+      ],
+      "upgrade_steps": [
+        { "title": "Sync your fork and redeploy", "text": "On GitHub, open your fork and select Sync fork. Netlify builds a new deploy by itself." },
+        { "title": "Database columns update by themselves", "text": "The server functions add the new columns the next time a business logs in. The old color columns and the old source column are removed at that time. No manual SQL is needed. New businesses get the new columns from schema.sql." }
+      ]
+    }
+  ]
+}
