@@ -1,0 +1,40 @@
+{
+  "product": "GitHub MCP (client fork)",
+  "current": "2026-08-05",
+  "how_to_find": "Open your fork on GitHub (the repo you made from keyona-rerev/founder-fork-github-mcp-server). Look at the date of the newest commit on the main page. Compare it with the dates below. If GitHub says your branch is behind, you do not have the newest version.",
+  "versions": [
+    {
+      "id": "2026-08-05",
+      "date": "2026-08-05",
+      "title": "Patch tool added and setup guide trimmed",
+      "summary": "Commits dated 2026-08-05 (newest commit c740cbd). VERIFY: this entry comes from commit dates and messages. No tag or release was visible.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Added", "text": "New tool github_patch_file. It edits part of a file by exact text replacement and needs no file SHA (commit bfd7472)." },
+        { "kind": "Changed", "text": "SETUP.md now uses random.org to make the auth string, and Step 3 is shorter (commit 5e44745)." },
+        { "kind": "Changed", "text": "SETUP.md lists github_patch_file in the tool list and in the notes (commit c740cbd)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Sync your fork", "text": "On GitHub, open your fork. If the bar above the file list says the branch is behind, click Sync fork, then Update branch." },
+        { "title": "Redeploy on Railway", "text": "Railway redeploys when your fork changes. Open the Deployments tab. Wait until the newest deployment shows ACTIVE. Your variables stay as they are." },
+        { "title": "Check the tools", "text": "Open the health page of your server. Then start a new Claude chat and ask Claude to run github_get_me. If the new tool is missing in Claude, remove the connector and add it again." }
+      ]
+    },
+    {
+      "id": "2026-07-29",
+      "date": "2026-07-29",
+      "title": "First client-ready release with auth lock",
+      "summary": "Commits dated 2026-07-29 (first commit da68cd8). VERIFY: this entry comes from commit dates and messages. No tag or release was visible.",
+      "upgrade_type": "settings",
+      "changes": [
+        { "kind": "Added", "text": "Server code, Dockerfile and Railway config for the fork-and-deploy flow." },
+        { "kind": "Added", "text": "MCP_AUTH_TOKEN lock on the /mcp routes. The server does not start without it (commit 107fe6c)." },
+        { "kind": "Added", "text": "README.md and a rewritten SETUP.md based on a real clean-fork run (commits 979f1ce, 3f2ee3f)." },
+        { "kind": "Fixed", "text": "Step order changed so the first deploy is never unprotected (commit 082b125)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Add MCP_AUTH_TOKEN before you sync", "text": "If your fork is older than this version, make an auth string first. Add it as MCP_AUTH_TOKEN in Railway Variables. Then sync your fork. Then add the same string to your Claude connector address as the key." }
+      ]
+    }
+  ]
+}
