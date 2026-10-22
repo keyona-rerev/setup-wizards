@@ -1,0 +1,68 @@
+{
+  "title": "ReRev Tapestry Tool setup",
+  "intro": "The Tapestry Tool is a planning tool for solo founders. It has a time plan for your week, an ICP fit grid, an execution matrix, a measure tab and a revenue mix. It is one HTML file. It runs in the browser. It has no server and no login. This wizard helps you make your own copy, put it online, set your own labels and run a first test.",
+  "variables": [
+    {"key":"business_name","label":"Your business name","help":"Used in the page title and in examples.","placeholder":"Acme Studio","pattern":"^.{2,80}$","pattern_error":"Enter 2 to 80 characters."},
+    {"key":"github_username","label":"Your GitHub username","help":"The username of your own GitHub account.","placeholder":"your-username","pattern":"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$","pattern_error":"Use letters, numbers and hyphens only."},
+    {"key":"repo_name","label":"Name for your copy of the repo","help":"Use lowercase letters, numbers and hyphens.","placeholder":"tapestry-tool","default":"tapestry-tool","pattern":"^[A-Za-z0-9._-]+$","pattern_error":"Use letters, numbers, dots, hyphens and underscores only."},
+    {"key":"app_url","label":"Your live app URL","help":"Enter it after your first deploy. Example: https://your-username.github.io/tapestry-tool","placeholder":"https://your-username.github.io/tapestry-tool","pattern":"^https://[^\\s]+$","pattern_error":"Enter a full URL that starts with https://"},
+    {"key":"monthly_goal","label":"Your monthly revenue goal in dollars","help":"A number only. The tool shows progress to this goal.","placeholder":"20000","pattern":"^[0-9]{3,9}$","pattern_error":"Enter a whole number with no symbols."},
+    {"key":"pages_url","label":"GitHub Pages address","derive":"https://{{github_username}}.github.io/{{repo_name}}"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need two things. First, a free GitHub account. Second, a web browser. You do not need a server. You do not need a database. The tool saves your data in your own browser.",
+      "checkbox_label": "I have a GitHub account.",
+      "verify_hint": "You can sign in at github.com."
+    },
+    {
+      "title": "Enter your public values",
+      "instructions": "Enter the values below. The wizard will fill them into later steps. Do not enter passwords or tokens here.",
+      "collect": ["business_name","github_username","repo_name","monthly_goal"],
+      "checkbox_label": "I entered my values.",
+      "verify_hint": "The wizard shows your values in the next steps."
+    },
+    {
+      "title": "Make your own copy of the code",
+      "instructions": "Open https://github.com/keyona-rerev/rerev-tapestry-tool in your browser. Choose Fork. Set the owner to {{github_username}}. Set the repository name to {{repo_name}}. Choose Create fork.",
+      "copy": [{"label":"Source repo","text":"https://github.com/keyona-rerev/rerev-tapestry-tool"}],
+      "checkbox_label": "I made my fork.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see index.html in the file list."
+    },
+    {
+      "title": "Put the tool online with GitHub Pages",
+      "instructions": "Open your repo on GitHub. Choose Settings, then Pages. Under Build and deployment, set Source to Deploy from a branch. Set Branch to main and the folder to / (root). Choose Save. Wait about one minute.",
+      "copy": [{"label":"Your Pages address","text":"{{pages_url}}"}],
+      "checkbox_label": "I turned on GitHub Pages.",
+      "verify_hint": "Open {{pages_url}}. You see the Tapestry Tool page."
+    },
+    {
+      "title": "Save your live URL",
+      "instructions": "Copy the address of your live tool. Enter it below. You will use it to share the tool.",
+      "collect": ["app_url"],
+      "checkbox_label": "I entered my live URL.",
+      "verify_hint": "{{app_url}} opens in your browser."
+    },
+    {
+      "title": "Set your own labels and numbers",
+      "instructions": "The tool starts with example ventures, audiences, service lines and revenue lines. Replace them with yours. Open index.html in your repo. Choose the pencil icon to edit. The defaults are at the top of the script in the file. Change the venture names, audience names, service line names and revenue lines. If you add or remove a service line or audience, change the grid array to match. Set the monthly goal to {{monthly_goal}}. Then choose Commit changes. The file data/default-state.json shows the shape of the default state.",
+      "copy": [{"label":"Monthly goal to set","text":"{{monthly_goal}}"},{"label":"Business name for examples","text":"{{business_name}}"}],
+      "checkbox_label": "I changed the labels and the goal.",
+      "verify_hint": "Wait one minute. Reload {{app_url}}. You see your labels."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Open {{app_url}}. Drag one time slider. The bar changes. Click one cell in the ICP fit grid. The score changes. Choose Save. Reload the page. Choose Load. Your changes return. Choose Export. A JSON file downloads.",
+      "checkbox_label": "Save, Load and Export all worked.",
+      "verify_hint": "A JSON file is in your Downloads folder. Your data stays in this browser only. Use Export to keep a backup."
+    },
+    {
+      "title": "Update the tool later",
+      "instructions": "The original tool gets new versions from time to time. Open the version history page to see them. To take a new version, open your fork on GitHub. Choose Sync fork, then Update branch. If you changed index.html, GitHub shows a conflict. Then copy your labels again into the new file. Your saved data stays safe in your browser. Export a backup before you update.",
+      "copy": [{"label":"Source repo","text":"https://github.com/keyona-rerev/rerev-tapestry-tool"}],
+      "checkbox_label": "I know how to update.",
+      "verify_hint": "Open the version history page of this wizard. It lists each version and how to upgrade."
+    }
+  ]
+}
