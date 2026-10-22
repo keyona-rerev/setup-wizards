@@ -1,0 +1,47 @@
+{
+  "product": "Prismm Renderer",
+  "current": "2026-07-05",
+  "how_to_find": "Open your copy of the repo on GitHub and look at the date of the newest commit on the main branch. Match it to the entries below. The product has no tags or releases that the wizard builder could see, so every date below comes from commit dates (VERIFY).",
+  "versions": [
+    {
+      "id": "2026-07-05",
+      "date": "2026-07-05",
+      "title": "PNG output at 1200 by 627",
+      "summary": "Newest commit ad8b616 on 2026-07-05. The default size is now 1200 by 627 and the output is PNG instead of JPEG. Dates come from commit history (VERIFY: no tag or release seen).",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Changed", "text": "Default render size is 1200 by 627 pixels (LinkedIn landscape). Callers can still send width and height."},
+        {"kind": "Changed", "text": "Output is PNG, not JPEG, for sharper text and gradients. The response mimeType is image/png."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork and redeploy", "text": "On GitHub, open your copy of the repo and click Sync fork. Railway redeploys by itself. Then run the test render step again. Check that mimeType is image/png. Update any content tool that expects JPEG."}
+      ]
+    },
+    {
+      "id": "2026-03-01",
+      "date": "2026-03-01",
+      "title": "Dockerfile deploy",
+      "summary": "Commits 175d6d8 and 7e44e82 on 2026-03-01 added a Dockerfile based on the Puppeteer image and removed the Procfile. Inferred from commit dates (VERIFY).",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Dockerfile that uses the official Puppeteer image with Chrome."},
+        {"kind": "Changed", "text": "The Procfile was deleted. Railway now builds from the Dockerfile."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork and redeploy", "text": "Click Sync fork on GitHub. Check that Railway builds with the Dockerfile. Open the health address to confirm."}
+      ]
+    },
+    {
+      "id": "2026-02-26",
+      "date": "2026-02-26",
+      "title": "First version of the service",
+      "summary": "Commits from 2026-02-26 (first cfdad77) created the Express and Puppeteer render service with an API secret check. Inferred from commit dates (VERIFY).",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "POST /render and GET /health routes."},
+        {"kind": "Added", "text": "Secret header check on /render."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
