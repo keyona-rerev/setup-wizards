@@ -1,0 +1,103 @@
+{
+  "title": "Set up Prismm Sequence Review for your team",
+  "intro": "Prismm Sequence Review is a password-gated web dashboard. Your team uses it to review email sequences before you send them. It shows sequences, a pipeline, weekly reports, scenarios and audiences. It is a static site on GitHub Pages. It has no server and no database. All data sits in JSON files in your own GitHub repo. You make a copy of the product repo, replace the example data with your own, and publish it. You need a GitHub account. The install takes about 30 minutes. This wizard does not copy any contact or sequence data. The product repo holds Prismm example data. You will remove that data in step 4.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "Your team sees this name. You will type it in the page title.", "placeholder": "Acme Bank Marketing", "pattern": "^.{2,80}$", "pattern_error": "Enter 2 to 80 characters."},
+    {"key": "github_username", "label": "Your GitHub username or organization", "help": "The account that will own your copy of the repo.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters."},
+    {"key": "repo_name", "label": "Name for your repo", "help": "Use lowercase letters and hyphens.", "placeholder": "sequence-review", "default": "sequence-review", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "pages_url", "label": "Your dashboard address", "help": "This follows from your GitHub name and repo name.", "derive": "https://{{github_username}}.github.io/{{repo_name}}"},
+    {"key": "raw_base", "label": "Your raw data address", "help": "The dashboard reads its JSON files from this address.", "derive": "https://raw.githubusercontent.com/{{github_username}}/{{repo_name}}/main"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need three things. First, a free GitHub account. Second, a modern web browser. Third, a short list of the people who will review sequences. They do not need GitHub accounts to read the dashboard. They do need a GitHub account to leave feedback, because feedback opens a GitHub issue. The product repo is public. Anyone can read your copy if you make it public. Do not put private contact data in a public repo. Use a private repo if your plan allows GitHub Pages on private repos. VERIFY: check GitHub's current plan rules for Pages on private repos.",
+      "checkbox_label": "I have a GitHub account and a list of reviewers.",
+      "verify_hint": "You can sign in at github.com."
+    },
+    {
+      "title": "Enter your values",
+      "instructions": "Enter the values below one time. This wizard will fill them into the later steps for you. Use public values only. Do not enter passwords here.",
+      "collect": ["business_name", "github_username", "repo_name"],
+      "checkbox_label": "I entered my values.",
+      "verify_hint": "Your dashboard address will be {{pages_url}}."
+    },
+    {
+      "title": "Fork the product repo",
+      "instructions": "Open the product repo: https://github.com/keyona-rerev/prismm-sequence-review. Choose Fork, then Create a new fork. Set the owner to {{github_username}}. Set the repository name to {{repo_name}}. Keep Copy the main branch only selected. Choose Create fork.",
+      "copy": [
+        {"label": "Product repo address", "text": "https://github.com/keyona-rerev/prismm-sequence-review"},
+        {"label": "Your repo name", "text": "{{repo_name}}"}
+      ],
+      "checkbox_label": "My fork exists.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the repo files."
+    },
+    {
+      "title": "Remove the Prismm example data",
+      "instructions": "The fork holds Prismm data. You must replace it before you share the site. In your repo, open each file below, choose the pencil icon, replace the full content with the text in the matching copy block, and commit. Files to replace: sequences.json, rejections.json, scenarios.json, audiences.json, pipeline.json, and data/icp-contacts.json. Then delete these items: the folder data/credit-unions.csv, the file data/targets.json, and every file in the sequences folder that starts with seq-. Also review icp-grid.html and icp-insights.html. They hold Prismm research. Replace them with your own research, or delete them. VERIFY: the icp-contacts.json format. The empty object below is the safest empty value, but the page may need a different shape. Test it in step 7.",
+      "copy": [
+        {"label": "sequences.json", "text": "{\n  \"sequences\": []\n}"},
+        {"label": "rejections.json", "text": "{\n  \"rejections\": []\n}"},
+        {"label": "scenarios.json", "text": "{\n  \"scenarios\": []\n}"},
+        {"label": "audiences.json", "text": "{\n  \"audiences\": []\n}"},
+        {"label": "pipeline.json", "text": "{\n  \"meta\": {\n    \"current_batch\": \"First batch\",\n    \"last_updated\": \"\",\n    \"total_contacted\": 0,\n    \"tier\": 1\n  },\n  \"batches\": [],\n  \"institutions\": []\n}"},
+        {"label": "data/icp-contacts.json", "text": "{}"}
+      ],
+      "checkbox_label": "I replaced the example data and deleted the Prismm files.",
+      "verify_hint": "Open sequences.json in your repo. You see an empty list."
+    },
+    {
+      "title": "Point the dashboard at your repo",
+      "instructions": "Open index.html in your repo. Choose the pencil icon. Find the three lines that start with const SITE_PASSWORD, const REPO_RAW and const PAGES_BASE. Replace them with the lines in the copy block. Choose your own gate phrase in place of PASTE_YOUR_OWN_GATE_PHRASE_HERE. The gate phrase is a light barrier only. Anyone who views the page source can read it. Do not use a real password that you use anywhere else. Next, search the file for keyona-rerev/prismm-sequence-review. Replace it with {{github_username}}/{{repo_name}}. This changes the feedback link on each sequence card. Next, change the page title text Prismm to {{business_name}}. Then find the header line that shows an email address and a date. Replace the email with your own contact address. Commit the change.",
+      "copy": [
+        {"label": "Lines to paste in index.html", "text": "const SITE_PASSWORD = 'PASTE_YOUR_OWN_GATE_PHRASE_HERE';\n  const REPO_RAW   = '{{raw_base}}';\n  const PAGES_BASE = '{{pages_url}}';"},
+        {"label": "Text to find", "text": "keyona-rerev/prismm-sequence-review"},
+        {"label": "Text to put in its place", "text": "{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "I changed the three lines, the feedback link and the title.",
+      "verify_hint": "Search index.html for keyona-rerev. It finds nothing."
+    },
+    {
+      "title": "Remove Prismm-only parts",
+      "instructions": "The dashboard has two parts that belong to Prismm. First, the System Info tab shows Prismm personas, sending domains and costs. They are written in the renderSysInfo function in index.html. Replace that text with your own details, or leave the tab empty. Second, the Daily Buyers tab calls a Prismm Apps Script web address. It will not work for you. Hide the tab. To do this, delete the line in index.html that holds the words Daily Buyers inside the tab bar. VERIFY: the Daily Buyers tab depends on a Prismm Apps Script proxy. The wizard author could not read the full index.html. Check the file for any script.google.com address and remove it. Also check the README.md and WORKFLOW.md files. They name Prismm reviewers and a password. Replace those names with yours.",
+      "checkbox_label": "I removed or replaced the Prismm-only parts.",
+      "verify_hint": "Search your repo for getprismm and script.google.com. You find nothing you do not own."
+    },
+    {
+      "title": "Publish with GitHub Pages",
+      "instructions": "In your repo, open Settings, then Pages. Under Build and deployment, set Source to Deploy from a branch. Set Branch to main and the folder to / (root). Choose Save. Wait one to two minutes. GitHub shows the live address at the top of the Pages screen.",
+      "checkbox_label": "GitHub Pages shows my live address.",
+      "verify_hint": "Open {{pages_url}}. You see a gate screen."
+    },
+    {
+      "title": "Test the dashboard",
+      "instructions": "Open {{pages_url}}. Enter your gate phrase. The Sequences tab must open with an empty state. Open each tab. No tab may show Prismm institution names. If a tab shows an error, open the browser console and read the message. The most common cause is a wrong REPO_RAW line. Check that it is exactly {{raw_base}}. Data changes can take about one minute to show.",
+      "checkbox_label": "The dashboard loads with no Prismm data.",
+      "verify_hint": "The gate opens and the Sequences tab shows no cards."
+    },
+    {
+      "title": "Add your first sequence",
+      "instructions": "Write your email sequence as an HTML file. Copy templates/plain-sequence-template.html as a start. Save it as sequences/seq-001-your-slug.html. Then open sequences.json and add an entry like the copy block. Set status to pending. Commit both files. The sequence shows under Awaiting Review within about one minute. Add a scenario in scenarios.json and an audience in audiences.json if you want those tabs to show content. The field lists are in README.md in your repo.",
+      "copy": [
+        {"label": "sequences.json entry", "text": "{\n  \"sequences\": [\n    {\n      \"id\": \"seq-001\",\n      \"title\": \"YOUR SEQUENCE NAME\",\n      \"targetAudience\": \"WHO THIS SEQUENCE IS FOR\",\n      \"status\": \"pending\",\n      \"pushedDate\": \"Oct 22, 2026\",\n      \"emailCount\": 3,\n      \"cadence\": \"Day 1 / 3 / 7\",\n      \"sender\": \"SENDER NAME\",\n      \"type\": \"plain\",\n      \"sequenceFile\": \"sequences/seq-001-your-slug.html\",\n      \"usageNote\": \"When to use this sequence.\"\n    }\n  ]\n}"}
+      ],
+      "checkbox_label": "My first sequence shows under Awaiting Review.",
+      "verify_hint": "Open {{pages_url}}. The card shows your sequence title."
+    },
+    {
+      "title": "Turn on feedback and invite reviewers",
+      "instructions": "Reviewers leave feedback through GitHub issues. A fork has issues turned off at first. In your repo, open Settings. Under Features, tick Issues. Then send your reviewers the dashboard address and the gate phrase. Send the phrase in a separate message from the address. To approve or reject a sequence, edit its status in sequences.json to approved or rejected. For a rejection, add the reason to rejections.json.",
+      "copy": [
+        {"label": "Dashboard address for reviewers", "text": "{{pages_url}}"}
+      ],
+      "checkbox_label": "Issues are on and I sent the address to my reviewers.",
+      "verify_hint": "On a sequence card, choose Leave feedback. A new issue page opens in {{github_username}}/{{repo_name}}."
+    },
+    {
+      "title": "Learn how to update later",
+      "instructions": "The product changes over time. Open the version history page at https://wizard-prismm-sequence-review.netlify.app/history.html. Find your version with the method on that page. Read each newer version. Follow its upgrade steps. Your data files are your own. Do not overwrite them when you update.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "The history page lists versions, newest first."
+    }
+  ]
+}
