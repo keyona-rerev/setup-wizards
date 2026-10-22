@@ -1,0 +1,219 @@
+{
+  "title": "MOFU Content Analyzer setup",
+  "intro": "MOFU Content Analyzer scores how well a company's website content does five content jobs. You install it on your own GitHub and Netlify accounts. The analysis uses your own Anthropic API account. Emails use your own Resend account (optional). The wizard takes about 40 minutes. You never paste a secret in this wizard. You paste secrets only inside Netlify.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your business name",
+      "help": "The name that appears in the emails and on the page.",
+      "placeholder": "Acme Marketing",
+      "pattern": "^[^<>{}]{2,80}$",
+      "pattern_error": "Use 2 to 80 characters. Do not use angle brackets or braces."
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "Your own GitHub account name.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9-]{1,39}$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your copy of the repo",
+      "help": "The name of the repo you create in your GitHub account.",
+      "placeholder": "mofu-content-analyzer",
+      "default": "mofu-content-analyzer",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Netlify site name",
+      "help": "The name of your Netlify site. It becomes part of your web address. Use lowercase letters, numbers and hyphens.",
+      "placeholder": "acme-content-analyzer",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,57}[a-z0-9]$",
+      "pattern_error": "Use 3 to 59 lowercase letters, numbers or hyphens. Do not start or end with a hyphen."
+    },
+    {
+      "key": "app_url",
+      "label": "Your site address",
+      "help": "Netlify builds this from your site name. If you use your own domain, replace it with that address. Do not add a slash at the end.",
+      "placeholder": "https://acme-content-analyzer.netlify.app",
+      "derive": "https://{{netlify_site_name}}.netlify.app",
+      "pattern": "^https://[A-Za-z0-9.-]+$",
+      "pattern_error": "Start with https:// and do not add a slash at the end."
+    },
+    {
+      "key": "notify_email",
+      "label": "Email address for new-lead alerts",
+      "help": "Each time a visitor runs a report with an email, you get an alert at this address.",
+      "placeholder": "you@yourbusiness.com",
+      "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+      "pattern_error": "Enter a full email address."
+    },
+    {
+      "key": "from_email",
+      "label": "Sender for results emails (optional)",
+      "help": "Use a sender on a domain you verified in Resend, in the form Name <name@yourdomain.com>. Skip this to use the Resend test sender.",
+      "placeholder": "Acme Analyzer <reports@yourdomain.com>",
+      "optional": true,
+      "pattern": "^[^<>]{1,60} <[^\\s@<>]+@[^\\s@<>]+\\.[^\\s@<>]+>$",
+      "pattern_error": "Use the form Name <name@yourdomain.com>."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Know what you are installing",
+      "instructions": "MOFU Content Analyzer reads a company website and scores its content. It opens each page in a real headless browser. It profiles the business from the home, services and about pages. Then it scores the blog and resource pages against five content jobs. The jobs are Symptom Awareness, Solution Education, Value Proposition, Customer and Data Stories, and Product Deep Dive. The visitor gets a report page with a permanent link. If the visitor gives an email, the app sends the report by email and alerts you.\n\nYou need three accounts. Make each one before you start.\n- GitHub (free). This holds your copy of the code.\n- Netlify. This hosts the page and the background function that does the work. The function runs up to 15 minutes. Check that your Netlify plan allows background functions (VERIFY on Netlify pricing page).\n- Anthropic API account. The analysis calls the Claude API. Each report costs a small amount on your Anthropic bill.\n\nOptional: a Resend account. Resend sends the results email and the lead alert. Without Resend the reports still work. No emails go out.\n\nThis wizard takes about 40 minutes.",
+      "checkbox_label": "I have a GitHub account, a Netlify account and an Anthropic API account.",
+      "verify_hint": "Open each site and confirm you can sign in."
+    },
+    {
+      "title": "Enter your public details",
+      "instructions": "Enter the values below. The wizard fills them into later steps. Do not enter any password, API key or token here. You paste those only inside your own Netlify account.",
+      "checkbox_label": "I entered my details.",
+      "collect": [
+        "business_name",
+        "github_username",
+        "repo_name",
+        "netlify_site_name",
+        "app_url",
+        "notify_email",
+        "from_email"
+      ]
+    },
+    {
+      "title": "Copy the code to your GitHub account",
+      "instructions": "Open the product repo on GitHub. The address is https://github.com/keyona-rerev/mofu-content-analyzer\n\nChoose Fork. Set the owner to {{github_username}}. Set the repository name to {{repo_name}}. Choose Create fork.\n\nIf ReRev Labs gave you access in another way, follow their instructions. Do not change the code yet.",
+      "checkbox_label": "My copy of the repo exists.",
+      "copy": [
+        {
+          "label": "Product repo address",
+          "text": "https://github.com/keyona-rerev/mofu-content-analyzer"
+        }
+      ],
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the files index.html, netlify.toml, package.json and the folder netlify."
+    },
+    {
+      "title": "Point the report links to your own site",
+      "instructions": "The code has one web address built in. It is the address that the results email links to. It is the address of the original author. You must change it to yours.\n\n1. In your repo, open the file netlify/functions/analyze-background.js.\n2. Choose the pencil icon to edit.\n3. Find the line that starts with const REPORT_BASE_URL.\n4. Replace the whole line with the line below.\n5. Choose Commit changes.",
+      "checkbox_label": "I replaced the REPORT_BASE_URL line and committed.",
+      "copy": [
+        {
+          "label": "New line for REPORT_BASE_URL",
+          "text": "const REPORT_BASE_URL = '{{app_url}}';"
+        }
+      ],
+      "verify_hint": "Open the file on GitHub. The REPORT_BASE_URL line shows {{app_url}}."
+    },
+    {
+      "title": "Set who gets the lead alerts",
+      "instructions": "The code sends a lead alert to a default address of the original author. You must change it to yours.\n\nThere are two ways. Use the first way if you can.\n\nWay 1 (no code change): in a later step you set the Netlify variable LEAD_NOTIFY_EMAIL. The code reads that variable first. Skip to the next step.\n\nWay 2 (code change): in netlify/functions/analyze-background.js, find the text process.env.LEAD_NOTIFY_EMAIL ||. Replace the address in quotes after it with {{notify_email}}. Commit the change.\n\nDo Way 1 at least. Way 2 is a second safety net.",
+      "checkbox_label": "I will set LEAD_NOTIFY_EMAIL (and, if I wanted, I also changed the code default).",
+      "copy": [
+        {
+          "label": "Netlify variable line",
+          "text": "LEAD_NOTIFY_EMAIL={{notify_email}}"
+        }
+      ],
+      "verify_hint": "Search the file for the original author's default address. If you used Way 2, it is gone."
+    },
+    {
+      "title": "Put your own brand on the page and the email",
+      "instructions": "The page and the email carry the original author's brand name, a link to its website and its colors. Replace them with yours.\n\n1. In your repo, open index.html. Search for ReRev. Replace each one with {{business_name}}. Also replace any link to the original author's website with your own website. (VERIFY: the audit did not read every line of index.html.)\n2. Open netlify/functions/analyze-background.js. In the function resultsEmailHtml, replace the text MOFU Content Analyzer &middot; ReRev Labs and the text ReRev Labs in the footer with {{business_name}}. Replace the link https://www.rerev.io with your own website.\n3. Optional: change the hex colors in the email (for example #2F5233) to your brand colors.\n4. Choose Commit changes for each file.",
+      "checkbox_label": "I replaced the brand text and links.",
+      "copy": [
+        {
+          "label": "Your business name",
+          "text": "{{business_name}}"
+        }
+      ],
+      "verify_hint": "Search both files for ReRev. You find no result."
+    },
+    {
+      "title": "Create the Netlify site from your repo",
+      "instructions": "1. Sign in to Netlify.\n2. Choose Add new project, then Import an existing project.\n3. Choose GitHub. Allow access to your repo if Netlify asks.\n4. Choose {{github_username}}/{{repo_name}}.\n5. Set the project name to {{netlify_site_name}}.\n6. Leave the build command empty. Set the publish directory to a single dot (.). The file netlify.toml already sets these.\n7. Do not deploy yet if Netlify lets you set variables first. If not, choose Deploy. It is fine if the first deploy has no variables.",
+      "checkbox_label": "My Netlify site exists.",
+      "copy": [
+        {
+          "label": "Publish directory",
+          "text": "."
+        }
+      ],
+      "verify_hint": "In Netlify you see a site named {{netlify_site_name}} linked to {{github_username}}/{{repo_name}}."
+    },
+    {
+      "title": "Add your Anthropic API key to Netlify",
+      "instructions": "This is the only required secret. Add it only inside your own Netlify account. Never put it in the code, in GitHub or in this wizard.\n\n1. In the Anthropic Console, create an API key. Copy it.\n2. In Netlify, open your site. Choose Site configuration, then Environment variables.\n3. Choose Add a variable. Use the name below. Paste your key as the value.\n4. Set scopes to include Functions and Runtime. Mark it as secret if Netlify offers that.\n\nThe code uses the model claude-haiku-4-5-20251001 (set in the code, VERIFY the model is still available on your account).",
+      "checkbox_label": "I added ANTHROPIC_API_KEY in Netlify.",
+      "copy": [
+        {
+          "label": "Variable name and placeholder",
+          "text": "ANTHROPIC_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "verify_hint": "The variable name ANTHROPIC_API_KEY shows in the Netlify list."
+    },
+    {
+      "title": "Set up emails with Resend (optional)",
+      "instructions": "Skip this step if you do not want emails. The reports still work without it.\n\n1. Create a Resend account and add your domain. Follow Resend to verify the domain.\n2. Create a Resend API key with sending access. Copy it.\n3. In Netlify, add these variables. Paste your own values.\n\nIf you leave RESEND_FROM empty, the app uses the Resend test sender. The test sender is limited. It may send only to your own Resend account address (VERIFY on the Resend docs). Use a verified domain for real visitors.",
+      "checkbox_label": "I added the Resend variables, or I chose to skip emails.",
+      "copy": [
+        {
+          "label": "Resend key",
+          "text": "RESEND_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "Sender (use only if you entered a sender)",
+          "text": "RESEND_FROM={{from_email}}"
+        },
+        {
+          "label": "Alert address",
+          "text": "LEAD_NOTIFY_EMAIL={{notify_email}}"
+        }
+      ],
+      "verify_hint": "The names RESEND_API_KEY and LEAD_NOTIFY_EMAIL show in the Netlify list (or you skipped)."
+    },
+    {
+      "title": "Deploy the site",
+      "instructions": "1. In Netlify, open your site. Choose Deploys.\n2. Choose Trigger deploy, then Clear cache and deploy site.\n3. Wait until the status says Published. The first build installs a large browser package. It can take several minutes.\n4. If the build fails, open the deploy log. Read the last red lines. The package.json file needs @sparticuz/chromium version 149 or newer and puppeteer-core version 25 or newer. Do not lower them.",
+      "checkbox_label": "The deploy says Published.",
+      "copy": [
+        {
+          "label": "Your site address",
+          "text": "{{app_url}}"
+        }
+      ],
+      "verify_hint": "Open {{app_url}}. You see the analyzer page with a box for a website address."
+    },
+    {
+      "title": "Check the functions are live",
+      "instructions": "Open the status address below in your browser. A fake job id is fine. You must see the text status pending.\n\nIf you see a 404 page, the functions did not deploy. In Netlify, open Functions. You must see analyze-background, analyze-status and analyze.",
+      "checkbox_label": "The status address shows pending.",
+      "copy": [
+        {
+          "label": "Status check address",
+          "text": "{{app_url}}/api/analyze-status?id=test"
+        }
+      ],
+      "verify_hint": "The page shows {\"status\":\"pending\"}."
+    },
+    {
+      "title": "Run your first test report",
+      "instructions": "1. Open {{app_url}}.\n2. Enter the address of a small website that has a blog.\n3. Enter your own email address if the page asks for one.\n4. Start the analysis.\n5. Wait. The page shows elapsed time. A run can take several minutes.\n6. Read the report. It shows a business profile, five job scores and a page inventory.\n7. If you set up Resend, check your inbox. The email link must open a page on {{app_url}}, not on another site.\n8. Check that {{notify_email}} gets a lead alert.",
+      "checkbox_label": "My first report finished.",
+      "verify_hint": "The report page shows a composite score and the link ends with /?job= and an id."
+    },
+    {
+      "title": "If a run fails",
+      "instructions": "Use this list.\n\n- The page waits and never finishes. In Netlify, open Logs, then Functions, then analyze-background. Read the error.\n- Error Missing ANTHROPIC_API_KEY. Add the variable in step 8. Then redeploy.\n- Error about libnspr4.so. Your @sparticuz/chromium version is too old. Keep version 149 or newer.\n- Error that says no readable content pages. The site may block bots or have no text. Try another site.\n- No emails. Check RESEND_API_KEY. Check that your sender domain is verified in Resend.\n\nThe analysis renders one page at a time to stay inside the memory limit. A site with many pages takes longer. Do not raise the page limits in the code without testing.",
+      "checkbox_label": "I read the troubleshooting list."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "When ReRev Labs ships a change, the version history page lists it with upgrade steps. Open the history page that belongs to this wizard. Add /history.html to the wizard address.\n\nTo take a change: open your repo on GitHub, choose Sync fork, then Update branch. Netlify redeploys by itself. Sync fork can conflict with your own edits to REPORT_BASE_URL, the lead address and the brand text. If that happens, redo steps 4 to 6 after you sync.",
+      "checkbox_label": "I know where the version history is."
+    }
+  ]
+}
