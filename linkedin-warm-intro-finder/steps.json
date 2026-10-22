@@ -1,0 +1,110 @@
+{
+  "title": "Install LinkedIn Warm Intro Finder on your own computer",
+  "intro": "LinkedIn Warm Intro Finder helps you find warm introduction paths through your own LinkedIn network. You import your own LinkedIn data export. You describe who you want to meet. The tool scores how strong each of your relationships is. It uses an AI model (Groq) to match people and to draft intro messages. It can also open LinkedIn pages in your own Chrome browser to find mutual connections. The tool runs on your own computer. It stores data in a local database file. It needs no hosting. You need Python 3.11 or newer, Git, Google Chrome, a GitHub account and a free Groq account. The scraper part reads LinkedIn pages. Check the LinkedIn Terms of Service before you use it. Use it with low limits.",
+  "variables": [
+    {"key": "business_name", "label": "Your name or business name", "help": "You use this name in your own notes and in your first test.", "placeholder": "Acme Consulting"},
+    {"key": "github_username", "label": "Your GitHub username", "help": "You fork the code into this account.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]+$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "repo_name", "label": "Name for your copy of the repo", "help": "Keep the default name unless you want another one.", "default": "linkedin-warm-intro-finder", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "daily_profile_limit", "label": "Daily limit of LinkedIn profiles to scan", "help": "The default is 20. Keep it low to protect your LinkedIn account.", "default": "20", "pattern": "^[0-9]{1,3}$", "pattern_error": "Enter a whole number, for example 20."},
+    {"key": "work_start_hour", "label": "Scan start hour (0 to 23, your local time)", "help": "The scraper runs only after this hour.", "default": "9", "pattern": "^([0-9]|1[0-9]|2[0-3])$", "pattern_error": "Enter a number from 0 to 23."},
+    {"key": "work_end_hour", "label": "Scan end hour (0 to 23, your local time)", "help": "The scraper stops at this hour.", "default": "18", "pattern": "^([0-9]|1[0-9]|2[0-3])$", "pattern_error": "Enter a number from 0 to 23."},
+    {"key": "clone_url", "label": "Your repo address", "derive": "https://github.com/{{github_username}}/{{repo_name}}.git"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "Get these ready before you start. 1. A computer with Python 3.11 or newer. 2. Git. 3. Google Chrome. The code finds your Chrome profile on Windows only. On Mac or Linux the scraper part may not work. VERIFY on your system. 4. A GitHub account. 5. A free Groq account at console.groq.com. 6. A LinkedIn account that you own. The tool needs no paid hosting. Groq has a free tier with a request limit per minute.",
+      "checkbox_label": "I have all six items."
+    },
+    {
+      "title": "Enter your public values",
+      "instructions": "Enter the values below. The wizard fills them into later steps. Enter only public values. Never enter a password or an API key here. You enter your Groq key later, only inside a file on your own computer.",
+      "collect": ["business_name", "github_username", "repo_name", "daily_profile_limit", "work_start_hour", "work_end_hour"],
+      "checkbox_label": "I entered my values."
+    },
+    {
+      "title": "Fork the code",
+      "instructions": "Open https://github.com/keyona-rerev/linkedin-warm-intro-finder in your browser. Choose Fork. Select your account {{github_username}}. Set the repository name to {{repo_name}}. Choose Create fork. The fork is your own copy.",
+      "checkbox_label": "My fork exists in my GitHub account.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the code files app.py and requirements.txt."
+    },
+    {
+      "title": "Download the code to your computer",
+      "instructions": "Open a terminal. Run the commands below. They download your fork and open its folder.",
+      "copy": [
+        {"label": "Clone your fork", "text": "git clone {{clone_url}}"},
+        {"label": "Open the folder", "text": "cd {{repo_name}}"}
+      ],
+      "checkbox_label": "I am inside the repo folder in my terminal.",
+      "verify_hint": "Run the command ls (Mac, Linux) or dir (Windows). You see app.py."
+    },
+    {
+      "title": "Install the Python packages",
+      "instructions": "Create a virtual environment. Turn it on. Install the packages. Then install the Chrome automation files. Use the Windows or the Mac and Linux command to turn the environment on.",
+      "copy": [
+        {"label": "Create the environment", "text": "python -m venv .venv"},
+        {"label": "Turn it on (Windows)", "text": ".venv\\Scripts\\activate"},
+        {"label": "Turn it on (Mac, Linux)", "text": "source .venv/bin/activate"},
+        {"label": "Install packages", "text": "pip install -r requirements.txt"},
+        {"label": "Install the browser files", "text": "playwright install chromium"}
+      ],
+      "checkbox_label": "The install finished with no error.",
+      "verify_hint": "Run: pip show streamlit. It prints a version number."
+    },
+    {
+      "title": "Create your Groq API key",
+      "instructions": "Open console.groq.com. Sign in. Choose API Keys. Create a new key. Copy it. Do not paste it in this wizard. Do not send it to anyone. You paste it in the next step, inside a file on your own computer.",
+      "checkbox_label": "I copied my Groq key and I keep it private."
+    },
+    {
+      "title": "Create the .env file",
+      "instructions": "In the repo folder, create a file named .env (with the dot at the start, no other ending). Paste the lines below. Replace PASTE_YOUR_OWN_VALUE_HERE with your Groq key. The app stops with an error if the key is missing. The .gitignore file already excludes .env, so Git does not upload it. The limit lines are optional. They use your values from step 2. Save the file.",
+      "copy": [
+        {"label": ".env file text", "text": "GROQ_API_KEY=PASTE_YOUR_OWN_VALUE_HERE\nGROQ_MODEL=llama-3.3-70b-versatile\nDAILY_PROFILE_LIMIT={{daily_profile_limit}}\nMIN_DELAY_SECONDS=180\nMAX_DELAY_SECONDS=480\nWORK_START_HOUR={{work_start_hour}}\nWORK_END_HOUR={{work_end_hour}}"}
+      ],
+      "checkbox_label": "I saved .env with my own Groq key.",
+      "verify_hint": "Run: git status. The file .env does not appear in the list. If it appears, stop and fix .gitignore before you continue."
+    },
+    {
+      "title": "Export your own LinkedIn data",
+      "instructions": "Open LinkedIn. Go to Settings and Privacy, then Data Privacy, then Get a copy of your data. Select Connections and Messages. Request the file. LinkedIn sends a download link, which can take some time. Download the ZIP. Extract it. You need two files: Connections.csv and Messages.csv. Keep these files on your computer only. Do not upload them to GitHub. Do not put them in a shared folder.",
+      "checkbox_label": "I have Connections.csv and Messages.csv on my computer."
+    },
+    {
+      "title": "Start the app",
+      "instructions": "Make sure the virtual environment is on. Run the command below. The app opens in your browser at http://localhost:8501. The app creates its local database file on first start.",
+      "copy": [
+        {"label": "Start the app", "text": "streamlit run app.py"}
+      ],
+      "checkbox_label": "The app is open in my browser.",
+      "verify_hint": "You see the app dashboard. If you see an error that says GROQ_API_KEY not found, check the .env file in step 7."
+    },
+    {
+      "title": "Run your first test",
+      "instructions": "Do a small test with your own data. 1. Open the Import Data page. Upload Connections.csv and Messages.csv. Wait for the import to finish. 2. Open the Initiatives page. Choose Create New. Enter a name such as {{business_name}} first test. Describe the people you want to meet, with job titles and industries. The AI shows the target criteria. 3. Open the Target Profiles page. Add one LinkedIn profile URL. 4. Log in to LinkedIn in Chrome. Close all Chrome windows. Then run the scraper once in a second terminal (see the copy block). The scraper keeps to your daily limit and your hours. 5. Open the Find Intros page. Choose your initiative and target. You see a ranked list of mutual connections. Choose Draft Message to get an intro message. Read the message and send it yourself on LinkedIn. The tool never sends messages.",
+      "copy": [
+        {"label": "Run the scraper once (second terminal, environment on)", "text": "python -m src.scheduler"}
+      ],
+      "checkbox_label": "I saw a ranked list and a draft message.",
+      "verify_hint": "If the list is empty, the scraper may not have run yet, or you ran it outside your scan hours (hours {{work_start_hour}} to {{work_end_hour}}, Monday to Friday). Look in the logs folder for the file app.log."
+    },
+    {
+      "title": "Run it every day (optional)",
+      "instructions": "To scan 3 times each day, keep a terminal open with the command below. The README says it runs at 10:00, 13:00 and 16:00. Stay under your daily limit of {{daily_profile_limit}} profiles. Stop the scraper if LinkedIn shows a CAPTCHA or a warning.",
+      "copy": [
+        {"label": "Run the scheduler", "text": "python -m src.scheduler schedule"}
+      ],
+      "checkbox_label": "I know how to start and stop the scheduler."
+    },
+    {
+      "title": "Update later",
+      "instructions": "The product has a version history page. Open the history page of this wizard. Find the version you installed. Read the upgrade steps for each newer version. To get new code, open your fork on GitHub, choose Sync fork, then run git pull in your repo folder. Then run pip install -r requirements.txt again. Your .env file and your local database stay in place.",
+      "copy": [
+        {"label": "Get the latest code", "text": "git pull"},
+        {"label": "Update packages", "text": "pip install -r requirements.txt"}
+      ],
+      "checkbox_label": "I opened the version history page.",
+      "verify_hint": "Your repo folder shows the latest commit date on GitHub."
+    }
+  ]
+}
