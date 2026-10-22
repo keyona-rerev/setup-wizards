@@ -9,5 +9,5 @@ product_repo: keyona-rerev/super-connector-app + keyona-rerev/super-connector-ap
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (app 230e971, api dd7f71b)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (blocked: Sheets MCP error Server not initialized, 3 tries)
 notes: app = static JS dashboard (GitHub Pages enabled), api = FastAPI on Railway with Postgres+pgvector. Env vars: DATABASE_URL, SC_API_KEY, VOYAGE_API_KEY, ANTHROPIC_API_KEY. Secret found in app config.js and HANDOFF.md (value not recorded).
