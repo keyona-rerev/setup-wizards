@@ -1,0 +1,18 @@
+{
+  "product": "LinkedIn Warm Intro Finder",
+  "current": "2026-02-12",
+  "how_to_find": "Open your copy of the repo on GitHub. Read the date and the id of the newest commit. Commit 49e5f64 (2026-02-12, message v1.0) is the newest commit known when this wizard was released. The repo has no tags and no database migrations. VERIFY with the product owner whether releases are used later.",
+  "versions": [
+    {
+      "id": "2026-02-12",
+      "date": "2026-02-12",
+      "title": "v1.0 - Complete working LinkedIn warm intro finder",
+      "summary": "Commit 49e5f64 on 2026-02-12 (message: v1.0). It is the only release commit after the initial commit cecc565 of the same day. The wizard was released on 2026-10-22 and matches this state. VERIFY: no tag exists, so this version label comes from the commit message and date.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "LinkedIn CSV import, relationship scoring, Groq AI matching and message drafting, Playwright scraper with rate limits, scheduler, and Streamlit interface (from the README of commit 49e5f64)."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
