@@ -9,5 +9,5 @@ product_repo: keyona-rerev/wayfinder
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit 74f649f3e2f24332dba9e4e253613831ad0086d3)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (blocked: Google Sheets MCP returned 'Server not initialized' on 3 tries)
 notes: Audit: static index.html on GitHub Pages, Supabase schema in supabase/schema.sql, assets/config.js holds Supabase URL and anon key (secret found in keyona-rerev/wayfinder/assets/config.js, value not recorded). Do NOT run scripts/migrate_tool_registry.py (holds Keyona's registry rows). Default branch main. No tags.
