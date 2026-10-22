@@ -45,15 +45,8 @@ Apps Script only. The GitHub MCP cannot create repos, so no README link is possi
 - superseded: keyona-rerev/claude-skillz is a fork of NTCoding/claude-skillz with no license file. Check terms before you give it to clients.
 - superseded: stakeholder-hub is a static BlackTech Capital fund-deck and marketing site (Vite/React), not a stakeholder CRM. The name does not match. Confirm the product identity.
 
-## secret found (values not recorded; rotate and move to private config)
-- secret found: keyona-rerev/prismm-sequence-review (README.md, WORKFLOW.md, index.html): dashboard gate phrase in plain text in a public repo.
-- secret found: keyona-rerev/rerev-comms-review (README.md, index.html): hardcoded site password in a public repo.
-- secret found: keyona-rerev/btc-comms-review (index.html): hardcoded site password in a public repo.
-- secret found: keyona-rerev/super-connector-app (config.js, HANDOFF.md): API access code hardcoded in a public repo and a public browser file. Rotate SC_API_KEY.
-- secret found: keyona-rerev/wayfinder (assets/config.js): Supabase anon key and Keyona's project name; the schema gives the anon role full access. Also scripts/migrate_tool_registry.py holds Tool Registry rows.
-- secret found: a Drive document titled "Katherine Password for Insight Forge Login" holds a plain-text password. Delete it and rotate the password.
-- secret found: no authentication on the /mcp endpoint of open-loops-mcp, gas-tasks-mcp, gas-dev-mcp and super-connector-mcp (anyone with the URL can use the tools). Wizards tell clients to keep the URL private. Add a bearer check in the product code.
-- secret found: repo keyona-rerev/gas-dev-mcp commits node_modules despite .gitignore (gas-tasks-mcp may too; VERIFY).
+## security findings
+- security: helpers found hardcoded access values and unauthenticated endpoints in several product repos. This repo is public, so the details are NOT listed here. They are in the lead's chat report to Keyona (2026-10-22). Keyona: rotate those values.
 
 ## unregistered tools (Tool Registry rows with no row in products.json)
 Source: Drive sheet "Keyona's Tool Registry" (see blocked). Registered tools that have a wizard: T001, T002, T003, T004, T008, T014, T016, T026, T028, T029, T033 (T026 mapping to proposals-server is VERIFY). These 21 registered rows have no row in products.json:
