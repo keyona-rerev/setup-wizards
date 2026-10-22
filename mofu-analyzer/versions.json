@@ -1,0 +1,46 @@
+{
+  "product": "MOFU Content Analyzer",
+  "current": "2026-07-22",
+  "how_to_find": "Open your copy of the repo on GitHub and read the date of the newest commit. Match it to the list below. The package.json file shows version 2.0.2. The repo has no git tags or releases that this wizard could confirm (VERIFY).",
+  "versions": [
+    {
+      "id": "2026-07-22",
+      "date": "2026-07-22",
+      "title": "Results email, lead capture and permalinks (package version 2.0.2)",
+      "summary": "Commits da6aeab and b388bda on 2026-07-22 (newest commit b388bda). Dates come from commit dates and the package version from package.json. VERIFY the date against your own copy.",
+      "upgrade_type": "settings",
+      "changes": [
+        {"kind": "Added", "text": "Results email through Resend with a link to the saved report."},
+        {"kind": "Added", "text": "Lead alert email and lead storage in the mofu-analyzer-leads Netlify Blobs store."},
+        {"kind": "Added", "text": "Permalink loader for report links in the form /?job=ID."},
+        {"kind": "Added", "text": "Required email field on the page."},
+        {"kind": "Changed", "text": "Pages that do not count toward the score show in a pink block with a legend."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "In your repo on GitHub, choose Sync fork, then Update branch. Netlify redeploys by itself."},
+        {"title": "Add the email variables in Netlify", "text": "Add RESEND_API_KEY and, if you want, RESEND_FROM and LEAD_NOTIFY_EMAIL. Then redeploy. Without RESEND_API_KEY no email is sent.", "copy": "RESEND_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"},
+        {"title": "Redo your local edits", "text": "Check REPORT_BASE_URL, the lead address and your brand text. Redo any edit that the sync replaced."}
+      ]
+    },
+    {
+      "id": "2026-07-21",
+      "date": "2026-07-21",
+      "title": "Headless rendering, two-stage analysis and crawl lanes",
+      "summary": "Commits from 19e8350 to 20e20d9 on 2026-07-21. Inferred from commit dates and messages. VERIFY the date against your own copy. This version also holds the first public commit (7c003b3).",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Background function that renders pages in headless Chromium and stores the result in Netlify Blobs."},
+        {"kind": "Added", "text": "Status function that the page polls for the result."},
+        {"kind": "Added", "text": "Two-stage analysis: profile the business from core pages, then score content pages against that profile."},
+        {"kind": "Added", "text": "Crawl lanes: 14 content slots and 4 core slots."},
+        {"kind": "Added", "text": "Full page inventory in the report."},
+        {"kind": "Fixed", "text": "Out-of-memory stops: one browser tab at a time and a lower page limit."},
+        {"kind": "Fixed", "text": "Chromium start-up errors: chromium 149 or newer, loaded with dynamic import."},
+        {"kind": "Fixed", "text": "Netlify Blobs error: connectLambda is now called first."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "In your repo on GitHub, choose Sync fork, then Update branch. Netlify redeploys by itself. Then run a test report."}
+      ]
+    }
+  ]
+}
