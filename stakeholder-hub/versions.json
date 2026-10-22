@@ -1,0 +1,18 @@
+{
+  "product": "Stakeholder Hub",
+  "current": "2026-10-22",
+  "how_to_find": "Open your repo on GitHub. Look at the date of the newest commit on the main branch. Compare it with the product repo keyona-rerev/stakeholder-hub. The newest product commit when this wizard was released is 6e3b221, dated 2026-03-18. The repo has no migrations and no known tags. VERIFY on GitHub that no tags exist.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The product repo keyona-rerev/stakeholder-hub was at commit 6e3b221 (2026-03-18, Update site info for publish). The repo is a static Vite, React and TypeScript site built with Lovable. It has no database.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Setup wizard and version history page for Stakeholder Hub." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
