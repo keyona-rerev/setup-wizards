@@ -1,0 +1,66 @@
+{
+  "title": "Claude Skillz (skill collection) setup",
+  "intro": "Claude Skillz is a collection of Claude Code skills, plugins and personas for software work. This repo is a fork of the public NTCoding/claude-skillz collection. You make your own copy on GitHub. You pick the skills you want. You add them to your own Claude Code. This wizard has 6 steps.",
+  "variables": [
+    {"key": "github_username", "label": "Your GitHub username", "help": "The account that will own your copy of the collection.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "repo_name", "label": "Name for your copy of the repo", "help": "Keep the default name unless you want a different one.", "placeholder": "claude-skillz", "default": "claude-skillz", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."}
+  ],
+  "steps": [
+    {
+      "title": "Learn what the collection holds",
+      "instructions": "The repo holds three kinds of content. First, skills. A skill is a folder with a SKILL.md file. Skill folders: architect-refine-critique, challenge-that, concise-output, confidence-honesty, create-tasks, critical-peer-personality, data-visualization, fetching-circleci-logs, fix-it-never-work-around-it, independent-research, lightweight-design-analysis, lightweight-implementation-analysis-protocol, lightweight-task-workflow, observability-first-debugging, questions-are-not-instructions, separation-of-concerns, software-design-principles, switch-persona, tactical-ddd, tdd-process, typescript-backend-project-setup, writing-tests. Second, plugins that add commands, agents or hooks. Plugin folders: architect-refine-critique, automatic-code-review, challenge-that, claude-code-updates, collaboration-modes, fetching-circleci-logs, full-codebase-review, learn-from-prs, optimization-team, session-optimizer, task-check, track-and-improve. Third, persona prompts in the system-prompts folder, and two launcher tools: claude-launcher and opencode-launcher. The file .claude-plugin/marketplace.json lists every plugin. Read the README.md in the repo for one-line descriptions.",
+      "checkbox_label": "I know what the collection holds.",
+      "verify_hint": "You can name at least three skill folders you want to use."
+    },
+    {
+      "title": "Make your own copy of the repo",
+      "instructions": "Enter your GitHub username and the repo name below. Open the original repo in your browser. Click Fork. Choose your own account as the owner. Keep the repo name you entered. Your copy is at https://github.com/{{github_username}}/{{repo_name}}. The original repo has no license file. VERIFY the license terms with the original author before you share your copy with others.",
+      "collect": ["github_username", "repo_name"],
+      "copy": [
+        {"label": "Original repo to fork", "text": "https://github.com/NTCoding/claude-skillz"},
+        {"label": "Your copy", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "My copy exists on my GitHub account.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. The page loads."
+    },
+    {
+      "title": "Pick your skills and fix owner details",
+      "instructions": "Choose which plugins and skills you want. The skills in the development-skills plugin install together. Other plugins install one by one. Delete nothing you are not sure about. Then open .claude-plugin/marketplace.json in your copy. The owner name, owner email and homepage fields hold the original author's details. Replace them with your own name, your own email and your own repo link. Also change the add command in README.md from ntcoding/claude-skillz to {{github_username}}/{{repo_name}}. The skill fetching-circleci-logs reads a CircleCI token from the file ~/.circleci/cli.yml on your own computer. Do not put a token in the repo. Skip that skill if you do not use CircleCI. The launcher file claude-launcher/README.md shows an alias with a path. Use your own path.",
+      "copy": [
+        {"label": "Value for homepage in marketplace.json", "text": "https://github.com/{{github_username}}/{{repo_name}}"},
+        {"label": "Value for the README add command", "text": "/plugin marketplace add {{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "I picked my skills and replaced the owner details.",
+      "verify_hint": "The file .claude-plugin/marketplace.json in your copy shows your name, email and link in the owner and homepage fields."
+    },
+    {
+      "title": "Add the collection to your Claude Code",
+      "instructions": "Open Claude Code on your own computer. Add your copy as a plugin marketplace. Then install the plugins you picked. Run each command on its own line. To use a single skill without a plugin, copy its folder into the skills folder at ~/.claude/skills/ on your computer. Each skill folder must keep its SKILL.md file.",
+      "copy": [
+        {"label": "Add your marketplace", "text": "/plugin marketplace add {{github_username}}/{{repo_name}}"},
+        {"label": "Install the skill bundle", "text": "/plugin install development-skills@claude-skillz"},
+        {"label": "Install one more plugin (example)", "text": "/plugin install task-check@claude-skillz"}
+      ],
+      "checkbox_label": "I installed at least one plugin.",
+      "verify_hint": "Run /plugin in Claude Code. The claude-skillz marketplace and your plugin appear in the list."
+    },
+    {
+      "title": "Run your first test",
+      "instructions": "Start a new Claude Code session. Use a skill from the bundle you installed. Ask Claude the prompt below. Claude should reply short and dense. That shows the concise-output skill is active. If nothing changes, run /plugin and check that the plugin shows as enabled. Then restart Claude Code.",
+      "copy": [
+        {"label": "Test prompt", "text": "Use the concise-output skill. Explain what a git fork is in three bullets."}
+      ],
+      "checkbox_label": "The skill worked in my test.",
+      "verify_hint": "Claude answers with three short bullets and no filler."
+    },
+    {
+      "title": "Keep your copy up to date",
+      "instructions": "The original author adds and changes skills over time. To get changes, open your copy on GitHub. Click Sync fork, then Update branch. Then update the marketplace in Claude Code. Compare your date with the version history page of this wizard. If you changed a file the author also changed, GitHub shows a conflict. Fix the conflict before you sync. Open the version history page at history.html on this wizard site to see what changed and what to do.",
+      "copy": [
+        {"label": "Update the marketplace", "text": "/plugin marketplace update claude-skillz"}
+      ],
+      "checkbox_label": "I know how to update.",
+      "verify_hint": "Your copy on GitHub says it is up to date with the original repo."
+    }
+  ]
+}
