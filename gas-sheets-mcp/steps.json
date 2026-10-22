@@ -1,0 +1,117 @@
+{
+  "title": "Set up GAS Sheets MCP",
+  "intro": "GAS Sheets MCP lets Claude work with your own Google Sheets. It has two parts. Part one is a Google Apps Script web app that runs in your Google account. Part two is a small Node.js server that runs on Railway in your account. Claude connects to the Node.js server. The server sends each request to your Apps Script web app. The tools let Claude list spreadsheets, create spreadsheets and tabs, read, write, find, update and delete rows, and read or write cell ranges. Everything runs on your own accounts. You need about 45 minutes.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "Use the name of your company. This text only appears in your own notes.", "placeholder": "Acme Studio", "optional": true},
+    {"key": "github_username", "label": "Your GitHub username", "help": "Find it at github.com in the menu at the top right.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]{1,39}$", "pattern_error": "Use only letters, numbers and hyphens."},
+    {"key": "repo_name", "label": "Name for your copy of the code repository", "help": "This is the name of your fork on GitHub.", "placeholder": "gas-sheets-mcp", "default": "gas-sheets-mcp", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use only letters, numbers, dots, hyphens and underscores."},
+    {"key": "railway_project_name", "label": "Railway project name", "help": "Choose any name. You enter it in Railway.", "placeholder": "sheets-mcp", "default": "sheets-mcp"},
+    {"key": "app_url", "label": "Your Railway public URL", "help": "Railway shows it after you create a public domain. It starts with https://.", "placeholder": "https://sheets-mcp-production.up.railway.app", "pattern": "^https://[A-Za-z0-9.-]+$", "pattern_error": "Start with https:// and do not add a slash at the end."},
+    {"key": "mcp_url", "label": "Your MCP address for Claude", "help": "This value follows from your Railway URL.", "derive": "{{app_url}}/mcp"},
+    {"key": "health_url", "label": "Your health check address", "help": "This value follows from your Railway URL.", "derive": "{{app_url}}/health"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need four things. First, a Google account that owns the sheets you want Claude to use. Second, a free GitHub account. Third, a Railway account at railway.com with a paid plan or trial credit. Fourth, a Claude plan that can add custom connectors. You also need the Apps Script template link that ReRev Labs sent you. Ask ReRev Labs if you do not have the link.",
+      "checkbox_label": "I have all four accounts and the template link.",
+      "verify_hint": "You can sign in to Google, GitHub, Railway and Claude."
+    },
+    {
+      "title": "Enter your public values",
+      "instructions": "Enter the values below. They are not secret. Never enter a password, token or secret in this wizard. You enter secrets only inside your own Google, Railway and Claude accounts.",
+      "collect": ["business_name", "github_username", "repo_name", "railway_project_name"],
+      "checkbox_label": "I entered my values.",
+      "verify_hint": "Your GitHub username and repo name show in the fields."
+    },
+    {
+      "title": "Make your Apps Script backend",
+      "instructions": "Open the template project link that ReRev Labs sent you. Then choose File, Make a copy. Open your copy. Name it for example \"Sheets API for {{business_name}}\". The project must run as you and must be able to open your spreadsheets. VERIFY with ReRev Labs: the exact setup function name and the exact Script Property name for the shared password are not in the public code repository. Follow the notes that ReRev Labs sent with the template link.",
+      "checkbox_label": "I made my own copy of the Apps Script project.",
+      "verify_hint": "Your copy appears in script.google.com under My projects."
+    },
+    {
+      "title": "Choose a shared password and store it in Apps Script",
+      "instructions": "The Node.js server sends a shared password with every request. The Apps Script web app checks it. Make a long random password of at least 32 characters. Use a password manager. In your Apps Script copy, open Project Settings, then Script Properties. Add the shared password in the property that the template notes name. Do not write the password in this wizard. Do not write it in GitHub. You paste the same password into Railway in a later step.",
+      "checkbox_label": "I stored the shared password in my Script Properties and saved it in my password manager.",
+      "verify_hint": "Script Properties shows the new property. The value is hidden or known only to you."
+    },
+    {
+      "title": "Deploy the Apps Script as a web app",
+      "instructions": "In your Apps Script copy, choose Deploy, then New deployment. Choose type Web app. Set Execute as to Me. Set Who has access to Anyone. The shared password protects the web app. Choose Deploy. Approve the Google permission screen. Copy the Web app URL that ends in /exec. Keep it private. You paste it into Railway in a later step.",
+      "checkbox_label": "I deployed the web app and copied the /exec URL.",
+      "verify_hint": "The Web app URL ends in /exec."
+    },
+    {
+      "title": "Fork the code",
+      "instructions": "Open https://github.com/keyona-rerev/gas-sheets-mcp in your browser. Choose Fork. Set the owner to {{github_username}}. Set the repository name to {{repo_name}}. The code is in the default branch named master. Choose Create fork.",
+      "copy": [
+        {"label": "Your fork address", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "I forked the repository.",
+      "verify_hint": "Your fork opens at https://github.com/{{github_username}}/{{repo_name}} and shows index.mjs and package.json."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "Sign in to Railway. Choose New Project, then Deploy from GitHub repo. Connect your GitHub account if Railway asks. Choose {{github_username}}/{{repo_name}}. Choose the master branch. Name the project {{railway_project_name}}. Railway reads package.json and runs the start command node index.mjs. The first deploy fails until you add the variables in the next step. This is normal.",
+      "copy": [
+        {"label": "Start command (Railway sets it for you)", "text": "npm start"}
+      ],
+      "checkbox_label": "I created the Railway project from my fork.",
+      "verify_hint": "The project {{railway_project_name}} shows one service."
+    },
+    {
+      "title": "Add the two variables in Railway",
+      "instructions": "In Railway, open your service. Choose Variables. Add the two variables below. Paste your own values. SHEETS_GAS_URL is the Web app URL that ends in /exec. SHEETS_GAS_TOKEN is the shared password from your Script Properties. Do not add a PORT variable. Railway sets it. Never share these values with anyone. Save the variables. Railway redeploys the service.",
+      "copy": [
+        {"label": "Variable 1 name", "text": "SHEETS_GAS_URL"},
+        {"label": "Variable 1 value", "text": "PASTE_YOUR_OWN_WEB_APP_URL_HERE"},
+        {"label": "Variable 2 name", "text": "SHEETS_GAS_TOKEN"},
+        {"label": "Variable 2 value", "text": "PASTE_YOUR_OWN_SHARED_PASSWORD_HERE"}
+      ],
+      "checkbox_label": "I added both variables in Railway.",
+      "verify_hint": "The Railway deploy log says: Google Sheets MCP (Streamable HTTP) running on port. It does not say FATAL."
+    },
+    {
+      "title": "Make a public address",
+      "instructions": "In Railway, open your service. Choose Settings, then Networking. Choose Generate Domain. Copy the address. Enter it below. Do not add a slash at the end.",
+      "collect": ["app_url"],
+      "checkbox_label": "I generated a public domain and entered it.",
+      "verify_hint": "Your Railway URL shows in the field and starts with https://."
+    },
+    {
+      "title": "Check that the server runs",
+      "instructions": "Open the health address in your browser. You must see a short message with status ok. If you see an error, open the Railway deploy logs. A FATAL message means one of the two variables is missing or has a typo.",
+      "copy": [
+        {"label": "Health check address", "text": "{{health_url}}"}
+      ],
+      "checkbox_label": "The health address shows status ok.",
+      "verify_hint": "The page at {{health_url}} shows: status ok, service google-sheets-mcp, transport streamable-http."
+    },
+    {
+      "title": "Add the connector to Claude",
+      "instructions": "Open Claude. Open Settings, then Connectors. Choose Add custom connector. Enter a name, for example Google Sheets. Paste the MCP address below. Save it. Do not choose the old SSE type: the server uses Streamable HTTP since the commit of 2026-04-22.",
+      "copy": [
+        {"label": "MCP address", "text": "{{mcp_url}}"}
+      ],
+      "checkbox_label": "I added the connector in Claude.",
+      "verify_hint": "Claude lists the connector as connected and shows 13 tools that start with sheets_."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Start a new chat in Claude. Turn on the Google Sheets connector. Send the message below. Claude must return a list of your own spreadsheets. If the list is empty or an error shows, go back to the Apps Script deployment and the two Railway variables. A permission error means you must approve the Google permission screen again.",
+      "copy": [
+        {"label": "Test message", "text": "Use the Google Sheets connector to list my spreadsheets."},
+        {"label": "Second test message", "text": "Create a new spreadsheet called Wizard Test. Then add one tab named Test with the headers Name and Date."}
+      ],
+      "checkbox_label": "Claude listed my spreadsheets and created the test spreadsheet.",
+      "verify_hint": "The spreadsheet Wizard Test appears in your Google Drive."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "Open the version history page of this wizard at history.html. Find your version in the list. Follow the upgrade steps for each newer version. To get new code, open your fork on GitHub and choose Sync fork. Railway redeploys by itself. If a new version changes the Apps Script, copy the new code into your Apps Script copy and choose Deploy, Manage deployments, then edit the deployment and pick New version.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "The history page lists your version."
+    }
+  ]
+}
