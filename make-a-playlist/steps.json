@@ -1,0 +1,195 @@
+{
+  "title": "Make a Playlist: set up your own copy",
+  "intro": "Make a Playlist lets people build a playlist of YouTube videos with a written note on each song. They share it as one link. Listeners need no account. This wizard installs your own copy on your own accounts. The API and the database run on Railway. The web pages run on Netlify. You need a GitHub account, a Railway account and a Netlify account. The setup takes about 45 minutes.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your brand name",
+      "help": "The name you want to show on your copy. Example: Sunday Sessions.",
+      "placeholder": "Sunday Sessions"
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "Look at the top right of github.com after you sign in.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your GitHub repository",
+      "help": "This is the name your fork will have.",
+      "placeholder": "my-playlist-app",
+      "default": "my-playlist-app",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Name for your Railway project",
+      "help": "This name is only for you. Example: playlist-app.",
+      "placeholder": "playlist-app",
+      "default": "playlist-app",
+      "pattern": "^[A-Za-z0-9 _-]{2,60}$",
+      "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only."
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Name for your Netlify site",
+      "help": "This becomes your web address. Use lowercase letters, numbers and hyphens. The name must be free on Netlify.",
+      "placeholder": "my-playlist-app",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,50}$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "app_url",
+      "label": "Your app web address",
+      "help": "The wizard builds this from your Netlify site name.",
+      "derive": "https://{{netlify_site_name}}.netlify.app"
+    },
+    {
+      "key": "admin_email",
+      "label": "Your admin email address",
+      "help": "This account can take down any playlist. Use the email you will sign up with in the app. You can skip this.",
+      "placeholder": "you@example.com",
+      "optional": true,
+      "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+      "pattern_error": "Enter a full email address."
+    },
+    {
+      "key": "report_email",
+      "label": "Email address for report links",
+      "help": "People who see a bad playlist use this address to report it. You can skip this.",
+      "placeholder": "reports@example.com",
+      "optional": true,
+      "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+      "pattern_error": "Enter a full email address."
+    },
+    {
+      "key": "brand_color",
+      "label": "Your accent color",
+      "help": "A hex color for buttons and links. The original uses a brass gold.",
+      "placeholder": "#c9a227",
+      "default": "#c9a227",
+      "optional": true,
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "pattern_error": "Use a hex color such as #c9a227."
+    },
+    {
+      "key": "railway_domain",
+      "label": "Your Railway public domain",
+      "help": "Enter the domain only. Do not add https://. Example: playlist-app-production.up.railway.app.",
+      "placeholder": "playlist-app-production.up.railway.app",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+      "pattern_error": "Enter the domain only, with no https:// and no slash."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "Make a Playlist has two parts.\n\n1. The API and database run on Railway.\n2. The web pages run on Netlify.\n\nNetlify sends all data requests to Railway. The browser sees one web address.\n\nBefore you start, make sure you have these accounts:\n\n- GitHub (github.com)\n- Railway (railway.com). Railway may charge for the server and the database. Check the Railway pricing page before you start.\n- Netlify (netlify.com)\n\nYou do not need to install anything on your computer. You do all the work in your web browser.",
+      "checkbox_label": "I have a GitHub, Railway and Netlify account.",
+      "verify_hint": "You can sign in to all three sites."
+    },
+    {
+      "title": "Choose your names",
+      "instructions": "Enter the names for your copy. The wizard fills them into the next steps. Do not enter passwords or secret values here.",
+      "collect": ["business_name", "github_username", "repo_name", "railway_project_name", "netlify_site_name", "admin_email", "report_email", "brand_color"],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "Your app address will be {{app_url}}."
+    },
+    {
+      "title": "Fork the code on GitHub",
+      "instructions": "Get your own copy of the code.\n\n1. Open the Make a Playlist code repository that ReRev Labs sent you. The name is Make-a-playlist.\n2. Select Fork, then Create a new fork.\n3. Set the repository name to {{repo_name}}.\n4. Select Create fork.\n\nThe fork now lives at github.com/{{github_username}}/{{repo_name}}.",
+      "copy": [
+        { "label": "Your fork address", "text": "https://github.com/{{github_username}}/{{repo_name}}" }
+      ],
+      "checkbox_label": "My fork exists on GitHub.",
+      "verify_hint": "You can open https://github.com/{{github_username}}/{{repo_name}} and see the files server.js and netlify.toml."
+    },
+    {
+      "title": "Create the Railway project and database",
+      "instructions": "Make the project that holds your API and database.\n\n1. Sign in to Railway.\n2. Select New Project.\n3. Choose Provision PostgreSQL. Railway adds a database.\n4. Select the project name at the top left. Rename the project to {{railway_project_name}}.\n\nThe app makes its own tables when it starts. You do not run any SQL.",
+      "checkbox_label": "My Railway project has a Postgres database.",
+      "verify_hint": "You see a Postgres service in the {{railway_project_name}} project."
+    },
+    {
+      "title": "Deploy the API on Railway",
+      "instructions": "Add the API service from your fork.\n\n1. In the project, select New, then GitHub Repo.\n2. Choose {{github_username}}/{{repo_name}}. Allow Railway to read the repository if it asks.\n3. Railway builds the code. The start command is npm start. Railway finds it by itself.\n4. Open the new service. Select the Variables tab.\n5. Select New Variable, then Add a Reference. Choose the Postgres service and the variable DATABASE_URL. Name the new variable DATABASE_URL. This links the API to the database.\n6. Add the optional variables below only if you want them.\n\nEnter all values inside Railway only. Do not paste them in this wizard.\n\nThe variable DATABASE_URL is required. The other variables are optional. Railway sets PORT for you.",
+      "copy": [
+        { "label": "Required variable name", "text": "DATABASE_URL" },
+        { "label": "Optional: admin accounts (comma separated)", "text": "ADMIN_EMAILS={{admin_email}}" },
+        { "label": "Optional: report email", "text": "REPORT_EMAIL={{report_email}}" }
+      ],
+      "checkbox_label": "The API service is deployed and has DATABASE_URL set.",
+      "verify_hint": "The Railway deploy log shows the line: schema ready, then: listening on."
+    },
+    {
+      "title": "Get your Railway public domain",
+      "instructions": "Give the API a public address.\n\n1. Open the API service in Railway.\n2. Select Settings, then Networking.\n3. Select Generate Domain.\n4. Copy the domain. It ends in .up.railway.app.\n5. Enter it below without https://.",
+      "collect": ["railway_domain"],
+      "checkbox_label": "I entered my Railway domain.",
+      "verify_hint": "Your API address is https://{{railway_domain}}."
+    },
+    {
+      "title": "Test the API",
+      "instructions": "Check that the API runs.\n\n1. Open the address below in your browser.\n2. You must see a short answer that says ok is true.\n\nIf you see an error page, open the Railway deploy log. Check that DATABASE_URL is a reference to the Postgres service.",
+      "copy": [
+        { "label": "API health address", "text": "https://{{railway_domain}}/healthz" }
+      ],
+      "checkbox_label": "The health address shows ok true.",
+      "verify_hint": "The page shows: {\"ok\":true,\"signIn\":true}"
+    },
+    {
+      "title": "Point the web pages at your API",
+      "instructions": "The file netlify.toml sends data requests to a Railway address. The copy you forked still holds the address of the original app. You must replace it.\n\n1. Open your fork on GitHub.\n2. Open the file netlify.toml.\n3. Select the pencil icon to edit.\n4. Find the host that starts with web-production and ends with .up.railway.app. It appears in four places: the /p/*, /api/*, /auth/* and /healthz rules.\n5. Replace every one with your own domain: {{railway_domain}}.\n6. Select Commit changes.\n\nDo not change the other lines.",
+      "copy": [
+        { "label": "Your Railway domain", "text": "{{railway_domain}}" },
+        { "label": "Example of one finished rule", "text": "to = \"https://{{railway_domain}}/api/:splat\"" }
+      ],
+      "checkbox_label": "I replaced all four addresses in netlify.toml and committed.",
+      "verify_hint": "The text web-production no longer appears in netlify.toml on GitHub."
+    },
+    {
+      "title": "Add your brand",
+      "instructions": "Make the app look like yours.\n\n1. In your fork, open public/index.html. Replace the product name and the intro text with {{business_name}}. Edit the text only. Do not change the code around it.\n2. Open public/app.css. Find the line that starts with --brass. Change its color to {{brand_color}}.\n3. The home page may keep its own colors in public/home.css. Search that file for the same color and change it too. VERIFY this file in your copy.\n4. Commit each change.\n\nYou can skip this step and do it later. The app works with the original look.",
+      "copy": [
+        { "label": "Accent color line for app.css", "text": "--brass: {{brand_color}};" }
+      ],
+      "checkbox_label": "I changed my brand text and color, or I chose to skip.",
+      "verify_hint": "Your Netlify site will show {{business_name}} after the next step."
+    },
+    {
+      "title": "Deploy the web pages on Netlify",
+      "instructions": "Put the web pages online.\n\n1. Sign in to Netlify.\n2. Select Add new project, then Import an existing project.\n3. Choose GitHub. Allow access to {{github_username}}/{{repo_name}}.\n4. Set the build command to empty. Leave it blank.\n5. Set the publish directory to public. The file netlify.toml already says this.\n6. Open Project configuration, then Change project name. Set the name to {{netlify_site_name}}.\n7. Deploy the site.\n\nYour app is now at {{app_url}}.",
+      "copy": [
+        { "label": "Publish directory", "text": "public" },
+        { "label": "Your app address", "text": "{{app_url}}" }
+      ],
+      "checkbox_label": "The Netlify deploy finished.",
+      "verify_hint": "The Netlify deploy shows Published. {{app_url}} opens your home page."
+    },
+    {
+      "title": "Run the first test",
+      "instructions": "Test the whole path from the browser to the database.\n\n1. Open {{app_url}}.\n2. Select New playlist. Give it a title. Create it.\n3. Save the edit link that the app shows. This link is the secret key to your playlist.\n4. Paste a YouTube link. Add a note for the song. Save the track.\n5. Open the public link. Check that the song plays and the note shows.\n6. Open {{app_url}}/healthz in a new tab. It must show ok true.\n\nIf the page loads but a playlist does not save, check step 8 again. The addresses in netlify.toml must match your Railway domain.",
+      "copy": [
+        { "label": "Health check through Netlify", "text": "{{app_url}}/healthz" }
+      ],
+      "checkbox_label": "I made a playlist, added a song and played it.",
+      "verify_hint": "The public link shows your title, the video and your note."
+    },
+    {
+      "title": "Test accounts and admin tools",
+      "instructions": "Accounts are optional. They give one place that lists your playlists.\n\n1. Open {{app_url}}/signin. Create an account with an email and a password of at least 8 characters.\n2. Open {{app_url}}/mine. Your playlist list must show.\n3. If you set ADMIN_EMAILS, sign up with that same email. Open any playlist edit page. You must see admin rights such as delete and unlist.\n\nIf you set ADMIN_EMAILS after the first deploy, redeploy the API service in Railway so it reads the change.",
+      "checkbox_label": "Sign up, sign in and my playlist list work.",
+      "verify_hint": "{{app_url}}/mine shows the playlist you made."
+    },
+    {
+      "title": "Know how to update",
+      "instructions": "ReRev Labs may improve Make a Playlist over time. Each change gets an entry on the version history page.\n\n1. Open the version history page of this wizard. Add /history.html to the address of this wizard.\n2. Find your version with the help text on that page.\n3. Follow the upgrade steps for each newer version. Most updates only need you to sync your fork and let Railway and Netlify redeploy.\n\nIf you changed netlify.toml or the brand files, keep your changes when you sync. Check them after each update.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "The history page lists at least one version."
+    }
+  ]
+}
