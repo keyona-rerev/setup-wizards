@@ -1,0 +1,66 @@
+{
+  "product": "Online Report Card",
+  "current": "2026-07-04",
+  "how_to_find": "Open your copy of the repository on GitHub. Read the date of the newest commit on the main branch. Compare it with the version dates on this page. The original repository is keyona-rerev/online-report-card. Git tags are not used. VERIFY: the tools used for this audit do not list tags.",
+  "versions": [
+    {
+      "id": "2026-07-04",
+      "date": "2026-07-04",
+      "title": "Backend moves from Supabase to Railway Postgres and PostgREST",
+      "summary": "VERIFY: inferred from commits dated 2026-07-04 (newest commit 9e5354c). The three functions now call a PostgREST service on Railway. The environment variable POSTGREST_URL replaces the Supabase address. schema.sql holds the current tables.",
+      "upgrade_type": "database",
+      "changes": [
+        { "kind": "Changed", "text": "report.js, get-report.js and cleanup.js read and write through POSTGREST_URL, not Supabase." },
+        { "kind": "Added", "text": "schema.sql holds the current table definitions. supabase.sql is marked deprecated." },
+        { "kind": "Changed", "text": "The README describes the Railway Postgres and PostgREST setup." }
+      ],
+      "upgrade_steps": [
+        { "title": "Create the new database", "text": "Follow steps 3, 4 and 5 of this wizard. Create Postgres and PostgREST on Railway and run schema.sql." },
+        { "title": "Change the Netlify settings", "text": "Add the variable POSTGREST_URL. Remove the old Supabase variables. Deploy the site again.", "copy": "POSTGREST_URL=https://your-postgrest.up.railway.app" },
+        { "title": "Move old data", "text": "VERIFY: the audit found no data migration script. Export the old rows from Supabase and import them into the new report_cards table by hand if you need them." }
+      ]
+    },
+    {
+      "id": "2026-06-04",
+      "date": "2026-06-04",
+      "title": "Search-based grading and cleaner cards",
+      "summary": "VERIFY: inferred from commits dated 2026-06-04. The grader judges what shows in search results. It marks missing areas as N/A. It locks a result for 30 days. A model change to Haiku 4.5 is in the commit messages.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Changed", "text": "The grader reads search results per category, with N/A logic and a 30-day lock for the same person and jobs." },
+        { "kind": "Added", "text": "Channel chips on the form, and a one-time cleanup function (netlify/functions/cleanup.js) that removes stray tags from old rows." },
+        { "kind": "Fixed", "text": "The page and the functions remove cite tags from saved text. Prose length limits are higher." }
+      ],
+      "upgrade_steps": [
+        { "title": "Redeploy", "text": "Sync your fork. Netlify deploys the change. No new variables are needed for this version. VERIFY: confirm in report.js." }
+      ]
+    },
+    {
+      "id": "2026-06-02",
+      "date": "2026-06-02",
+      "title": "Four-job redesign",
+      "summary": "VERIFY: inferred from commits dated 2026-06-02. The form asks for a primary job and an optional secondary job. The card adds a narrative read, an audience read and a harmony read. The share page shows them.",
+      "upgrade_type": "database",
+      "changes": [
+        { "kind": "Added", "text": "Primary job and secondary job inputs. The grade depends on the primary job." },
+        { "kind": "Added", "text": "Narrative, audience and harmony reads on the card and on the share page." },
+        { "kind": "Changed", "text": "The table report_cards holds the columns primary_job and secondary_job (see schema.sql)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Add the new columns", "text": "VERIFY: if your table is older, add the two columns in the Railway Data tab, then redeploy.", "copy": "alter table report_cards add column if not exists primary_job text; alter table report_cards add column if not exists secondary_job text;" }
+      ]
+    },
+    {
+      "id": "2026-06-01",
+      "date": "2026-06-01",
+      "title": "First release with share page and email",
+      "summary": "VERIFY: inferred from the oldest commits that the audit read (2026-06-01). The repository was created on 2026-06-01. This version added a per-report token, the share page report.html with PNG download, the get-report function, Cloudflare Turnstile and Resend email. Older commits may exist beyond the 30 that the audit read.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Share page report.html with Download as PNG, and the get-report function." },
+        { "kind": "Added", "text": "Per-report token, Turnstile bot check and email send through Resend." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
