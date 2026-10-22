@@ -1,0 +1,21 @@
+{
+  "product": "BTC Comms Review",
+  "current": "2026-10-22",
+  "how_to_find": "Open your repository on GitHub. Look at the date of the newest commit that came from the original repository. The repository has no version tags and no version number in the code (VERIFY). Match that commit date to the entries below.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The page code (index.html) was last changed in commit f7fe5a7 dated 2026-04-21. The Debbie agent code was added in April 2026. The repository later received automatic data commits to pipeline.json, the newest being f524012 dated 2026-08-24. Later changes will appear above this entry.",
+      "upgrade_type": "none",
+      "changes": [
+        {
+          "kind": "Added",
+          "text": "Setup wizard for BTC Comms Review. It covers copy, data cleanup, address edits, hosting, a first test and the optional email agent."
+        }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
