@@ -9,5 +9,5 @@ product_repo: keyona-rerev/prismm-sequence-review
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit a648237dc7f4c64ce77323be3a0e7de3d0d07241)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (BLOCKED: Sheets MCP 'Server not initialized', lead must append)
 notes: Full index.html not readable (tool truncates), Daily Buyers proxy URL marked VERIFY.
