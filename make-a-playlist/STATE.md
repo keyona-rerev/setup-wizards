@@ -9,5 +9,5 @@ product_repo: keyona-rerev/Make-a-playlist
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit d1d6ea2ebe42fa045b63370ba0400107413b9815)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (blocked: Sheets MCP returned 'Server not initialized' on 3 tries; lead must append 2 lines for job-wz-05)
 notes: Audit: Express + Postgres API (server.js, deps express and pg only), static front end in public/, netlify.toml proxies /p /api /auth /healthz to a Railway host (hard-coded, client must replace). Default branch main. Env: DATABASE_URL (required), optional PORT, ADMIN_EMAILS, REPORT_EMAIL, NODE_ENV. No tags seen (VERIFY). Last commit 20ea0cc 2026-08-05.
