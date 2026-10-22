@@ -1,0 +1,34 @@
+{
+  "product": "Super Connector MCP",
+  "current": "2026-04-16",
+  "how_to_find": "Open your own fork of the super-connector-mcp repo on GitHub. Read the date and short sha of the newest commit. Compare it to the commit sha on each version below.",
+  "versions": [
+    {
+      "id": "2026-04-16",
+      "date": "2026-04-16",
+      "title": "Content idea tools and README",
+      "summary": "Adds three content asset tools and a README with deployment notes and a tool list (29 tools in total). Commit 1193bda (content tools) and commit e5dcd49 (README), both dated 2026-04-16. VERIFY: no git tag exists that this wizard can see. The id comes from the commit date. This is the newest commit seen at wizard release on 2026-10-22.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Added", "text": "Tools sc_log_content_idea, sc_list_content_ideas and sc_get_content_idea." },
+        { "kind": "Added", "text": "README with deployment notes, tool list and known gaps." }
+      ],
+      "upgrade_steps": [
+        { "title": "Sync your fork", "text": "On your fork page on GitHub, choose Sync fork, then Update branch. Railway redeploys by itself. Start a new Claude chat to load the new tools.", "copy": "" }
+      ]
+    },
+    {
+      "id": "2026-04-01",
+      "date": "2026-04-01",
+      "title": "First release with delete tools",
+      "summary": "First release of the server: contacts, initiatives, sub-projects, stakeholders, action items, buckets, follow-ups, events, brain dump and health check. Delete tools for initiatives, contacts and sub-projects were added the same day. Commits 31c322f and d527eda, dated 2026-04-01. VERIFY: dates and content come from commit messages only.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Initial MCP server on streamable HTTP." },
+        { "kind": "Added", "text": "Tools sc_delete_initiative, sc_delete_contact and sc_delete_sub_project." },
+        { "kind": "Fixed", "text": "Host and port now set in the FastMCP constructor, not in run()." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
