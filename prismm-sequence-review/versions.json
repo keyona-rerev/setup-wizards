@@ -1,0 +1,91 @@
+{
+  "product": "Prismm Sequence Review",
+  "current": "2026-07-17",
+  "how_to_find": "Open your repo on GitHub. Find the date of the commit you forked from. If you changed only data files, look at the date of the last commit to index.html in the product repo, then compare it with the list below. The product repo is keyona-rerev/prismm-sequence-review.",
+  "versions": [
+    {
+      "id": "2026-07-17",
+      "date": "2026-07-17",
+      "title": "Sequence split and new benchmark sequence",
+      "summary": "Newest commit seen at wizard release is b093e58 on 2026-07-17. The dates in this list come from commit dates. VERIFY each date against the repo history.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "A fourth sequence file and scenario for a benchmark follow-on (commits 6c900f9, 8db1bc9)."},
+        {"kind": "Changed", "text": "A third sequence was split into parts, with a new sender and tag field (commit 89b5187, 86d7540)."},
+        {"kind": "Changed", "text": "An audience record links to two sequences (commit b093e58)."}
+      ],
+      "upgrade_steps": [
+        {"title": "Copy changed code files only", "text": "Compare index.html and the templates folder with the product repo. Copy changes you want. Do not copy the data files or sequence files. They hold Prismm data."}
+      ]
+    },
+    {
+      "id": "2026-06-23",
+      "date": "2026-06-23",
+      "title": "Daily Buyers tab",
+      "summary": "A Daily Buyers tab was added between 2026-06-22 and 2026-06-24 (commits ee82875, 4d27227, 1cc1876, 844c14a). VERIFY the date range. The tab calls a Prismm Apps Script address and does not work for other teams.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Daily Buyers tab with approve, skip and draft actions."},
+        {"kind": "Changed", "text": "The tab was moved to a new Apps Script web address on 2026-06-24."}
+      ],
+      "upgrade_steps": [
+        {"title": "Hide the tab", "text": "Remove the Daily Buyers tab from the tab bar in index.html if you do not run your own backend."}
+      ]
+    },
+    {
+      "id": "2026-05-18",
+      "date": "2026-05-18",
+      "title": "ICP hypothesis grid and contact lists",
+      "summary": "ICP grid, clickable hypothesis cards and a contact-list data file were added on 2026-05-18 (commits e78d9af to f96d5f2). VERIFY the dates.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "icp-grid.html and a data/icp-contacts.json file read by the Audiences tab."},
+        {"kind": "Fixed", "text": "Two rows in one hypothesis were replaced with verified rows (commit f96d5f2)."}
+      ],
+      "upgrade_steps": [
+        {"title": "Replace the contact file", "text": "Use your own data in data/icp-contacts.json. Do not use the Prismm file."}
+      ]
+    },
+    {
+      "id": "2026-04-13",
+      "date": "2026-04-13",
+      "title": "Batch and classification fields",
+      "summary": "Batch and classification fields were added to sequence records on 2026-04-13 (commits 45c8856, d41380a, 8b74883). VERIFY the date.",
+      "upgrade_type": "settings",
+      "changes": [
+        {"kind": "Added", "text": "A batchId field and a classification field on sequence records."}
+      ],
+      "upgrade_steps": [
+        {"title": "Add the fields to your records", "text": "Add batchId and classification to entries in sequences.json if you want to use them."}
+      ]
+    },
+    {
+      "id": "2026-04-02",
+      "date": "2026-04-02",
+      "title": "ICP Insights report",
+      "summary": "An ICP Insights page and tab link were added on 2026-04-02 (commits 728e449 to 561c68e). VERIFY the date.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "icp-insights.html report page and a nav link."},
+        {"kind": "Changed", "text": "The report design was simplified on the same day."}
+      ],
+      "upgrade_steps": [
+        {"title": "Replace the report text", "text": "The report holds Prismm research. Write your own or remove the page and its nav link."}
+      ]
+    },
+    {
+      "id": "2026-03-26",
+      "date": "2026-03-26",
+      "title": "Tabs consolidated and README added",
+      "summary": "The tabs were rebuilt into Sequences, Pipeline and Weekly Reports. A full README was added. Dates are commit dates (commits d0fca75, ae3da29). VERIFY.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Changed", "text": "Sequences tab has one filter for all statuses."},
+        {"kind": "Added", "text": "pipeline.json and a README with a usage guide."}
+      ],
+      "upgrade_steps": [
+        {"title": "Compare index.html", "text": "Copy the new index.html over your edited one. Then repeat the edits in step 5 of the wizard."}
+      ]
+    }
+  ]
+}
