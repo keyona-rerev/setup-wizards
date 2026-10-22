@@ -9,5 +9,5 @@ product_repo: keyona-rerev/founder-fork-html-publisher
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit 57a73c0e94e7fabfc20ef86607d22b4a8f4cd21c)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (blocked: Sheets MCP returned 'Server not initialized' on 3 tries)
 notes: default branch main. Newest product commit 70371e0 2026-08-05.
