@@ -1,0 +1,108 @@
+{
+  "title": "HTML Publisher setup",
+  "intro": "This wizard installs your own HTML Publisher. You ask Claude to write a page. Claude saves it to your GitHub account. Your Railway server shows it at a live link. You can lock single pages with a user name and password. The index page lists all your pages. The code comes from the repository keyona-rerev/founder-fork-html-publisher. It is a small Node and Express server. It does not make a website with menus. It does not track who opens a page. Pages without a password are public.",
+  "variables": [
+    { "key": "business_name", "label": "Your name or business name", "help": "Shows as the brand name on your index page.", "placeholder": "Acme Studio", "optional": true },
+    { "key": "github_username", "label": "Your GitHub username", "help": "The GitHub account that will own your copy of the code.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters." },
+    { "key": "repo_name", "label": "Name of your copy of the repository", "help": "Keep the default name. The Claude skill expects it.", "placeholder": "founder-fork-html-publisher", "default": "founder-fork-html-publisher", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only." },
+    { "key": "railway_project_name", "label": "Railway project name", "help": "Any name you like. It is only a label inside Railway.", "placeholder": "html-publisher", "default": "html-publisher", "pattern": "^[A-Za-z0-9 _-]+$", "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only." },
+    { "key": "railway_domain", "label": "Your Railway domain", "help": "Railway shows it after you generate a domain. Enter it without https:// and without a slash at the end.", "placeholder": "html-publisher-production.up.railway.app", "pattern": "^[A-Za-z0-9.-]+$", "pattern_error": "Enter the domain only. Do not add https:// or a slash." },
+    { "key": "app_url", "label": "Your index page address", "help": "Built from your Railway domain.", "derive": "https://{{railway_domain}}" },
+    { "key": "fork_url", "label": "Your repository address", "help": "Built from your GitHub name and repository name.", "derive": "https://github.com/{{github_username}}/{{repo_name}}" }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need three things:\n- A GitHub account. It is free.\n- A Railway account. Railway charges by use. This server is very small. Check the Railway price page before you start.\n- Claude with the GitHub connector turned on.\n\nThe Railway connector for Claude is optional. Without it, you set page passwords by hand in the Railway dashboard.\n\nThe setup takes about 15 minutes.",
+      "collect": ["business_name", "github_username"],
+      "checkbox_label": "I have a GitHub account and a Railway account.",
+      "verify_hint": "You can sign in to github.com and railway.com."
+    },
+    {
+      "title": "Copy the code to your GitHub account",
+      "instructions": "Open https://github.com/keyona-rerev/founder-fork-html-publisher in your browser.\n\nClick Fork, near the top right.\n\nChoose your own account as the owner.\n\nKeep the default repository name. Then click Create fork.\n\nKeep it as a fork. Do not download the files. The fork link lets you take updates with one click later.",
+      "collect": ["repo_name"],
+      "checkbox_label": "I made a fork in my own GitHub account.",
+      "verify_hint": "The page {{fork_url}} opens and says forked from keyona-rerev/founder-fork-html-publisher."
+    },
+    {
+      "title": "Turn on GitHub Actions",
+      "instructions": "GitHub turns off automation in forks. Your index page stays empty if you skip this step.\n\nOpen your fork: {{fork_url}}\n\nClick the Actions tab.\n\nClick the green button: I understand my workflows, go ahead and enable them.",
+      "checkbox_label": "I enabled workflows in the Actions tab.",
+      "verify_hint": "The Actions tab shows the workflow named Update Document Index and no warning banner."
+    },
+    {
+      "title": "Deploy the server on Railway",
+      "instructions": "Open https://railway.com and sign in.\n\nClick New Project.\n\nChoose Deploy from GitHub repo.\n\nSelect your fork {{github_username}}/{{repo_name}}. Allow Railway to read it if Railway asks.\n\nRailway finds Node by itself. You do not need any setting or variable now.\n\nOptional: rename the project to {{railway_project_name}} in the project settings.\n\nWait for the first deploy to finish. It takes one or two minutes.",
+      "collect": ["railway_project_name"],
+      "checkbox_label": "The first Railway deploy shows as successful.",
+      "verify_hint": "The deployment in Railway shows Active or Success."
+    },
+    {
+      "title": "Give the server a web address",
+      "instructions": "In Railway, click your service.\n\nOpen Settings, then Networking.\n\nClick Generate Domain.\n\nCopy the domain. It looks like the example below. Enter it in the box. Do not add https:// or a slash.\n\nSave this address. It is your index page and the home of every page you publish.",
+      "collect": ["railway_domain"],
+      "copy": [
+        { "label": "Example of a Railway domain", "text": "html-publisher-production.up.railway.app" }
+      ],
+      "checkbox_label": "I generated a domain and entered it above.",
+      "verify_hint": "The address {{app_url}} is the one shown in Railway."
+    },
+    {
+      "title": "Check that the server works",
+      "instructions": "Open {{app_url}} in your browser.\n\nYou see an index page. It has no cards yet. This is correct.\n\nIf you see an error, open the Railway deployment logs. Fix the error first. Do not go to the next step.",
+      "checkbox_label": "I see the empty index page.",
+      "verify_hint": "{{app_url}} shows the Document Index page."
+    },
+    {
+      "title": "Put your name on the index page (optional)",
+      "instructions": "Open the file site.config.json in your fork. Use the pencil icon to edit it.\n\nChange brandName to {{business_name}}. Change pageTitle, tagline and the group names if you want.\n\nKeep the JSON valid. A missing comma or quote makes the server use default settings.\n\nCommit the change to the main branch.\n\nEdit only this file for your settings. Do not edit server.js or other tool files. This keeps future updates free of conflicts.",
+      "copy": [
+        { "label": "Fields to change in site.config.json", "text": "\"brandName\": \"{{business_name}}\",\n\"pageTitle\": \"Document Index\",\n\"repoLabel\": \"{{github_username}}/{{repo_name}}\"" }
+      ],
+      "checkbox_label": "I edited site.config.json, or I chose to skip this step.",
+      "verify_hint": "The file {{fork_url}}/blob/main/site.config.json shows your name."
+    },
+    {
+      "title": "Make your Claude publishing skill",
+      "instructions": "Open the file claude-skill/SKILL.md in your fork: {{fork_url}}/blob/main/claude-skill/SKILL.md\n\nCopy all the text. Paste it into a new file on your own computer. Name the file SKILL.md.\n\nIn your copy, replace every YOUR_GITHUB_USERNAME with {{github_username}}.\n\nIn your copy, replace every YOUR_RAILWAY_DOMAIN with {{railway_domain}}. There are several of each.\n\nDo not edit the SKILL.md file inside your repository. Edit only your copy on your computer.",
+      "copy": [
+        { "label": "Replace YOUR_GITHUB_USERNAME with", "text": "{{github_username}}" },
+        { "label": "Replace YOUR_RAILWAY_DOMAIN with", "text": "{{railway_domain}}" }
+      ],
+      "checkbox_label": "I made my edited copy of SKILL.md.",
+      "verify_hint": "Your copy has no text YOUR_GITHUB_USERNAME and no text YOUR_RAILWAY_DOMAIN left."
+    },
+    {
+      "title": "Add the skill and the connectors in Claude",
+      "instructions": "In Claude, open Settings, then Capabilities, then Skills.\n\nUpload your edited SKILL.md.\n\nIn Claude, open the connectors list. Turn on the GitHub connector. Sign in with your own GitHub account if Claude asks.\n\nOptional: turn on the Railway connector. With it, Claude sets page passwords for you.\n\nEnter any password or login only in the GitHub and Railway sign-in pages. Never type it into this wizard.",
+      "checkbox_label": "The skill is uploaded and the GitHub connector is on.",
+      "verify_hint": "The skill named publish-document shows in your Claude skills list."
+    },
+    {
+      "title": "Publish a test page",
+      "instructions": "Open a new Claude chat.\n\nSend the message below.\n\nClaude shows you the page. Approve it. Confirm the slug. Answer the privacy question with no.\n\nClaude gives you a link. Open it. The page loads in about 30 seconds.\n\nThe card appears on your index page one or two minutes later. Refresh {{app_url}} to see it.",
+      "copy": [
+        { "label": "Message to send to Claude", "text": "Publish a one-page test document that says Hello from my HTML Publisher. Use the group other." }
+      ],
+      "checkbox_label": "My test page opens at its own link.",
+      "verify_hint": "The test page opens at {{app_url}}/proposals/ followed by its slug and .html."
+    },
+    {
+      "title": "Try a password on one page (optional)",
+      "instructions": "Ask Claude to protect your test page.\n\nWith the Railway connector, Claude sets the password in Railway. Without it, Claude gives you a variable name and a value. Open Railway, your service, then Variables. Click New Variable. Paste the name and the value. Railway redeploys in under a minute.\n\nThe variable name is GATE_ plus the slug in capital letters. Dashes become underscores. The value is user name, a colon, and password.\n\nOpen the page in a private window. Your browser asks for the user name and password.\n\nSend the password to your reader in a separate message from the link. Keep the password only in Railway and in your Claude chat.",
+      "copy": [
+        { "label": "Message to send to Claude", "text": "Make my test page private with a username and password." },
+        { "label": "Shape of the Railway variable (use your own slug and password)", "text": "GATE_YOUR_SLUG_IN_CAPITALS = your_slug_with_underscores:PASTE_YOUR_OWN_VALUE_HERE" }
+      ],
+      "checkbox_label": "I tested a password, or I chose to skip this step.",
+      "verify_hint": "The page asks for a user name and password in a private window."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "Updates are one click.\n\nOpen your fork: {{fork_url}}\n\nWhen GitHub shows that your branch is behind, click Sync fork, then Update branch. Railway redeploys by itself. Your pages, settings and passwords stay as they are.\n\nIf GitHub reports a conflict, do not fix it alone. Ask for help. The usual cause is a hand edit to a tool file.\n\nTo see what changed in each version, open the version history page of this wizard. It is the page history.html next to this wizard.\n\nYour version is the date of the newest commit shown on your fork.",
+      "checkbox_label": "I know how to sync my fork and where the version history is.",
+      "verify_hint": "Your fork page shows Sync fork when an update exists."
+    }
+  ]
+}
