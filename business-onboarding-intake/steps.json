@@ -1,0 +1,123 @@
+{
+  "title": "Install Business Onboarding Intake",
+  "intro": "Business Onboarding Intake collects and checks the setup details of a new business. The business owner logs in and pastes text about their business. Claude reads the text and fills in a structured record. The tool then shows what is complete and what is missing. The owner can add brand colors and a logo. You run it on your own accounts: GitHub, Netlify, Supabase and Railway. Netlify hosts the pages and the server functions. Supabase holds the list of logins (the router). Railway holds one small Postgres database for each business. The tool uses the Anthropic API to read pasted text. Anthropic API use costs money on your own account. This install takes about 60 minutes.",
+  "variables": [
+    { "key": "business_name", "label": "Your company name", "help": "The name of your company. You are the person who runs this tool for your clients.", "placeholder": "Acme Consulting", "pattern": "^.{2,80}$", "pattern_error": "Enter 2 to 80 characters." },
+    { "key": "github_username", "label": "Your GitHub username", "help": "Your GitHub user name. It is the name in your GitHub profile address.", "placeholder": "acme-consulting", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters." },
+    { "key": "repo_name", "label": "Name for your copy of the repository", "help": "The name your fork will have on GitHub. You can keep the original name.", "placeholder": "business-onboarding-intake", "default": "business-onboarding-intake", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only." },
+    { "key": "netlify_site_name", "label": "Netlify site name", "help": "This name becomes your web address. Use lowercase letters, numbers and hyphens. The name must be free on Netlify.", "placeholder": "acme-business-intake", "pattern": "^[a-z0-9][a-z0-9-]{1,60}$", "pattern_error": "Use lowercase letters, numbers and hyphens only." },
+    { "key": "site_url", "label": "Your tool address", "help": "Netlify builds this address from the site name.", "derive": "https://{{netlify_site_name}}.netlify.app" },
+    { "key": "supabase_project_ref", "label": "Supabase project reference", "help": "The project reference is 20 lowercase letters. Find it in Supabase under Project Settings, then General.", "placeholder": "abcdefghijklmnopqrst", "pattern": "^[a-z]{20}$", "pattern_error": "The reference is exactly 20 lowercase letters." },
+    { "key": "supabase_url", "label": "Supabase project address", "help": "Built from the project reference.", "derive": "https://{{supabase_project_ref}}.supabase.co" },
+    { "key": "intake_business_name", "label": "First client business name", "help": "The name of the first business that will use the intake. Use a test business first.", "placeholder": "Test Business LLC", "pattern": "^.{2,80}$", "pattern_error": "Enter 2 to 80 characters." },
+    { "key": "login_username", "label": "Login name for that business", "help": "The business owner types this name to log in. Pick a short name with no spaces.", "placeholder": "test-business", "pattern": "^[A-Za-z0-9_.-]{3,40}$", "pattern_error": "Use 3 to 40 letters, numbers, dots, hyphens or underscores. No spaces." }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need four accounts. All four are free to start.\n\n1. A GitHub account.\n2. A Netlify account. Sign in with GitHub.\n3. A Supabase account.\n4. A Railway account. Railway can charge for use after the trial. Check the Railway price page before you start.\n\nYou also need an Anthropic API account. Create an API key in the Anthropic Console. The tool uses this key to read pasted text. Anthropic charges you for each use.\n\nNever share keys or passwords in this wizard. Enter them only inside Netlify, Supabase and Railway.",
+      "checkbox_label": "I have all four accounts and an Anthropic API account.",
+      "verify_hint": "You can log in to GitHub, Netlify, Supabase, Railway and the Anthropic Console."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Enter the values below. The wizard fills them into later steps. The wizard keeps them only in this browser.",
+      "collect": ["business_name", "github_username", "repo_name", "netlify_site_name"],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "Your tool address will be {{site_url}}."
+    },
+    {
+      "title": "Copy the code to your GitHub",
+      "instructions": "1. Open the product repository: https://github.com/keyona-rerev/business-onboarding-intake\n2. Select Fork.\n3. Set the owner to {{github_username}}.\n4. Set the repository name to {{repo_name}}.\n5. Select Create fork.\n\nThe code runs on Netlify. You do not need to run it on your own computer.",
+      "copy": [
+        { "label": "Product repository", "text": "https://github.com/keyona-rerev/business-onboarding-intake" },
+        { "label": "Your fork will be here", "text": "https://github.com/{{github_username}}/{{repo_name}}" }
+      ],
+      "checkbox_label": "My fork exists on GitHub.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the files netlify.toml, schema.sql and the netlify folder."
+    },
+    {
+      "title": "Create the Supabase router project",
+      "instructions": "Supabase holds the list of logins. It also holds the logo files. This project is the router. It does not hold business answers.\n\n1. Open Supabase and select New project.\n2. Name it, for example, {{business_name}} intake router.\n3. Save the database password in your own password manager. Do not paste it here.\n4. Wait until the project is ready.\n5. Open Project Settings, then General. Copy the Project reference (20 letters).\n6. Enter the reference below.",
+      "collect": ["supabase_project_ref"],
+      "checkbox_label": "My Supabase router project is ready.",
+      "verify_hint": "The address {{supabase_url}} shows a short JSON message or a page, not a DNS error."
+    },
+    {
+      "title": "Create the login table",
+      "instructions": "1. In Supabase, open SQL Editor.\n2. Select New query.\n3. Paste the SQL below.\n4. Select Run.\n\nThe table holds one row for each business. The row links a login to that business database. The code reads and writes these columns: id, business_name, login_username, password_hash, railway_connection_string, status, cached_payload and updated_at.\n\nVERIFY: ReRev Labs wrote this table definition from the code. The product repository does not contain it. If the first test fails at login, tell ReRev Labs.\n\nNote: the product reads this table with the public (anon) Supabase key. The product README says the table has an open-access policy for that key. The SQL below does the same. Do not store anything else in this Supabase project.",
+      "copy": [
+        {
+          "label": "SQL: login table",
+          "text": "create table if not exists public.business_intake_instances (\n  id uuid primary key default gen_random_uuid(),\n  business_name text not null,\n  login_username text not null unique,\n  password_hash text not null,\n  railway_connection_string text not null,\n  status text not null default 'collecting',\n  cached_payload jsonb,\n  created_at timestamptz not null default now(),\n  updated_at timestamptz not null default now()\n);\n\nalter table public.business_intake_instances enable row level security;\n\ncreate policy \"anon full access\" on public.business_intake_instances\n  for all to anon using (true) with check (true);"
+        }
+      ],
+      "checkbox_label": "The login table exists.",
+      "verify_hint": "In Supabase, open Table Editor. You see the table business_intake_instances with no rows."
+    },
+    {
+      "title": "Create the logo storage bucket",
+      "instructions": "Business owners upload a logo. The tool stores it in a public bucket named business-logos.\n\n1. In Supabase, open SQL Editor.\n2. Select New query.\n3. Paste the SQL below.\n4. Select Run.",
+      "copy": [
+        {
+          "label": "SQL: logo bucket",
+          "text": "insert into storage.buckets (id, name, public)\nvalues ('business-logos', 'business-logos', true)\non conflict (id) do nothing;\n\ncreate policy \"anon upload logos\" on storage.objects\n  for insert to anon with check (bucket_id = 'business-logos');\n\ncreate policy \"anon update logos\" on storage.objects\n  for update to anon using (bucket_id = 'business-logos') with check (bucket_id = 'business-logos');\n\ncreate policy \"public read logos\" on storage.objects\n  for select to public using (bucket_id = 'business-logos');"
+        }
+      ],
+      "checkbox_label": "The business-logos bucket exists.",
+      "verify_hint": "In Supabase, open Storage. You see a public bucket named business-logos."
+    },
+    {
+      "title": "Create the Netlify site",
+      "instructions": "1. Open Netlify and select Add new project, then Import an existing project.\n2. Choose GitHub.\n3. Select the repository {{github_username}}/{{repo_name}}.\n4. Set the site name to {{netlify_site_name}}.\n5. Leave the build settings as they are. The file netlify.toml sets them: functions folder netlify/functions, publish folder public.\n6. Select Deploy.\n\nThe first deploy will work, but the login will fail until you add the settings in the next step.",
+      "checkbox_label": "The Netlify site is created.",
+      "verify_hint": "Open {{site_url}}. You see a page named Business Setup Login."
+    },
+    {
+      "title": "Add the settings in Netlify",
+      "instructions": "The tool needs four settings. Two of them are secrets. Enter them only in Netlify.\n\n1. In Netlify, open Site configuration, then Environment variables.\n2. Add each variable from the copy block.\n3. For WAYFINDER_SUPABASE_ANON_KEY: in Supabase, open Project Settings, then API Keys. Copy the anon (publishable) key. Paste it in Netlify only.\n4. For ANTHROPIC_API_KEY: paste your own key from the Anthropic Console. Paste it in Netlify only.\n5. For INTAKE_JWT_SECRET: make a long random text. Use the command in the second copy block. Do not reuse a secret from another project.\n6. Open Deploys and select Trigger deploy, then Deploy site.\n\nThe variable name WAYFINDER_SUPABASE_URL is an old name from the original build. It holds your own router project address.",
+      "copy": [
+        { "label": "Netlify variables", "text": "WAYFINDER_SUPABASE_URL={{supabase_url}}\nWAYFINDER_SUPABASE_ANON_KEY=PASTE_YOUR_OWN_VALUE_HERE\nANTHROPIC_API_KEY=PASTE_YOUR_OWN_VALUE_HERE\nINTAKE_JWT_SECRET=PASTE_YOUR_OWN_RANDOM_TEXT_HERE" },
+        { "label": "Command: make a random secret (run in any terminal with Node.js)", "text": "node -e \"console.log(require('crypto').randomBytes(48).toString('hex'))\"" }
+      ],
+      "checkbox_label": "I added all four variables and the new deploy finished.",
+      "verify_hint": "In Netlify, the latest deploy shows Published. The four variable names show in Environment variables."
+    },
+    {
+      "title": "Create the database for the first business",
+      "instructions": "Each business gets its own small Postgres database on Railway. Start with a test business.\n\n1. Open Railway and select New project.\n2. Choose Provision PostgreSQL.\n3. Name the project {{intake_business_name}} intake.\n4. Open the Postgres service. Open the Data tab.\n5. Open the file schema.sql in your fork: https://github.com/{{github_username}}/{{repo_name}}/blob/main/schema.sql\n6. Copy all of the file. Paste it in the Railway query box. Run it.\n7. Open the Variables tab of the Postgres service. Find DATABASE_PUBLIC_URL. Keep this tab open for the next step.\n\nDATABASE_PUBLIC_URL holds a password. Never paste it in this wizard. You paste it only in Supabase in the next step.",
+      "collect": ["intake_business_name"],
+      "copy": [
+        { "label": "Schema file in your fork", "text": "https://github.com/{{github_username}}/{{repo_name}}/blob/main/schema.sql" }
+      ],
+      "checkbox_label": "The Railway database exists and schema.sql ran with no error.",
+      "verify_hint": "In the Railway Data tab, you see a table named intake_data with one row."
+    },
+    {
+      "title": "Add the login for that business",
+      "instructions": "This step links a login to the Railway database.\n\n1. Pick a password for the business owner. Use at least 12 characters.\n2. In Supabase, open SQL Editor and select New query.\n3. Paste the SQL below.\n4. Replace PASTE_PASSWORD_HERE with the owner password.\n5. Replace PASTE_DATABASE_PUBLIC_URL_HERE with the DATABASE_PUBLIC_URL from Railway. Keep the quote marks.\n6. Select Run.\n\nSupabase stores only a bcrypt hash of the password. After you run the query, close the tab. Do not save the query.\n\nSend the login name and password to the owner in a safe way. Do not send them in a shared chat.",
+      "collect": ["login_username"],
+      "copy": [
+        {
+          "label": "SQL: add a business login",
+          "text": "insert into public.business_intake_instances\n  (business_name, login_username, password_hash, railway_connection_string)\nvalues (\n  '{{intake_business_name}}',\n  '{{login_username}}',\n  crypt('PASTE_PASSWORD_HERE', gen_salt('bf')),\n  'PASTE_DATABASE_PUBLIC_URL_HERE'\n);"
+        },
+        { "label": "SQL: turn on password hashing (run once if the query fails with 'function crypt does not exist')", "text": "create extension if not exists pgcrypto with schema extensions;" }
+      ],
+      "checkbox_label": "The login row is added.",
+      "verify_hint": "In Supabase Table Editor, the table business_intake_instances has one row with login name {{login_username}}."
+    },
+    {
+      "title": "Run the first test",
+      "instructions": "1. Open {{site_url}}.\n2. Log in with the login name {{login_username}} and the owner password.\n3. You see the dashboard for {{intake_business_name}}.\n4. Select the paste option. Paste a few sentences about a business: what it does, who it serves, and its web address.\n5. Submit. Wait for the result.\n6. Check that some fields are now filled and the completeness number went up.\n7. Upload a small PNG logo. Check that the logo shows on the dashboard.\n\nIf login fails, check the table row and the four Netlify variables. If the paste fails, check ANTHROPIC_API_KEY in Netlify.",
+      "checkbox_label": "Login, paste and logo upload all worked.",
+      "verify_hint": "The dashboard shows {{intake_business_name}}, a completeness number above zero and your logo."
+    },
+    {
+      "title": "Add the next business and keep the tool current",
+      "instructions": "For each new business, repeat the two steps: create a Railway database with schema.sql, then add one login row in Supabase. The web address stays the same for all businesses.\n\nTo update the tool: open the version history page of this wizard. Compare your version with the newest version. Follow the upgrade steps for each newer version.\n\nTo see your version: open your fork on GitHub and read the date of the newest commit.",
+      "checkbox_label": "I know how to add a business and how to update.",
+      "verify_hint": "You can find the version history link at the top of this wizard."
+    }
+  ]
+}
