@@ -1,0 +1,33 @@
+{
+  "product": "Google Tasks MCP for Claude",
+  "current": "2026-04-22",
+  "how_to_find": "Server part: open your fork of keyona-rerev/gas-tasks-mcp on GitHub and look at the date of the newest commit on the main branch. The original repo had its newest commit, 4ac0b0d (migrate from SSE to Streamable HTTP), on 2026-04-22. Apps Script part: open your project, choose Deploy, then Manage deployments, and read the version number. The original project code was last changed on 2026-03-11 (deployment version 2).",
+  "versions": [
+    {
+      "id": "2026-04-22",
+      "date": "2026-04-22",
+      "title": "Streamable HTTP transport",
+      "summary": "Commit 4ac0b0d in keyona-rerev/gas-tasks-mcp moved the server from the SSE transport to the Streamable HTTP transport. The commit message says SSE is deprecated in Claude. The date comes from the commit. Git tags and releases: VERIFY. Whether older client installs need this change: VERIFY.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Changed", "text": "The server now uses the Streamable HTTP transport at the /mcp path. A /health path returns status ok."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork and redeploy", "text": "Sync your fork of the repo on GitHub. Railway deploys the new commit. Then remove the old connector in Claude and add it again with the MCP address that ends in /mcp."}
+      ]
+    },
+    {
+      "id": "2026-03-11",
+      "date": "2026-03-11",
+      "title": "First build of the server and the Apps Script bridge",
+      "summary": "All commits from 3747fdc (initial commit) to 1b4031a (switch to SSE transport) are dated 2026-03-11. The Apps Script project has a web app deployment at version 2, updated 2026-03-11. These dates come from commits and the deployment list, so the grouping is inferred: VERIFY.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "Apps Script web app with the actions listTasklists, listTasks, createTask, updateTask, completeTask, deleteTask and ping, protected by the GAS_TOKEN script property."},
+        {"kind": "Added", "text": "Node server with six tools: tasks_list_tasklists, tasks_list, tasks_create, tasks_update, tasks_complete and tasks_delete."},
+        {"kind": "Fixed", "text": "Several transport and session fixes for Claude connector compatibility the same day."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
