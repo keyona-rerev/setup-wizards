@@ -1,0 +1,49 @@
+{
+  "product": "Claude Skillz (skill collection)",
+  "current": "2026-03-24",
+  "how_to_find": "Open your copy on GitHub and read the date of the newest commit. Compare it with the dates below. You can also read the version number in .claude-plugin/marketplace.json (metadata.version).",
+  "versions": [
+    {
+      "id": "2026-03-24",
+      "date": "2026-03-24",
+      "title": "Marketplace 1.3.0 and CircleCI logs skill",
+      "summary": "Newest commit seen in keyona-rerev/claude-skillz is 21c6101 on 2026-03-24. This entry is read from commit dates and messages. VERIFY the exact contents against the commits on GitHub.",
+      "upgrade_type": "settings",
+      "changes": [
+        {"kind": "Added", "text": "New skill and plugin: fetching-circleci-logs (commit baf17f6, 2026-03-24)."},
+        {"kind": "Changed", "text": "Marketplace version bumped to 1.3.0 (commit 21c6101)."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your copy", "text": "Click Sync fork on GitHub. Then update the marketplace in Claude Code.", "copy": "/plugin marketplace update claude-skillz"},
+        {"title": "Check your owner details", "text": "Open .claude-plugin/marketplace.json after the sync. Make sure your own owner name, email and homepage are still there."}
+      ]
+    },
+    {
+      "id": "2026-03-13",
+      "date": "2026-03-13",
+      "title": "OpenCode launcher",
+      "summary": "Commit eb352fe on 2026-03-13 added a launcher that builds OpenCode agents from the persona prompts. VERIFY against the commit.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "opencode-launcher folder with generate-opencode-agents.py."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your copy", "text": "Click Sync fork on GitHub. Run the generator again if you use OpenCode."}
+      ]
+    },
+    {
+      "id": "2026-02-06",
+      "date": "2026-02-06",
+      "title": "development-skills 5.0.0",
+      "summary": "Commits 689d61f and 9c529b7 on 2026-02-06 raised the development-skills plugin to version 5.0.0 and reworked separation-of-concerns. VERIFY against the commits. Older history was not read.",
+      "upgrade_type": "settings",
+      "changes": [
+        {"kind": "Changed", "text": "development-skills plugin version bumped to 5.0.0."},
+        {"kind": "Changed", "text": "separation-of-concerns skill trimmed and access rules fixed."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your copy", "text": "Click Sync fork on GitHub. Then update the marketplace in Claude Code."}
+      ]
+    }
+  ]
+}
