@@ -1,0 +1,229 @@
+{
+  "title": "Open Loops MCP setup",
+  "intro": "Open Loops MCP is a small server that lets Claude read and edit your Google Docs. It works on tabs: Claude can list tabs, read a tab, add text, insert text, find and replace, format text, make bullets, and read and write table cells. You run the server on your own host with your own Google login. Then you add it to Claude as a custom connector. This wizard takes about 45 minutes. The server has no password on its web address, so keep that address private.",
+  "variables": [
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "Your own GitHub account name.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9-]{1,39}$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your copy of the repo",
+      "help": "The name of the repo you create in your GitHub account.",
+      "placeholder": "open-loops-mcp",
+      "default": "open-loops-mcp",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Railway project name",
+      "help": "Any name you like for the project on Railway.",
+      "placeholder": "open-loops-mcp",
+      "default": "open-loops-mcp",
+      "pattern": "^[A-Za-z0-9 _-]{1,60}$",
+      "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only."
+    },
+    {
+      "key": "google_cloud_project_name",
+      "label": "Google Cloud project name",
+      "help": "Any name for the new Google Cloud project.",
+      "placeholder": "open-loops-mcp",
+      "default": "open-loops-mcp",
+      "pattern": "^[A-Za-z0-9 '!-]{4,30}$",
+      "pattern_error": "Use 4 to 30 letters, numbers, spaces, hyphens or apostrophes."
+    },
+    {
+      "key": "default_doc_id",
+      "label": "Default document ID",
+      "help": "Open your Google Doc. In the browser address, copy the text between /d/ and the next slash.",
+      "placeholder": "1AbCdEfGhIjKlMnOpQrStUvWxYz",
+      "pattern": "^[A-Za-z0-9_-]{20,}$",
+      "pattern_error": "Paste only the ID, not the whole link. It has 20 or more letters, numbers, hyphens or underscores."
+    },
+    {
+      "key": "railway_app_url",
+      "label": "Your Railway public address",
+      "help": "Railway shows this after you create a domain. It starts with https://.",
+      "placeholder": "https://your-service.up.railway.app",
+      "pattern": "^https://[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+      "pattern_error": "Enter the address with https:// and no path at the end."
+    },
+    {
+      "key": "connector_url",
+      "label": "Connector address for Claude",
+      "help": "Built from your Railway address.",
+      "derive": "{{railway_app_url}}/mcp"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need four accounts.\n\n1. A Google account that can edit the Docs you want Claude to use.\n2. A GitHub account.\n3. A Railway account. Railway is a paid host. Check the current Railway price before you start.\n4. A Claude account that can add custom connectors.\n\nThe ReRev Labs team must give you access to the code first. If you cannot open the product repo, ask ReRev Labs to add your GitHub account.\n\nYou also need a free Google Cloud project. You make it in a later step.",
+      "checkbox_label": "I have all four accounts.",
+      "verify_hint": "You can sign in to Google, GitHub, Railway and Claude."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Enter the values below one time. The wizard fills them into the steps that follow.",
+      "collect": [
+        "github_username",
+        "repo_name",
+        "railway_project_name",
+        "google_cloud_project_name"
+      ],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "All four fields show a green check."
+    },
+    {
+      "title": "Get your own copy of the code",
+      "instructions": "Open the product repo at https://github.com/keyona-rerev/open-loops-mcp. Choose Fork. If Fork is not offered, choose Use this template or ask ReRev Labs to send you a copy. Set the owner to {{github_username}}. Set the name to {{repo_name}}. Choose Create.",
+      "copy": [
+        {
+          "label": "Your repo address",
+          "text": "https://github.com/{{github_username}}/{{repo_name}}"
+        }
+      ],
+      "checkbox_label": "My copy of the repo exists.",
+      "verify_hint": "The address above opens and shows the folder src and the file package.json."
+    },
+    {
+      "title": "Make a Google Cloud project and turn on the Docs API",
+      "instructions": "Open https://console.cloud.google.com. Make a new project named {{google_cloud_project_name}}. Select the project. Open APIs and Services, then Library. Search for Google Docs API. Choose Enable.\n\nThe server uses the Docs API only. It does not need the Drive API.",
+      "checkbox_label": "The Google Docs API is enabled.",
+      "verify_hint": "The Docs API page shows the status Enabled."
+    },
+    {
+      "title": "Set up the Google consent screen",
+      "instructions": "In your Google Cloud project, open APIs and Services, then OAuth consent screen (also called Google Auth Platform). Choose External if you use a personal Google account. Choose Internal if you use a Google Workspace account and only people in your company will use the server. Enter an app name and your own support email. Add your own Google account as a test user.\n\nIf the app stays in Testing mode, Google may end the login after 7 days. To avoid this, set the publishing status to In production. Google may show a warning screen when you sign in. This is normal for your own app.",
+      "checkbox_label": "The consent screen is saved and I am a test user or the app is in production.",
+      "verify_hint": "The consent screen page shows your app name and your Google account as a test user."
+    },
+    {
+      "title": "Make an OAuth client",
+      "instructions": "Open APIs and Services, then Credentials. Choose Create credentials, then OAuth client ID. Choose Web application. Add this Authorized redirect URI so you can use the Google OAuth Playground in the next step.\n\nSave the client. Google shows a client ID and a client secret. Keep this page open. Do NOT paste the client secret into this wizard, into chat or into an email. You enter it only inside Railway later.",
+      "copy": [
+        {
+          "label": "Redirect URI",
+          "text": "https://developers.google.com/oauthplayground"
+        }
+      ],
+      "checkbox_label": "I made the OAuth client and I can see the client ID and the client secret.",
+      "verify_hint": "The Credentials page lists your new OAuth client."
+    },
+    {
+      "title": "Get a refresh token",
+      "instructions": "The code does not include a login helper. Use the Google OAuth Playground to get a refresh token. VERIFY this flow in your own account.\n\n1. Open https://developers.google.com/oauthplayground.\n2. Open the gear icon. Select Use your own OAuth credentials.\n3. Enter your own client ID and client secret from the last step.\n4. In the scope box, enter the scope below. Choose Authorize APIs.\n5. Sign in with the Google account that owns your Docs. Allow access.\n6. Choose Exchange authorization code for tokens.\n7. Copy the refresh token. Keep it in a safe place. You paste it only inside Railway.\n\nThe refresh token gives full edit access to your Docs. Never share it.",
+      "copy": [
+        {
+          "label": "Scope to authorize",
+          "text": "https://www.googleapis.com/auth/documents"
+        }
+      ],
+      "checkbox_label": "I have my refresh token saved in a safe place.",
+      "verify_hint": "The Playground shows a refresh token after the exchange step."
+    },
+    {
+      "title": "Choose your default Google Doc",
+      "instructions": "Open the Google Doc that Claude should use when you do not name a doc. Look at the address in the browser bar. It looks like https://docs.google.com/document/d/DOC_ID/edit. Copy only the DOC_ID part. Paste it below.\n\nThe Doc should use Google Docs tabs. If it has only one tab, Claude can use it without a tab name.",
+      "collect": [
+        "default_doc_id"
+      ],
+      "checkbox_label": "I entered my default Doc ID.",
+      "verify_hint": "The ID field shows a green check."
+    },
+    {
+      "title": "Make a Railway project from your repo",
+      "instructions": "Open https://railway.com. Choose New project, then Deploy from GitHub repo. Allow Railway to read your GitHub account if it asks. Select {{github_username}}/{{repo_name}}. Name the project {{railway_project_name}}. Railway builds the project with Node. The start command is npm start. The repo has no build step.\n\nThe first deploy may fail or the service may not work until you add variables in the next step. This is normal.",
+      "checkbox_label": "The Railway project exists and is linked to my repo.",
+      "verify_hint": "Railway shows a service named after your repo."
+    },
+    {
+      "title": "Add the variables in Railway",
+      "instructions": "In Railway, open your service. Open the Variables tab. Add the variables below one at a time. Replace every PASTE_YOUR_OWN_VALUE_HERE with your own value from Google Cloud. Enter the secret values only inside Railway.\n\nThe server uses these names. The first three are required. GDOCS_DOC_ID sets the default Doc. GDOCS_RADHIKA_DOC_ID is optional. It sets a second shortcut named radhika. Skip it if you do not need a second default Doc. You can always pass a Doc link to any tool instead.\n\nDo not set PORT. Railway sets it.",
+      "copy": [
+        {
+          "label": "GOOGLE_CLIENT_ID",
+          "text": "GOOGLE_CLIENT_ID=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "GOOGLE_CLIENT_SECRET",
+          "text": "GOOGLE_CLIENT_SECRET=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "GOOGLE_REFRESH_TOKEN",
+          "text": "GOOGLE_REFRESH_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "GDOCS_DOC_ID",
+          "text": "GDOCS_DOC_ID={{default_doc_id}}"
+        },
+        {
+          "label": "GDOCS_RADHIKA_DOC_ID (optional)",
+          "text": "GDOCS_RADHIKA_DOC_ID=PASTE_A_SECOND_DOC_ID_OR_SKIP"
+        }
+      ],
+      "checkbox_label": "I added the variables in Railway.",
+      "verify_hint": "The Variables tab lists GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN and GDOCS_DOC_ID. The values are hidden."
+    },
+    {
+      "title": "Deploy and get a public address",
+      "instructions": "In Railway, open your service, then Settings, then Networking. Choose Generate Domain. Redeploy the service so it reads the new variables. Wait until the deploy shows Active.\n\nCopy the public address. Paste it below. It starts with https:// and has no slash at the end.",
+      "collect": [
+        "railway_app_url"
+      ],
+      "checkbox_label": "The service is Active and I entered its address.",
+      "verify_hint": "The address field shows a green check."
+    },
+    {
+      "title": "Check that the server is running",
+      "instructions": "Open the health address below in your browser. You must see a short message with status ok and a version number. The newest version in the repo code is 2.4.0 (VERIFY against your own copy).\n\nIf you see an error, open the Railway logs. A message that says Missing GOOGLE_CLIENT_ID means a variable is missing or has a wrong name.",
+      "copy": [
+        {
+          "label": "Health address",
+          "text": "{{railway_app_url}}/health"
+        }
+      ],
+      "checkbox_label": "The health address shows status ok.",
+      "verify_hint": "The page shows: status ok, service gdocs-mcp-server, and a version."
+    },
+    {
+      "title": "Add the server to Claude",
+      "instructions": "Open Claude. Go to Settings, then Connectors. Choose Add custom connector. Enter a name such as Open Loops. Paste the connector address below. Choose Add. Do not add a password or login. The server does not ask for one.\n\nThe address works like a password. Anyone who has it can edit the Docs your Google login can reach. Keep it private. Do not post it in public places.",
+      "copy": [
+        {
+          "label": "Connector address",
+          "text": "{{connector_url}}"
+        }
+      ],
+      "checkbox_label": "The connector shows in my Claude connector list.",
+      "verify_hint": "Claude lists the connector and shows its tools, for example gdocs_list_tabs and gdocs_read_tab."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Open a new Claude chat. Turn on the connector. Send the test message below. Claude must list the tabs of your default Doc. Then ask Claude to read one tab.\n\nDo a safe write test only on a Doc you do not mind changing. Ask Claude to add one line at the end of a tab. Check the line in Google Docs. Then delete the line yourself.",
+      "copy": [
+        {
+          "label": "Test message",
+          "text": "Use the Open Loops connector. List the tabs in my default Google Doc."
+        },
+        {
+          "label": "Write test message",
+          "text": "Use the Open Loops connector. Add the line \"Connector test\" at the end of the first tab of my default Google Doc."
+        }
+      ],
+      "checkbox_label": "Claude listed my tabs and the write test worked.",
+      "verify_hint": "The new line shows in your Google Doc."
+    },
+    {
+      "title": "Use other Docs and learn how to update",
+      "instructions": "To use another Doc, give Claude the full Doc link in your message. Your Google login must have edit access to that Doc.\n\nTo update the server later, open the version history page. It lists each version and tells you if you must redeploy. Compare the newest entry with the commit date of your own copy on GitHub. If a new version exists, pull the change into your repo. Railway then redeploys by itself.\n\nOpen the history page at the address that ends with /history.html on the same site as this wizard.",
+      "checkbox_label": "I know where the version history page is.",
+      "verify_hint": "You opened the history page and found the current version."
+    }
+  ]
+}
