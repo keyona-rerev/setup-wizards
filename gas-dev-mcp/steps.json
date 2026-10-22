@@ -1,0 +1,240 @@
+{
+  "title": "GAS Developer MCP setup",
+  "intro": "Install GAS Developer MCP on your own host with your own Google OAuth app. Then connect it to Claude. Claude can then read and edit your Google Apps Script projects. This takes about 40 minutes. You enter each value once.",
+  "variables": [
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The account that will own your copy of the code.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Repository name",
+      "help": "The name of your copy on GitHub. Keep the default if you can.",
+      "placeholder": "gas-dev-mcp",
+      "default": "gas-dev-mcp",
+      "pattern": "^[A-Za-z0-9._-]+$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "google_project_name",
+      "label": "Google Cloud project name",
+      "help": "Any name you like. You will create this project in your own Google account.",
+      "placeholder": "gas-developer-mcp",
+      "default": "gas-developer-mcp",
+      "pattern": "^[A-Za-z][A-Za-z0-9 '!-]{3,28}[A-Za-z0-9]$",
+      "pattern_error": "Use 4 to 30 characters. Start with a letter."
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Railway project name",
+      "help": "Any name you like. You will create this project in your own Railway account.",
+      "placeholder": "gas-dev-mcp",
+      "default": "gas-dev-mcp",
+      "pattern": "^[A-Za-z0-9 _-]+$",
+      "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only."
+    },
+    {
+      "key": "app_url",
+      "label": "Your Railway public URL",
+      "help": "Starts with https:// and has no slash at the end. You get it from Railway after the first deploy.",
+      "placeholder": "https://your-app.up.railway.app",
+      "pattern": "^https://[A-Za-z0-9.-]+$",
+      "pattern_error": "Start with https:// and do not end with a slash."
+    },
+    {
+      "key": "mcp_url",
+      "label": "MCP address",
+      "derive": "{{app_url}}/mcp"
+    },
+    {
+      "key": "health_url",
+      "label": "Health check address",
+      "derive": "{{app_url}}/health"
+    },
+    {
+      "key": "connector_name",
+      "label": "Connector name in Claude",
+      "help": "The name you will see in Claude.",
+      "placeholder": "GAS Developer",
+      "default": "GAS Developer",
+      "optional": true
+    }
+  ],
+  "steps": [
+    {
+      "title": "Know what you are installing",
+      "instructions": "GAS Developer MCP is a small server. It lets Claude read and edit your own Google Apps Script projects. Claude can list projects, read files, edit files, add files, create projects and create deployments.\n\nYou run the server on your own host (Railway in this wizard). It uses your own Google OAuth app. Nobody at ReRev Labs can see your Google account or your scripts.\n\nWarning: this server gives Claude write access to ALL Apps Script projects in the Google account you connect. Use a Google account you trust it with. Step 13 shows how to limit the risk.\n\nThe server does not ask callers for a password. Anyone who knows your server address can use it. Keep the address private.",
+      "checkbox_label": "I understand what the server does and the risk."
+    },
+    {
+      "title": "Check what you need first",
+      "instructions": "You need these accounts and tools:\n\n- A Google account that owns your Apps Script projects.\n- A GitHub account.\n- A Railway account (railway.com). A paid plan or trial credit is needed to keep a server running. Check the current Railway pricing.\n- Node.js 18 or newer on your computer (nodejs.org). It is used once, for the Google sign-in step. Check with the command below.\n- Git on your computer.\n- A Claude plan that allows custom connectors (VERIFY on your plan page).\n\nOpen a terminal and run the command to check Node.js.",
+      "copy": [
+        {
+          "label": "Check Node.js version",
+          "text": "node --version"
+        }
+      ],
+      "checkbox_label": "I have all accounts and tools.",
+      "verify_hint": "The command prints v18 or a higher number."
+    },
+    {
+      "title": "Enter your public names",
+      "instructions": "Enter the names you will use. These are not secrets. Never type a password, client secret or token in this wizard.\n\nYou enter the Railway address later, in step 8, after Railway gives it to you.",
+      "collect": [
+        "github_username",
+        "repo_name",
+        "google_project_name",
+        "railway_project_name"
+      ],
+      "checkbox_label": "I entered my names."
+    },
+    {
+      "title": "Make your own copy of the code",
+      "instructions": "Open the GitHub page of the product code: github.com/keyona-rerev/gas-dev-mcp\n\n1. Click Fork.\n2. Set the owner to {{github_username}}.\n3. Set the repository name to {{repo_name}}.\n4. Click Create fork.\n\nThe main branch of this repository is named master. Keep it as master.\n\nThen clone your copy to your computer. Run the commands below.",
+      "copy": [
+        {
+          "label": "Clone your fork",
+          "text": "git clone https://github.com/{{github_username}}/{{repo_name}}.git"
+        },
+        {
+          "label": "Go into the folder",
+          "text": "cd {{repo_name}}"
+        }
+      ],
+      "checkbox_label": "My fork exists and is cloned.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}} and see the file index.mjs."
+    },
+    {
+      "title": "Create your Google Cloud project",
+      "instructions": "1. Open console.cloud.google.com and sign in with your Google account.\n2. Click the project picker at the top. Click New Project.\n3. Set the name to {{google_project_name}}. Click Create.\n4. Select the new project.\n5. Open APIs and Services, then Library.\n6. Search for Apps Script API. Click Enable.\n7. Go back to Library. Search for Google Drive API. Click Enable.\n8. Open script.google.com/home/usersettings. Turn on Google Apps Script API.\n\nThe server uses the Drive API to list your projects. It uses the Apps Script API to read and edit them.",
+      "checkbox_label": "Both APIs are enabled and the Apps Script setting is on.",
+      "verify_hint": "In APIs and Services, then Enabled APIs, you see Apps Script API and Google Drive API."
+    },
+    {
+      "title": "Create your Google OAuth client",
+      "instructions": "1. In your Google Cloud project, open APIs and Services, then OAuth consent screen (or Google Auth Platform).\n2. Choose User type External. Enter an app name and your own email as support and developer contact. Save.\n3. Add these scopes on the Data Access page (see the copy block):\n4. Open Clients (or Credentials). Click Create Client (or Create Credentials, then OAuth client ID).\n5. Set Application type to Desktop app. Name it anything. Click Create.\n6. Google shows a Client ID and a Client secret. Keep this window open or download the JSON file. Do not paste them in this wizard.\n7. IMPORTANT: Open the Audience page. Click Publish app so the status is In production. If the status stays Testing, Google ends your refresh token after 7 days and the server stops working. Google may show an unverified-app warning at sign-in. That is normal for your own use.",
+      "copy": [
+        {
+          "label": "Scope 1",
+          "text": "https://www.googleapis.com/auth/script.projects"
+        },
+        {
+          "label": "Scope 2",
+          "text": "https://www.googleapis.com/auth/script.deployments"
+        },
+        {
+          "label": "Scope 3",
+          "text": "https://www.googleapis.com/auth/drive.readonly"
+        }
+      ],
+      "checkbox_label": "I have a Client ID and Client secret, and the app is In production.",
+      "verify_hint": "The Audience page shows Publishing status: In production."
+    },
+    {
+      "title": "Get your Google refresh token (one time)",
+      "instructions": "Run this on your own computer, inside the {{repo_name}} folder. The file get-token.mjs opens your browser and asks you to approve access. Then it prints a refresh token in your terminal.\n\nReplace the placeholders with your own Client ID and Client secret. The values stay on your computer.\n\n1. Run the command for your system.\n2. Sign in with the Google account that owns your scripts.\n3. Click Continue on the unverified-app screen, then approve all three permissions.\n4. Copy the refresh token from the terminal. Keep it private. It gives access to your Google account.\n\nIf no refresh token appears, open myaccount.google.com/permissions, remove access for your app, and run the command again.",
+      "copy": [
+        {
+          "label": "macOS or Linux",
+          "text": "GOOGLE_CLIENT_ID=PASTE_YOUR_OWN_VALUE_HERE GOOGLE_CLIENT_SECRET=PASTE_YOUR_OWN_VALUE_HERE node get-token.mjs"
+        },
+        {
+          "label": "Windows PowerShell",
+          "text": "$env:GOOGLE_CLIENT_ID=\"PASTE_YOUR_OWN_VALUE_HERE\"; $env:GOOGLE_CLIENT_SECRET=\"PASTE_YOUR_OWN_VALUE_HERE\"; node get-token.mjs"
+        }
+      ],
+      "checkbox_label": "I have my refresh token saved privately.",
+      "verify_hint": "The terminal shows a long line between two rows of dashes."
+    },
+    {
+      "title": "Deploy to Railway",
+      "instructions": "1. Open railway.com and sign in.\n2. Click New Project, then Deploy from GitHub repo.\n3. Allow Railway to read your repositories if it asks. Choose {{github_username}}/{{repo_name}}.\n4. Name the project {{railway_project_name}}.\n5. Railway builds the code and runs npm start. The first run fails until you add the three variables in step 9. That is expected.\n6. Open the service, then Settings, then Networking. Click Generate Domain.\n7. Copy the public address. It starts with https://.\n8. Enter it below.\n\nThe server reads the port from Railway. Do not set a port yourself.",
+      "collect": [
+        "app_url"
+      ],
+      "checkbox_label": "My service has a public domain and I entered it.",
+      "verify_hint": "Your address is {{app_url}}."
+    },
+    {
+      "title": "Add your three secrets in Railway",
+      "instructions": "Enter these only inside Railway. Never put them in GitHub or in this wizard.\n\n1. Open your Railway service, then Variables.\n2. Add the three variables below. Use the names exactly.\n3. For each value, paste your own Client ID, Client secret and refresh token.\n4. Railway redeploys the service when you save.\n\nIf a variable is missing, the server prints a FATAL message and stops.",
+      "copy": [
+        {
+          "label": "Variable 1",
+          "text": "GOOGLE_CLIENT_ID=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "Variable 2",
+          "text": "GOOGLE_CLIENT_SECRET=PASTE_YOUR_OWN_VALUE_HERE"
+        },
+        {
+          "label": "Variable 3",
+          "text": "GOOGLE_REFRESH_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "checkbox_label": "All three variables are saved in Railway and the deploy finished.",
+      "verify_hint": "The Railway deploy log shows: GAS Developer MCP (Streamable HTTP) running on port."
+    },
+    {
+      "title": "Check the server is running",
+      "instructions": "Open the health address in your browser. Or run the command below.\n\nA working server returns JSON with status ok and transport streamable-http.",
+      "copy": [
+        {
+          "label": "Health address",
+          "text": "{{health_url}}"
+        },
+        {
+          "label": "Check with curl",
+          "text": "curl {{health_url}}"
+        }
+      ],
+      "checkbox_label": "The health check returns status ok.",
+      "verify_hint": "Expected: {\"status\":\"ok\",\"service\":\"gas-developer-mcp\", ...}"
+    },
+    {
+      "title": "Add the server to Claude",
+      "instructions": "1. Open Claude. Go to Settings, then Connectors.\n2. Click Add custom connector.\n3. Set the name to {{connector_name}}.\n4. Paste the MCP address below as the server URL.\n5. Click Add. Leave any OAuth fields empty. This server does not use them.\n6. Open a new chat. Turn the connector on in the tools menu.\n\nThe menu names can change. Check Anthropic help pages if you cannot find them.",
+      "copy": [
+        {
+          "label": "MCP address",
+          "text": "{{mcp_url}}"
+        }
+      ],
+      "checkbox_label": "The connector shows as connected in Claude.",
+      "verify_hint": "Claude lists tools such as gas_list_projects."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Run a read-only test first. Open a new chat with the connector on. Paste the prompt below.\n\nClaude must call gas_list_projects and list your own Apps Script projects. Check that the titles are yours.\n\nDo not ask Claude to edit anything yet. Edits write straight to your live scripts.",
+      "copy": [
+        {
+          "label": "Test prompt",
+          "text": "Use the GAS Developer connector. Call gas_list_projects and list the titles of my Apps Script projects. Do not change anything."
+        }
+      ],
+      "checkbox_label": "Claude listed my own projects.",
+      "verify_hint": "If you see a token or 403 error, check the three Railway variables and that both Google APIs are enabled."
+    },
+    {
+      "title": "Stay safe and keep it healthy",
+      "instructions": "This server has no password on /mcp. Do these things:\n\n- Never share {{mcp_url}}. Treat it like a password.\n- Use a Google account that holds only the scripts you accept Claude editing.\n- Ask Claude to call gas_list_project_files before any edit. Tell Claude to use gas_update_file for single files.\n- Do not let Claude call gas_update_project unless you want files deleted. It can delete files that are missing from a push.\n- To cut off access at any time: remove the app at myaccount.google.com/permissions, or delete the Railway service.\n\nIf the server stops working with an invalid_grant message, your refresh token ended. Repeat step 7 and update GOOGLE_REFRESH_TOKEN in Railway.",
+      "checkbox_label": "I read and understood the safety notes."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "Open the version history page of this wizard. It lists each version of GAS Developer MCP and how to upgrade.\n\nTo get new code: open your fork on GitHub, click Sync fork, then Update branch. Railway redeploys by itself.\n\nTo see which version you run, open {{health_url}} and read the version number. Also check the newest commit date on your fork.",
+      "copy": [
+        {
+          "label": "Health address",
+          "text": "{{health_url}}"
+        }
+      ],
+      "checkbox_label": "I know where the version history is."
+    }
+  ]
+}
