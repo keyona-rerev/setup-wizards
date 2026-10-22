@@ -1,0 +1,36 @@
+{
+  "product": "HTML Publisher",
+  "current": "2026-08-05",
+  "how_to_find": "Open your fork on GitHub. Look at the date of the newest commit by the upstream author on the main branch. Match it to the dates below. Commits by github-actions[bot] only regenerate your index and do not count. The newest upstream commit seen when this wizard was released is 70371e0, dated 2026-08-05. No git tags or releases were visible to this wizard (VERIFY). The package.json version is 1.0.0 and does not change with each version below.",
+  "versions": [
+    {
+      "id": "2026-08-05",
+      "date": "2026-08-05",
+      "title": "Claude publishing skill template",
+      "summary": "VERIFY: This entry comes from commit dates on 2026-08-05, not from tags. The repository now holds a skill file that you copy into Claude. The newest commit seen is 70371e0.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "claude-skill/SKILL.md, a template skill that lets Claude publish documents for you (commit 9a5580b)." },
+        { "kind": "Changed", "text": "Setup step 6 in the README points to the prepared skill file (commit 70371e0)." }
+      ],
+      "upgrade_steps": [
+        { "title": "Sync your fork", "text": "Open your fork on GitHub. Click Sync fork, then Update branch. If you already made your own SKILL.md copy, compare it with the new claude-skill/SKILL.md and copy over any change you want." }
+      ]
+    },
+    {
+      "id": "2026-07-24",
+      "date": "2026-07-24",
+      "title": "First release",
+      "summary": "VERIFY: This entry comes from commit dates on 2026-07-24, not from tags. It covers the first commit and all work that day, ending with commit 251ebfa.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Express server with optional per-document password protection that fails closed (commit 2e92f69)." },
+        { "kind": "Added", "text": "Empty protected.json manifest, so all documents are open by default (commit 9fac9d4)." },
+        { "kind": "Added", "text": "Index generator with brand settings, groups and Protected badges, plus a GitHub Action that rebuilds the index (commits ba48354, aaa16ef)." },
+        { "kind": "Changed", "text": "Site settings moved into site.config.json so that updates never conflict (commits 03e833b, 3689d0e)." },
+        { "kind": "Added", "text": "README sections on getting updates and on enabling Actions on your fork, and MAINTAINING.md with the file ownership rules (commits a4bff43, 3fef5bd, 251ebfa)." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
