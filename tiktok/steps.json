@@ -1,0 +1,121 @@
+{
+  "title": "TikTok Transcript MCP: setup wizard",
+  "intro": "This tool is a small server that lets Claude read TikTok. Claude can get video captions with timestamps, search a video or a creator's recent videos for a phrase, read video and creator details, and list videos by creator, hashtag, sound or collection. Claude can also read comments, but that one tool uses a paid Apify account and is optional. You run the server on your own host (Railway in this wizard) with your own tokens. Then you connect it to Claude. Plan for about 30 minutes.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "Used only to label things in this wizard.", "placeholder": "Acme Studio", "optional": true},
+    {"key": "github_username", "label": "Your GitHub username", "help": "The GitHub account that will own your copy of the code.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]{1,39}$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "repo_name", "label": "Name for your copy of the repo", "help": "Any name you like.", "placeholder": "tiktoktransmcp", "default": "tiktoktransmcp", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "railway_project_name", "label": "Railway project name", "help": "The name of the Railway project you will create.", "placeholder": "tiktok-mcp", "default": "tiktok-mcp"},
+    {"key": "app_url", "label": "Your public server URL", "help": "Railway shows this after you generate a domain. It starts with https://.", "placeholder": "https://tiktok-mcp-production.up.railway.app", "pattern": "^https://[^\\s/]+$", "pattern_error": "Enter the URL with https:// and no slash at the end."},
+    {"key": "connector_name", "label": "Name for the connector in Claude", "help": "The label you will see inside Claude.", "placeholder": "TikTok Transcripts", "default": "TikTok Transcripts"},
+    {"key": "mcp_url", "label": "MCP address", "derive": "{{app_url}}/mcp"}
+  ],
+  "steps": [
+    {
+      "title": "Know what you are building",
+      "instructions": "You will make your own copy of the TikTok Transcript MCP code. You will run it on Railway. You will protect it with a password token that only you know. Then you will add it to Claude. The tools are: get_transcript, search_transcript, search_creator_transcripts, get_video_info, get_creator_videos, get_creator_info, get_hashtag_videos, get_sound_videos, get_collection_videos and get_comments. Only get_comments costs money. It needs an Apify account. Skip Apify if you do not need comments.",
+      "checkbox_label": "I understand what I will build."
+    },
+    {
+      "title": "Get your accounts ready",
+      "instructions": "You need three accounts. A GitHub account holds the code. A Railway account (railway.com) runs the server. A Claude account on a plan that allows custom connectors adds the server. Apify (apify.com) is optional. Add it only if you want comments. Railway is a paid host. Check its current pricing before you start. Never share any password or token with ReRev Labs.",
+      "checkbox_label": "My accounts are ready."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Fill in the fields below. The wizard will reuse them in later steps. These are public names. Do not enter any password or token here.",
+      "collect": ["business_name", "github_username", "repo_name", "railway_project_name"],
+      "checkbox_label": "I filled in my names."
+    },
+    {
+      "title": "Copy the code to your GitHub",
+      "instructions": "Open https://github.com/keyona-rerev/tiktoktransmcp in your browser. Click Fork, or use the Use this template button if it shows. Choose your account {{github_username}}. Name the copy {{repo_name}}. The code must live in your own account so that you control updates.",
+      "verify_hint": "You can open https://github.com/{{github_username}}/{{repo_name}} and see the folders src and the files Procfile and requirements.txt.",
+      "checkbox_label": "My copy of the repo exists."
+    },
+    {
+      "title": "Make a password token for your server",
+      "instructions": "The server is public on the internet. A token keeps strangers out. Make a long random value that only you know. Use a password manager to generate 40 or more random characters. Keep it safe. You will paste it into Railway in the next steps and into Claude later. Do not paste it into this wizard. Do not put it in GitHub.",
+      "checkbox_label": "I made a token and saved it in my password manager."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "Sign in to Railway. Click New Project. Choose Deploy from GitHub repo. Allow Railway to see your repos if it asks. Choose {{github_username}}/{{repo_name}}. Then open the project settings and rename the project to {{railway_project_name}}. Railway reads the Procfile in the repo and installs the Python packages from requirements.txt. The first build can fail until you add variables. That is fine.",
+      "copy": [
+        {"label": "Start command that the Procfile already sets (for your information)", "text": "PYTHONPATH=src python -m tiktok_mcp_server.server --transport streamable-http --port $PORT"}
+      ],
+      "checkbox_label": "The Railway project is created and linked to my repo."
+    },
+    {
+      "title": "Add the variables in Railway",
+      "instructions": "Open your service in Railway. Click Variables. Add the variable below. Replace the placeholder with the token you made. Enter the token only inside Railway. If you want comments, also add the Apify variable with your own Apify API token from your Apify account settings. Leave APIFY_COMMENTS_ACTOR unset to use the default actor. Without the Apify variable, every tool works except get_comments.",
+      "copy": [
+        {"label": "Required variable", "text": "MCP_AUTH_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"},
+        {"label": "Optional variable for comments", "text": "APIFY_API_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"},
+        {"label": "Optional variable to swap the comments actor", "text": "APIFY_COMMENTS_ACTOR=clockworks~tiktok-comments-scraper"}
+      ],
+      "checkbox_label": "I added MCP_AUTH_TOKEN in Railway (and APIFY_API_TOKEN if I want comments)."
+    },
+    {
+      "title": "Deploy and open a public address",
+      "instructions": "In Railway, open the service Settings. Under Networking, click Generate Domain. Wait for the deploy to finish. Open the Deploy logs. Look for the line that starts with auth: token required. If you see auth: OPEN, the token variable is missing. Fix it before you go on. Then copy the public address and enter it below.",
+      "collect": ["app_url"],
+      "verify_hint": "The deploy logs show yt-dlp with a version number and the line auth: token required. A browser visit to {{app_url}}/mcp shows an unauthorized message. That is correct.",
+      "checkbox_label": "The server runs and the logs show auth: token required."
+    },
+    {
+      "title": "Test the server from your computer",
+      "instructions": "Run the command below in a terminal. Replace the placeholder with your token. You should get a 401 reply when you leave the token out, and a different reply (not 401) when you add it. This proves the token gate works.",
+      "copy": [
+        {"label": "Without token (expect 401)", "text": "curl -i {{mcp_url}}"},
+        {"label": "With token (expect not 401)", "text": "curl -i -H \"Authorization: Bearer PASTE_YOUR_OWN_VALUE_HERE\" {{mcp_url}}"}
+      ],
+      "verify_hint": "The first command shows 401. The second command does not show 401.",
+      "checkbox_label": "The token gate works."
+    },
+    {
+      "title": "Add the server to Claude",
+      "instructions": "Open Claude. Go to Settings, then Connectors. Click Add custom connector. Name it below. Enter the MCP address. Open the advanced options if you see them. Add your token as an Authorization header with the value Bearer and then your token. If your Claude plan has no field for a header, ask ReRev Labs for the supported way to pass the token. Do not remove the token from the server to make this work.",
+      "collect": ["connector_name"],
+      "copy": [
+        {"label": "Connector name", "text": "{{connector_name}}"},
+        {"label": "MCP address", "text": "{{mcp_url}}"},
+        {"label": "Header name", "text": "Authorization"},
+        {"label": "Header value", "text": "Bearer PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "verify_hint": "The connector {{connector_name}} shows in your connector list with the TikTok tools.",
+      "checkbox_label": "The connector is added in Claude."
+    },
+    {
+      "title": "Run a first test in Claude",
+      "instructions": "Start a new chat in Claude. Turn on the connector {{connector_name}}. Paste the prompt below. Use a public TikTok video that has captions. Claude should call get_video_info, then get_transcript. A video with no captions returns an error. That is normal. Silent and music-only videos often have no captions.",
+      "copy": [
+        {"label": "Test prompt", "text": "Use the TikTok tools. Get the video info for PASTE_A_PUBLIC_TIKTOK_VIDEO_URL. Check the caption languages. Then get the transcript and give me a 3-line summary."}
+      ],
+      "verify_hint": "Claude shows video details and a transcript with timestamps.",
+      "checkbox_label": "My first test worked."
+    },
+    {
+      "title": "Test comments (optional)",
+      "instructions": "Do this step only if you added the Apify variable. The get_comments tool costs money on your Apify account. Keep the limit small. Ask for 10 comments first.",
+      "copy": [
+        {"label": "Comments test prompt", "text": "Use get_comments on PASTE_A_PUBLIC_TIKTOK_VIDEO_URL with a limit of 10. Do not include replies."}
+      ],
+      "verify_hint": "Claude lists comments with author, likes and time. An error that names APIFY_API_TOKEN means the variable is missing in Railway.",
+      "checkbox_label": "I tested comments, or I skipped this step."
+    },
+    {
+      "title": "Fix common problems",
+      "instructions": "If a tool returns an empty list for a hashtag or a sound, TikTok may have refused the request. Try again later. If many tools fail at once, TikTok may have changed. The code uses yt-dlp nightly builds for this reason. Redeploy your service in Railway to pull the newest build. If Claude cannot connect, check that the address ends with /mcp and that the token matches in both places.",
+      "checkbox_label": "I know where to look when something fails."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "Open the version history page for this product. It lists each version and what to do. Find your version by the date of the newest commit in your repo on GitHub. To update, sync your fork with the original repo on GitHub. Railway then redeploys by itself. Check the logs for the line auth: token required.",
+      "copy": [
+        {"label": "Version history page", "text": "./history.html"}
+      ],
+      "checkbox_label": "I know how to update."
+    }
+  ]
+}
