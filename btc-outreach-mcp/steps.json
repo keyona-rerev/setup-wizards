@@ -1,0 +1,116 @@
+{
+  "title": "Install BTC Outreach MCP on your own accounts",
+  "intro": "BTC Outreach MCP lets Claude work with your own Gmail account. Claude can search threads, read threads and messages, list labels, and create, read, change and delete drafts. Claude can also create reply drafts and label threads. The tool never sends mail. You send each message yourself from Gmail. The tool has two parts. Part one is a small Node.js server that runs on your own host (Railway in this guide). Part two is a Google Apps Script web app that runs inside your own Google account. You need a Google account, a GitHub account, a Railway account and Claude. This guide uses your own accounts only.",
+  "variables": [
+    {"key": "business_name", "label": "Your business name", "help": "Claude uses this name in tool text and sender name examples.", "placeholder": "Acme Capital"},
+    {"key": "from_email", "label": "Your Gmail address for the outreach mailbox", "help": "This is the Google account that owns the Apps Script project. Drafts appear in this mailbox.", "placeholder": "you@yourcompany.com", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", "pattern_error": "Enter a full email address, for example you@yourcompany.com."},
+    {"key": "github_username", "label": "Your GitHub username", "help": "You fork the code into this account.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]+$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "repo_name", "label": "Name for your copy of the repo", "help": "Keep the default name unless you want another one.", "default": "outreach-mcp", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "railway_project_name", "label": "Railway project name", "help": "Any name you like.", "placeholder": "outreach-mcp", "optional": true},
+    {"key": "gas_web_app_url", "label": "Apps Script web app URL", "help": "You get this URL in step 6, after you deploy the web app. It ends in /exec.", "placeholder": "https://script.google.com/macros/s/.../exec", "pattern": "^https://script\\.google\\.com/.+/exec$", "pattern_error": "The URL must start with https://script.google.com and end with /exec."},
+    {"key": "app_url", "label": "Public URL of your Railway service", "help": "You get this URL in step 9. Do not add a slash at the end.", "placeholder": "https://your-service.up.railway.app", "pattern": "^https://[^/\\s]+$", "pattern_error": "Start with https:// and do not add a path or a slash at the end."},
+    {"key": "mcp_url", "label": "MCP address for Claude", "derive": "{{app_url}}/mcp"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "Get these accounts ready before you start. 1. A Google account for the mailbox that Claude will use. 2. A GitHub account. 3. A Railway account. Railway has a free trial and then costs money. Check the Railway price page before you deploy. 4. Claude with custom connectors turned on. Use a Claude plan that lets you add a custom connector. The tool creates drafts and never sends mail. It can read the whole mailbox, so use it only on a mailbox you trust Claude to read.",
+      "checkbox_label": "I have all four accounts."
+    },
+    {
+      "title": "Enter your public values",
+      "instructions": "Enter the values below. The wizard fills them into later steps. Enter only public values. Never enter a password, token or secret here. You will enter secrets later, only inside your own accounts. You get the Apps Script URL and the Railway URL in later steps. Leave those two fields empty for now.",
+      "collect": ["business_name", "from_email", "github_username", "repo_name", "railway_project_name"],
+      "checkbox_label": "I entered my values."
+    },
+    {
+      "title": "Fork the code on GitHub",
+      "instructions": "Open the ReRev Labs repo keyona-rerev/btc-outreach-mcp on GitHub. Choose Fork. Set the owner to {{github_username}}. Set the repository name to {{repo_name}}. Choose Create fork. This repo holds the server and a folder named gas. The gas folder holds the Apps Script file McpActions.gs.",
+      "copy": [
+        {"label": "Source repo", "text": "https://github.com/keyona-rerev/btc-outreach-mcp"},
+        {"label": "Your fork", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "My fork exists.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You must see server.js, package.json and a gas folder."
+    },
+    {
+      "title": "Change the mailbox name in the server text",
+      "instructions": "The tool descriptions in server.js name the original mailbox. Claude reads these descriptions. Change them to your mailbox. Open server.js in your fork. Choose the pencil icon. Find every place that shows the original mailbox address. Replace each one with {{from_email}}. Choose Commit changes. This change is only text. It does not change how the tool works.",
+      "copy": [
+        {"label": "Your mailbox address", "text": "{{from_email}}"}
+      ],
+      "checkbox_label": "I replaced the mailbox address in server.js.",
+      "verify_hint": "Search server.js in your fork for the original address. You must find no match."
+    },
+    {
+      "title": "Make your own Apps Script project",
+      "instructions": "Sign in to Google as {{from_email}}. Open the template project link that ReRev Labs sent you, then choose File, Make a copy. The copy is now your own project. Open your copy. Check that the project has a file named McpActions.gs and a doPost function. If a file is missing, ask ReRev Labs for the current template. VERIFY: confirm with ReRev Labs that the template holds the original create_draft handler in doPost.",
+      "checkbox_label": "I have my own copy of the project.",
+      "verify_hint": "Your project list must show your copy. The file list must show McpActions.gs."
+    },
+    {
+      "title": "Set the shared secret and deploy the web app",
+      "instructions": "Make a long random string. This string is the shared secret. Use a password manager to make one. Do not paste it into this wizard. In your Apps Script project, choose Project Settings. Under Script Properties, choose Add script property. Set the name to MCP_SECRET. Paste your secret as the value. Save. Keep the secret ready for step 8. Then choose Run on the function mcpAuthorize. Accept the Gmail permission prompt. Next choose Deploy, then New deployment, then Web app. Set Execute as to Me. Set Who has access to Anyone. Choose Deploy. Copy the web app URL. Paste it into the field below.",
+      "collect": ["gas_web_app_url"],
+      "copy": [
+        {"label": "Script property name", "text": "MCP_SECRET"},
+        {"label": "Script property value (enter it only in your Script Properties)", "text": "PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "checkbox_label": "I deployed the web app and entered the URL.",
+      "verify_hint": "Open {{gas_web_app_url}} in a browser. A response, not a Google error page, shows that the web app runs. The server step tests the full path."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "Sign in to Railway. Choose New Project. Choose Deploy from GitHub repo. Allow Railway to read your GitHub account if it asks. Pick {{github_username}}/{{repo_name}}. If you entered a project name, rename the project to {{railway_project_name}}. Railway builds the service. The first build can fail until you set variables in the next step. This is normal.",
+      "checkbox_label": "The Railway service exists.",
+      "verify_hint": "Your Railway project shows one service that is linked to {{github_username}}/{{repo_name}}."
+    },
+    {
+      "title": "Set the Railway variables",
+      "instructions": "Open your Railway service. Choose Variables. Add the two variables below. GAS_WEB_APP_URL is your web app URL. GAS_SHARED_SECRET must be the same string as MCP_SECRET in your Script Properties. Enter the secret only in Railway. Do not share it with anyone. Railway sets PORT for you. Do not add PORT. Railway redeploys after you save.",
+      "copy": [
+        {"label": "Variable 1 name", "text": "GAS_WEB_APP_URL"},
+        {"label": "Variable 1 value", "text": "{{gas_web_app_url}}"},
+        {"label": "Variable 2 name", "text": "GAS_SHARED_SECRET"},
+        {"label": "Variable 2 value (same as MCP_SECRET)", "text": "PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "checkbox_label": "I saved both Railway variables.",
+      "verify_hint": "Railway shows GAS_WEB_APP_URL and GAS_SHARED_SECRET in the Variables list, and a new deployment starts."
+    },
+    {
+      "title": "Make a public URL",
+      "instructions": "Open your Railway service. Choose Settings, then Networking. Choose Generate Domain. Copy the domain. Add https:// in front. Paste the result into the field below. Do not add a slash at the end. The start command is npm start. Railway finds it from package.json.",
+      "collect": ["app_url"],
+      "copy": [
+        {"label": "Health check address", "text": "{{app_url}}/health"}
+      ],
+      "checkbox_label": "I entered my public URL.",
+      "verify_hint": "Open {{app_url}}/health in a browser. You must see JSON with ok set to true and the name btc-outreach-mcp."
+    },
+    {
+      "title": "Add the tool to Claude",
+      "instructions": "Open Claude. Go to Settings, then Connectors. Choose Add custom connector. Set the name to {{business_name}} Outreach. Paste the MCP address below. Save. Turn the connector on in a new chat. The server has no sign-in of its own. Anyone who knows your public URL could call the tools. Keep the URL private. Do not post it anywhere.",
+      "copy": [
+        {"label": "MCP address", "text": "{{mcp_url}}"}
+      ],
+      "checkbox_label": "The connector is added and turned on.",
+      "verify_hint": "In a new chat, the connector list shows these tools: create_draft, search_threads, get_thread, get_message, list_labels, list_drafts, get_draft, update_draft, delete_draft, create_reply_draft, label_thread."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Test the read path first. Ask Claude to list the labels in your mailbox. You must see your own Gmail labels. Then test drafts. Ask Claude to create a draft to your own address with the subject Test draft. Open Gmail as {{from_email}}. Check the Drafts folder. Delete the test draft when you finish. If Claude says unauthorized, the secret in Railway differs from MCP_SECRET. Set both to the same value again.",
+      "copy": [
+        {"label": "Test prompt 1", "text": "List my Gmail labels with the Outreach connector."},
+        {"label": "Test prompt 2", "text": "Create a draft to {{from_email}} with the subject Test draft and a one-line body."}
+      ],
+      "checkbox_label": "Both tests worked.",
+      "verify_hint": "The label list matches your Gmail labels. The test draft shows in Gmail Drafts."
+    },
+    {
+      "title": "Update later",
+      "instructions": "Open the version history page of this wizard to see new versions. Compare the newest version with your fork. The server updates by syncing your fork on GitHub. Railway redeploys by itself. The Apps Script part updates only when McpActions.gs changes. Copy the new file content into your project. Then choose Deploy, Manage deployments, edit your deployment, choose New version, and choose Deploy. Keep the same deployment so the web app URL does not change.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "Open history.html on this wizard site. You see the version list."
+    }
+  ]
+}
