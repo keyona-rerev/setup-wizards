@@ -1,0 +1,37 @@
+{
+  "product": "Wayfinder (project dashboard and Tool Registry), repository keyona-rerev/wayfinder",
+  "current": "2026-07-05",
+  "how_to_find": "The repository has no git tags. Open your fork on GitHub and read the date of the newest commit that came from keyona-rerev/wayfinder. Compare it with the dates below. For the database, compare your Supabase tables with supabase/schema.sql in the fork.",
+  "versions": [
+    {
+      "id": "2026-07-05",
+      "date": "2026-07-05",
+      "title": "Board gated on completed analysis",
+      "summary": "VERIFY: inferred from commit dates. Newest commit b425be3 (2026-07-05). The main board now lists only projects with analysis_status complete. Awaiting Analysis merges unanalyzed projects and repos without a project. A migration script for the ReRev Labs Tool Registry was added (do not run it).",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Changed", "text": "Main board shows only projects whose analysis_status is complete (commit b425be3)."},
+        {"kind": "Added", "text": "Script scripts/migrate_tool_registry.py for the ReRev Labs own Tool Registry rows. It is not for client use (commit e178975)."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync your fork", "text": "On your fork page on GitHub, choose Sync fork, then Update branch. Check that assets/config.js still holds your own values."}
+      ]
+    },
+    {
+      "id": "2026-07-04",
+      "date": "2026-07-04",
+      "title": "First build of the dashboard and its seven modules",
+      "summary": "VERIFY: inferred from commit dates. The repository was created 2026-07-04 and 13 commits followed the same day. The last change to supabase/schema.sql was commit 100dae9 (2026-07-04). The schema file lists its own migration names in its header.",
+      "upgrade_type": "database",
+      "changes": [
+        {"kind": "Added", "text": "Interface with Kanban, list, grid and gallery views (commit 4e47f70)."},
+        {"kind": "Added", "text": "Session Log, Rubric with evolution log, Architecture Map, Consideration Mode, Tech Stack and Deep Test modules."},
+        {"kind": "Added", "text": "Analysis status tracking with stages and elapsed time (commit ca4ff3a)."},
+        {"kind": "Changed", "text": "Kanban columns are Building, Live, Parked and Blocked (commit 100dae9)."}
+      ],
+      "upgrade_steps": [
+        {"title": "Check the database", "text": "Compare your Supabase tables and the status check on the projects table with supabase/schema.sql in your fork. Ask ReRev Labs before you change an existing table."}
+      ]
+    }
+  ]
+}
