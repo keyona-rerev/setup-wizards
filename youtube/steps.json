@@ -1,0 +1,120 @@
+{
+  "title": "YouTube MCP setup",
+  "intro": "This wizard installs your own YouTube MCP server. The server lets Claude search YouTube, read video transcripts, list channel videos, read comments, and search across all transcripts of one channel. It runs on your own Railway account. You need no YouTube API key. You set one access password for the server. You can add an optional cookie file if YouTube blocks your server. The code comes from the repository keyona-rerev/youtube-mcp-server. It is a Python server built with FastMCP and yt-dlp.",
+  "variables": [
+    { "key": "business_name", "label": "Your business name", "help": "Used only to label your own notes in this wizard.", "placeholder": "Acme Studio", "optional": true },
+    { "key": "github_username", "label": "Your GitHub username", "help": "The GitHub account that will own your copy of the code.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters." },
+    { "key": "repo_name", "label": "Name of your copy of the repository", "help": "Keep the default name unless you want a different one.", "placeholder": "youtube-mcp-server", "default": "youtube-mcp-server", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only." },
+    { "key": "railway_project_name", "label": "Railway project name", "help": "Any name you like. It is only a label inside Railway.", "placeholder": "youtube-mcp", "default": "youtube-mcp", "pattern": "^[A-Za-z0-9 _-]+$", "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only." },
+    { "key": "app_url", "label": "Your Railway public URL", "help": "Railway shows it after you generate a domain. It starts with https://. Do not add a slash at the end.", "placeholder": "https://youtube-mcp-production.up.railway.app", "pattern": "^https://[A-Za-z0-9.-]+$", "pattern_error": "Enter the URL that starts with https:// and has no slash at the end." },
+    { "key": "mcp_url", "label": "Your MCP address", "help": "Built from your Railway URL.", "derive": "{{app_url}}/mcp" },
+    { "key": "fork_url", "label": "Your repository address", "help": "Built from your GitHub name and repository name.", "derive": "https://github.com/{{github_username}}/{{repo_name}}" }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "This product runs one small server for you. Claude connects to it and calls its tools.\n\nYou need these accounts:\n- A GitHub account. It is free.\n- A Railway account. Railway charges for hosting. A small server costs a few dollars each month. Check the Railway price page before you start.\n- Claude Code or Claude Desktop on your computer.\n\nYou do not need a YouTube API key. The server reads public YouTube pages with a tool called yt-dlp.\n\nYou will make one access password for the server in a later step. You will enter it only inside Railway and inside your Claude settings. Never type it into this wizard.",
+      "collect": ["business_name", "github_username"],
+      "checkbox_label": "I have a GitHub account and a Railway account.",
+      "verify_hint": "You can sign in to github.com and railway.com."
+    },
+    {
+      "title": "Copy the code to your GitHub account",
+      "instructions": "Open https://github.com/keyona-rerev/youtube-mcp-server in your browser.\n\nClick Fork, near the top right.\n\nChoose your own account as the owner.\n\nKeep or change the repository name. Then enter the name below.\n\nClick Create fork.",
+      "collect": ["repo_name"],
+      "copy": [
+        { "label": "Source repository", "text": "https://github.com/keyona-rerev/youtube-mcp-server" }
+      ],
+      "checkbox_label": "My fork exists in my GitHub account.",
+      "verify_hint": "Open {{fork_url}}. You see the files Procfile, README.md and requirements.txt."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "Open https://railway.com/new and sign in.\n\nClick Deploy from GitHub repo.\n\nAllow Railway to read your GitHub account if it asks.\n\nChoose {{github_username}}/{{repo_name}}.\n\nClick Deploy Now. Railway starts a first build. The first build can fail or show a warning about the password. This is normal. You fix it in the next steps.\n\nEnter the project name you use in Railway below. You can rename the project in Project Settings.",
+      "collect": ["railway_project_name"],
+      "checkbox_label": "The Railway project exists and uses my fork.",
+      "verify_hint": "Railway shows a service that is linked to {{github_username}}/{{repo_name}}. The repository has a file named Procfile. Railway uses it to start the server."
+    },
+    {
+      "title": "Make your access password",
+      "instructions": "The server is public on the internet. The access password stops other people from using it. Make a long random value.\n\nOpen a terminal on your computer. Run the command that matches your system. The command prints one line of random text.\n\nCopy that line. Keep it in your password manager. You need it again in two later steps.\n\nDo not paste the password into this wizard.",
+      "copy": [
+        { "label": "Mac or Linux terminal", "text": "openssl rand -hex 32" },
+        { "label": "Windows PowerShell", "text": "-join ((48..57)+(97..102) | Get-Random -Count 64 | ForEach-Object {[char]$_})" }
+      ],
+      "checkbox_label": "I made a password and saved it in my password manager.",
+      "verify_hint": "Your password is a line of 64 letters and numbers."
+    },
+    {
+      "title": "Add the password in Railway",
+      "instructions": "In Railway, open your service. Click the Variables tab.\n\nClick New Variable.\n\nEnter the name shown below.\n\nPaste your own password as the value.\n\nClick Add. Railway offers to deploy. Click Deploy.\n\nEnter the password only here, inside your own Railway account.",
+      "copy": [
+        { "label": "Railway variable name", "text": "MCP_AUTH_TOKEN" },
+        { "label": "Railway variable value", "text": "PASTE_YOUR_OWN_VALUE_HERE" }
+      ],
+      "checkbox_label": "The variable MCP_AUTH_TOKEN is saved in Railway.",
+      "verify_hint": "The Variables tab lists MCP_AUTH_TOKEN. The value is hidden."
+    },
+    {
+      "title": "Add a cookie file (optional)",
+      "instructions": "YouTube sometimes blocks servers that run in data centers. It shows a bot check. A cookie file from a signed-in browser answers the check. Skip this step if you want to try without cookies first. You can come back to it later.\n\nIf you add cookies, use a separate Google account that you do not need. Cookies give access to the account they come from.\n\n1. Sign in to YouTube with the separate account in a private browser window.\n2. Export the cookies for youtube.com in Netscape format. Use a cookie export extension that you trust.\n3. Save the file as cookies.txt.\n4. Turn the file into one line of base64 text. Use the command below.\n5. In Railway, open the Variables tab. Add the variable named below. Paste the base64 text as the value.\n6. Click Deploy.\n\nThe server accepts base64 because some screens remove the tab characters that the cookie format needs.",
+      "copy": [
+        { "label": "Mac or Linux: make base64 text", "text": "base64 -w0 cookies.txt" },
+        { "label": "Windows PowerShell: make base64 text", "text": "[Convert]::ToBase64String([IO.File]::ReadAllBytes(\"cookies.txt\"))" },
+        { "label": "Railway variable name", "text": "YOUTUBE_COOKIES" },
+        { "label": "Railway variable value", "text": "PASTE_YOUR_OWN_VALUE_HERE" }
+      ],
+      "checkbox_label": "I added the cookie variable, or I chose to skip it for now.",
+      "verify_hint": "If you added cookies, the Railway deploy log later shows the line: cookies: loaded."
+    },
+    {
+      "title": "Open a public address",
+      "instructions": "In Railway, open your service. Click the Settings tab.\n\nFind Networking. Click Generate Domain.\n\nRailway shows an address that starts with https://.\n\nCopy the address. Enter it below. Do not add a slash at the end.\n\nWait until the latest deploy shows Active.",
+      "collect": ["app_url"],
+      "checkbox_label": "My service has a public address and the deploy is Active.",
+      "verify_hint": "The Railway Deployments tab shows the newest deploy as Active."
+    },
+    {
+      "title": "Read the start-up log",
+      "instructions": "In Railway, open the Deployments tab. Click the newest deploy. Click View Logs.\n\nLook for these lines:\n- yt-dlp: followed by a version number.\n- auth: token required.\n- cookies: loaded, or cookies: none.\n\nIf you see the line that starts with auth: OPEN, the password is missing. Go back to the step Add the password in Railway. Fix it before you go on.",
+      "checkbox_label": "The log shows auth: token required.",
+      "verify_hint": "The log shows auth: token required. It does not show auth: OPEN."
+    },
+    {
+      "title": "Test the server from your terminal",
+      "instructions": "Run the first command. You must see the word unauthorized and the code 401. This proves strangers cannot use your server.\n\nRun the second command. Replace PASTE_YOUR_OWN_VALUE_HERE with your password. The answer must not be 401. Any other answer shows the password works. The server may answer with a message about the request format. This is normal for a plain test.",
+      "copy": [
+        { "label": "Test without the password", "text": "curl -i {{mcp_url}}" },
+        { "label": "Test with the password", "text": "curl -i -H \"Authorization: Bearer PASTE_YOUR_OWN_VALUE_HERE\" {{mcp_url}}" }
+      ],
+      "checkbox_label": "The first test returns 401. The second test does not return 401.",
+      "verify_hint": "Test one returns 401 and the text unauthorized. Test two returns a different code."
+    },
+    {
+      "title": "Connect the server to Claude",
+      "instructions": "Pick the way you use Claude.\n\nOption A: Claude Code. Run the command below in your terminal. Replace the placeholder with your password.\n\nOption B: Claude Desktop. Open Settings, then Developer, then Edit Config. Add the block below inside mcpServers. Replace the placeholder with your password. Keep the word Bearer and the space after it. Save the file. Restart Claude Desktop. This option needs Node.js on your computer.\n\nThe server checks a password header on every request. Some Claude web connector screens cannot send a custom header. If you use only Claude on the web, ask ReRev Labs for help.\n\nEnter the password only in your own Claude settings.",
+      "copy": [
+        { "label": "Option A: Claude Code command", "text": "claude mcp add --transport http youtube {{mcp_url}} --header \"Authorization: Bearer PASTE_YOUR_OWN_VALUE_HERE\"" },
+        { "label": "Option B: Claude Desktop config block", "text": "{\n  \"mcpServers\": {\n    \"youtube\": {\n      \"command\": \"npx\",\n      \"args\": [\"mcp-remote\", \"{{mcp_url}}\", \"--header\", \"Authorization:${YT_AUTH_HEADER}\"],\n      \"env\": { \"YT_AUTH_HEADER\": \"Bearer PASTE_YOUR_OWN_VALUE_HERE\" }\n    }\n  }\n}" }
+      ],
+      "checkbox_label": "I added the server to Claude.",
+      "verify_hint": "Claude lists a server named youtube with 8 tools."
+    },
+    {
+      "title": "Run your first test",
+      "instructions": "Open a new chat in Claude. Paste the first prompt below.\n\nClaude must call the tool get_video_info and show the title of the video.\n\nThen paste the second prompt. Claude must call get_transcript and show text with timestamps.\n\nIf the transcript call fails with a message about blocked requests, YouTube is blocking your server address. Add the cookie file from the optional step. Wait a few hours if you made many requests.\n\nThe server has 8 tools: search_videos, get_video_info, get_channel_info, get_channel_videos, get_transcript, get_comments, search_transcript and search_channel_transcripts.",
+      "copy": [
+        { "label": "Test 1", "text": "Use the youtube tools. Get the video info for https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+        { "label": "Test 2", "text": "Use the youtube tools. Get the transcript for https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+      ],
+      "checkbox_label": "Claude returned video info and a transcript.",
+      "verify_hint": "Claude shows the video title and transcript lines with timestamps."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "The code changes over time. YouTube changes often, and the tool yt-dlp needs updates to keep up. This code asks for the newest yt-dlp build each time Railway builds it.\n\nOpen the version history page of this wizard. It lists each version and what to do.\n\nTo update, open {{fork_url}} on GitHub. Click Sync fork, then Update branch. Railway builds again by itself. If a build fails, open the Railway logs and read the last lines.\n\nTo make Railway rebuild without a code change, open the Deployments tab. Click the three dots on the newest deploy. Click Redeploy.\n\nTo find your current version, see the how to find your version text on the history page.",
+      "checkbox_label": "I know how to update my copy.",
+      "verify_hint": "You opened the version history page of this wizard."
+    }
+  ]
+}
