@@ -1,0 +1,142 @@
+{
+  "title": "Set up BTC Comms Review for your organization",
+  "intro": "BTC Comms Review is a password page that tracks your communications and marketing campaigns, audiences, initiatives and pipeline. It reads JSON files from your own GitHub repository and runs on GitHub Pages. This wizard copies the tool to your account and removes the original organization's data. An optional email agent is covered in step 7.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your organization name",
+      "help": "The name you want to show on your tracker. Example: Acme Ventures.",
+      "placeholder": "Acme Ventures"
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "Look at the top right of github.com after you sign in.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your GitHub repository",
+      "help": "This is the name your copy will have.",
+      "placeholder": "comms-review",
+      "default": "comms-review",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "contact_email",
+      "label": "Contact email to show on the page",
+      "help": "This email shows in the page footer. Use a public team address.",
+      "placeholder": "team@yourcompany.com",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a valid email address."
+    },
+    {
+      "key": "app_url",
+      "label": "Your tracker web address",
+      "derive": "https://{{github_username}}.github.io/{{repo_name}}"
+    },
+    {
+      "key": "raw_base",
+      "label": "Raw data address",
+      "derive": "https://raw.githubusercontent.com/{{github_username}}/{{repo_name}}/main"
+    },
+    {
+      "key": "edit_url",
+      "label": "Edit link for campaigns file",
+      "derive": "https://github.com/{{github_username}}/{{repo_name}}/edit/main/campaigns.json"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "BTC Comms Review is a small web page. It shows your communications and marketing plan. It reads JSON data files from a GitHub repository.\n\nThe page has no database and no server. You host it for free on GitHub Pages.\n\nBefore you start, make sure you have this account:\n\n- GitHub (github.com)\n\nThe tool also includes an optional daily email agent called Debbie. It uses Google Apps Script. Step 7 covers it. You can skip step 7.\n\nYou do not need to install anything. You do all the work in your web browser.",
+      "checkbox_label": "I have a GitHub account.",
+      "verify_hint": "You can sign in to github.com."
+    },
+    {
+      "title": "Choose your names",
+      "instructions": "Enter the names for your copy. The wizard fills them into the next steps. Do not enter passwords or secret values here.",
+      "collect": [
+        "business_name",
+        "github_username",
+        "repo_name",
+        "contact_email"
+      ],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "Your tracker address will be {{app_url}}."
+    },
+    {
+      "title": "Copy the code",
+      "instructions": "Open the template project link that ReRev Labs sent you. Choose Fork, or choose Use this template if it shows. Name the new repository {{repo_name}}. Set it to Public. The page reads its data files from the public raw address, so a private repository does not work.\n\nThe code in the original repository holds data for another organization. You remove that data in the next step.",
+      "checkbox_label": "My copy exists in my GitHub account.",
+      "verify_hint": "You can open github.com/{{github_username}}/{{repo_name}}."
+    },
+    {
+      "title": "Remove the sample data",
+      "instructions": "The data files in the copy belong to another organization. Do not keep them. Replace the content of each file with your own data.\n\n1. Open the file on GitHub.\n2. Choose the pencil icon to edit.\n3. Replace the content.\n4. Choose Commit changes.\n\nStart with campaigns.json and rejections.json. Paste the empty starter text from the copy blocks below.\n\nThe files audiences.json, content_formats.json, initiatives.json, pipeline.json and scenarios.json hold more sample data. Keep each file valid JSON. Keep the same top-level keys. Replace the entries inside with your own. VERIFY: read each file first to see its layout.\n\nDelete the folder named debbie if you skip step 7.",
+      "copy": [
+        {
+          "label": "campaigns.json (empty start)",
+          "text": "{\n  \"campaigns\": []\n}"
+        },
+        {
+          "label": "rejections.json (empty start)",
+          "text": "{\n  \"rejections\": []\n}"
+        }
+      ],
+      "checkbox_label": "I replaced the sample data with my own.",
+      "verify_hint": "No other organization names remain in the data files."
+    },
+    {
+      "title": "Point the page at your repository",
+      "instructions": "The file index.html has fixed addresses and a password. You change four lines.\n\n1. Open index.html in your repository.\n2. Choose the pencil icon.\n3. Find the line that starts with const SITE_PASSWORD. Replace the value with a password you choose. The page checks this password in the browser. Anyone who views the page source can read it. Use it only as a light door, not as real security. Do not reuse a password from another account.\n4. Replace the three address lines (REPO_RAW, PAGES_BASE and GITHUB_EDIT) with the lines below.\n5. Search the file for the old contact email and for the old scheduling links in the System Info tab. Replace them with {{contact_email}} and your own links.\n6. Choose Commit changes.",
+      "copy": [
+        {
+          "label": "Password line (choose your own password)",
+          "text": "const SITE_PASSWORD = 'PASTE_YOUR_OWN_VALUE_HERE';"
+        },
+        {
+          "label": "REPO_RAW line",
+          "text": "const REPO_RAW   = '{{raw_base}}';"
+        },
+        {
+          "label": "PAGES_BASE line",
+          "text": "const PAGES_BASE = '{{app_url}}';"
+        },
+        {
+          "label": "GITHUB_EDIT line",
+          "text": "const GITHUB_EDIT = '{{edit_url}}';"
+        }
+      ],
+      "checkbox_label": "I changed the four lines and the contact details.",
+      "verify_hint": "The file no longer holds the original repository address."
+    },
+    {
+      "title": "Turn on hosting and test",
+      "instructions": "1. In your repository, open Settings, then Pages.\n2. Under Build and deployment, set Source to Deploy from a branch.\n3. Choose branch main and folder / (root). Choose Save.\n4. Wait two minutes.\n5. Open {{app_url}} in your browser.\n6. Enter the password you set in step 5.\n\nThe Home tab must load. Open the Campaigns tab. It must show your data, not an error.",
+      "checkbox_label": "My tracker loads and shows my data.",
+      "verify_hint": "{{app_url}} shows the password page, then the Home tab."
+    },
+    {
+      "title": "Optional: set up the Debbie email agent",
+      "instructions": "Skip this step if you only want the tracker page.\n\nDebbie is an Apps Script project that sends a daily check-in email and syncs a file in your repository. Its code calls a separate task API (called Super Connector in the original code). It also holds fixed initiative names for the original organization. You need your own task API and you must edit the code. VERIFY: the original deployment was not checked by this wizard. Ask ReRev Labs before you start.\n\n1. Open the template project link that ReRev Labs sent you, then choose File, Make a copy.\n2. Open Bridge.gs. Change GITHUB_OWNER to {{github_username}} and GITHUB_REPO to {{repo_name}}.\n3. Open Railway.gs. Change the BASE address to your own task API address.\n4. In Bridge.gs, edit the function named _inferInitiativeId. Replace the fixed initiative IDs with your own.\n5. Open Project Settings, then Script Properties. Add the three properties below. Enter each value only inside Script Properties. Do not paste them into this wizard or into any file.\n6. Run setupAllTriggers once. Approve the Google permission request.\n7. Run testSendCheckIn. A check-in email must arrive.",
+      "copy": [
+        {
+          "label": "Script property names (add your own values)",
+          "text": "SC_API_KEY = PASTE_YOUR_OWN_VALUE_HERE\nANTHROPIC_API_KEY = PASTE_YOUR_OWN_VALUE_HERE\nGITHUB_TOKEN = PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "checkbox_label": "I finished Debbie, or I skipped this step.",
+      "verify_hint": "testSendCheckIn sends one email to your inbox, or you skipped."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "The wizard has a version history page. It lists each version of the tool and what changed.\n\n1. Open the version history page for this wizard.\n2. Find your version with the help text at the top of that page.\n3. Read each newer version. Follow its upgrade steps.\n\nTo take new page code, compare index.html in the original repository with yours. Keep your own four address and password lines from step 5.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "You can open the history page."
+    }
+  ]
+}
