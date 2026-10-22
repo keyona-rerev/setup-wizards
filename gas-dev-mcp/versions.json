@@ -1,0 +1,143 @@
+{
+  "product": "GAS Developer MCP (keyona-rerev/gas-dev-mcp)",
+  "current": "2026-05-23",
+  "how_to_find": "Open your server health address (your Railway address plus /health) and read the version field. It shows the server version, for example 2.2.0. You can also read the newest commit date on your fork on GitHub and match it to a version below. The repository has no git tags (VERIFY).",
+  "versions": [
+    {
+      "id": "2026-05-23",
+      "date": "2026-05-23",
+      "title": "SDK upgrade for Streamable HTTP",
+      "summary": "Latest commit 3f7710b on branch master. Date taken from the commit. Server reports version 2.2.0. VERIFY: version grouping is inferred from commit dates, not from tags.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {
+          "kind": "Fixed",
+          "text": "Raised the MCP SDK to ^1.10.0 so StreamableHTTPServerTransport works (commit 3f7710b)."
+        }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Sync your fork",
+          "text": "On GitHub, open your fork and click Sync fork, then Update branch. Railway redeploys by itself. Then open the health address and check it returns status ok."
+        }
+      ]
+    },
+    {
+      "id": "2026-05-01",
+      "date": "2026-05-01",
+      "title": "Add file tool",
+      "summary": "Commit 676a16b. VERIFY: inferred from commit date.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {
+          "kind": "Added",
+          "text": "New tool gas_add_file creates .gs or .html files in an existing project (commit 676a16b)."
+        }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Sync your fork",
+          "text": "Sync your fork on GitHub. Railway redeploys by itself."
+        }
+      ]
+    },
+    {
+      "id": "2026-04-30",
+      "date": "2026-04-30",
+      "title": "Safety guards",
+      "summary": "Commits cbfbb55 and 58f2d45. VERIFY: inferred from commit dates.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {
+          "kind": "Fixed",
+          "text": "Added payload truncation guards and a forceDelete safety check (commit cbfbb55)."
+        },
+        {
+          "kind": "Fixed",
+          "text": "Removed server.setInstructions because the SDK did not support it (commit 58f2d45)."
+        }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Sync your fork",
+          "text": "Sync your fork on GitHub. Railway redeploys by itself."
+        }
+      ]
+    },
+    {
+      "id": "2026-04-29",
+      "date": "2026-04-29",
+      "title": "Single-file read and update tools",
+      "summary": "Commits 4524836 and a579241. VERIFY: inferred from commit dates.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {
+          "kind": "Added",
+          "text": "New tools gas_get_file and gas_list_project_files to fix truncated reads of large projects (commit 4524836)."
+        },
+        {
+          "kind": "Added",
+          "text": "New tool gas_update_file patches one file without sending the full project (commit a579241)."
+        }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Sync your fork",
+          "text": "Sync your fork on GitHub. Railway redeploys by itself."
+        }
+      ]
+    },
+    {
+      "id": "2026-04-22",
+      "date": "2026-04-22",
+      "title": "Move to Streamable HTTP",
+      "summary": "Commit 53426da. VERIFY: inferred from commit date.",
+      "upgrade_type": "settings",
+      "changes": [
+        {
+          "kind": "Changed",
+          "text": "Moved from SSE to Streamable HTTP transport. The MCP address is now your Railway address plus /mcp (commit 53426da)."
+        }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Update the connector address",
+          "text": "In Claude, edit the connector. Set the server URL to your Railway address followed by /mcp. Then sync your fork on GitHub."
+        }
+      ]
+    },
+    {
+      "id": "2026-03-19",
+      "date": "2026-03-19",
+      "title": "Project file handling refactor",
+      "summary": "Commits 69de9b8, 4afff90 and 0638da9. VERIFY: inferred from commit dates.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {
+          "kind": "Changed",
+          "text": "Update logic now fetches existing project content and updates the files array (commits 69de9b8, 0638da9)."
+        }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Sync your fork",
+          "text": "Sync your fork on GitHub. Railway redeploys by itself."
+        }
+      ]
+    },
+    {
+      "id": "2026-03-15",
+      "date": "2026-03-15",
+      "title": "First commit",
+      "summary": "Initial commit 4562874. VERIFY: inferred from commit date.",
+      "upgrade_type": "none",
+      "changes": [
+        {
+          "kind": "Added",
+          "text": "First version of the GAS Developer MCP server (commit 4562874)."
+        }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
