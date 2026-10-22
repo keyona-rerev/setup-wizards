@@ -1,0 +1,51 @@
+{
+  "product": "YouTube MCP",
+  "current": "2026-08-27",
+  "how_to_find": "Open your copy of the repository on GitHub. Look at the date of the newest commit on the main branch. Match it to the version dates below. The newest commit in keyona-rerev/youtube-mcp-server when this wizard was released is 59b9b29, dated 2026-08-27. The repository has no git tags that this wizard could see (VERIFY). The package version in pyproject.toml is 0.1.2 and does not change with each version below.",
+  "versions": [
+    {
+      "id": "2026-08-27",
+      "date": "2026-08-27",
+      "title": "Railway hosting, access password and cookie support",
+      "summary": "VERIFY: This entry comes from commit dates on 2026-08-27, not from tags. The server now runs on Railway with an access password, an optional cookie file and a newer yt-dlp. The newest commit seen is 59b9b29.",
+      "upgrade_type": "settings",
+      "changes": [
+        { "kind": "Added", "text": "Procfile and requirements.txt so Railway can build and start the server over HTTP." },
+        { "kind": "Added", "text": "Access password check on every HTTP request. It reads the Railway variable MCP_AUTH_TOKEN. If the variable is empty, the server stays open and the log says so." },
+        { "kind": "Added", "text": "Optional cookie file from the Railway variable YOUTUBE_COOKIES. The server also accepts it as base64 text. If the cookie request fails, the server tries again without cookies." },
+        { "kind": "Changed", "text": "Transcripts now come from yt-dlp caption extraction with browser impersonation. The youtube-transcript-api library is gone." },
+        { "kind": "Changed", "text": "The server follows the nightly yt-dlp build and logs the yt-dlp version at start-up." },
+        { "kind": "Changed", "text": "URL arguments must point to YouTube hosts." }
+      ],
+      "upgrade_steps": [
+        {
+          "title": "Sync your fork",
+          "text": "On GitHub, open your fork. Click Sync fork, then Update branch. Railway rebuilds by itself."
+        },
+        {
+          "title": "Set the access password",
+          "text": "In Railway, open the Variables tab. Add the variable named below with your own password. Click Deploy. Check that the log shows: auth: token required.",
+          "copy": "MCP_AUTH_TOKEN"
+        },
+        {
+          "title": "Add cookies if YouTube blocks you (optional)",
+          "text": "Add the variable named below with your own base64 cookie text. See the cookie step in the setup wizard.",
+          "copy": "YOUTUBE_COOKIES"
+        }
+      ]
+    },
+    {
+      "id": "2026-03-17",
+      "date": "2026-03-17",
+      "title": "First public version with 8 tools",
+      "summary": "VERIFY: This entry comes from commit dates on 2026-03-17, not from tags. The first commit is 77142dc. The server offers search_videos, get_video_info, get_channel_info, get_channel_videos, get_transcript, get_comments, search_transcript and search_channel_transcripts, and runs on a computer through stdio. The package name yt-mcp-server was set on the same day.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "The 8 YouTube tools and the optional HTTP transport." },
+        { "kind": "Added", "text": "PyPI publishing workflow and the package name yt-mcp-server." },
+        { "kind": "Fixed", "text": "Number format in duration and timestamp text. Search results have a size limit." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
