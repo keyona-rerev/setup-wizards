@@ -1,0 +1,47 @@
+{
+  "product": "Super Connector (app and API)",
+  "current": "2026-10-22",
+  "how_to_find": "Open your copy of each repo on GitHub and read the date of the newest commit. Compare it with the dates below. The API repo and the app repo have separate histories. The repos show no release tags that this wizard could confirm (VERIFY). There is no version value in the code.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The wizard was released on this date. At this date the newest API commit is c801751 (2026-05-01) and the newest app commit is e97a581 (2026-05-02). No code changed on the release date.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "Setup wizard for the API (Railway) and the app (GitHub Pages)."}
+      ],
+      "upgrade_steps": []
+    },
+    {
+      "id": "2026-05-02",
+      "date": "2026-05-02",
+      "title": "Piper fields and deep links",
+      "summary": "API commit c801751 (2026-05-01) and app commit e97a581 (2026-05-02) add Piper fields to the contact Context tab and remove what_i_can_offer from it. The app also adds support for a contact link in the address (commits b305f7c to dbd0eab). Dates and the grouping come from commit dates and messages. VERIFY against your copy.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Contact fields piper_initiatives, piper_seeking, piper_activated and piper_replied_at in the API."},
+        {"kind": "Added", "text": "Piper badge in the contact left panel and a deep link that opens a contact from the address."},
+        {"kind": "Changed", "text": "The what_i_can_offer field is removed from the Context tab and from the API model."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync both repos", "text": "In your copy of each repo on GitHub, choose Sync fork, then Update branch. Railway redeploys the API by itself. GitHub Pages rebuilds the dashboard by itself. Keep your own values in config.js, enricher.py and drafter.py if GitHub shows a conflict."}
+      ]
+    },
+    {
+      "id": "2026-04-08",
+      "date": "2026-04-08",
+      "title": "Activation angles for buckets and contacts",
+      "summary": "API commits a1e4613 to 2a61257 (2026-04-08) add activation angles on buckets and per-contact angle overrides. The date comes from commit dates. VERIFY against your copy.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Bucket activation angle routes in the API."},
+        {"kind": "Added", "text": "Per-contact angle override table contact_bucket_angles. The API makes it on start."}
+      ],
+      "upgrade_steps": [
+        {"title": "Sync the API repo", "text": "In your copy of the API repo, choose Sync fork, then Update branch. Railway redeploys. The API makes new tables by itself on start, so you run no database steps."}
+      ]
+    }
+  ]
+}
