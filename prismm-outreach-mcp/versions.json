@@ -1,0 +1,50 @@
+{
+  "product": "Prismm Outreach MCP",
+  "current": "2026-08-25",
+  "how_to_find": "Open your copy of the repository on GitHub. Look at the date of the newest commit on the main branch. Find the same date in this list. The repository has no git tags that this wizard could verify (VERIFY).",
+  "versions": [
+    {
+      "id": "2026-08-25",
+      "date": "2026-08-25",
+      "title": "Gmail read tools and password on /mcp",
+      "summary": "Commit efe0392 on 2026-08-25. Dates and notes come from commit messages and dates. VERIFY that no other change shipped that day.",
+      "upgrade_type": "settings",
+      "changes": [
+        { "kind": "Added", "text": "Read tools: search_messages, get_message and get_thread." },
+        { "kind": "Changed", "text": "The server now needs the MCP_AUTH_TOKEN variable and refuses to start without it. The /mcp address needs the matching password." },
+        { "kind": "Changed", "text": "The sign-in step now asks for read access to Gmail (gmail.readonly) as well as draft access." }
+      ],
+      "upgrade_steps": [
+        { "title": "Set the password variable", "text": "In Railway, add MCP_AUTH_TOKEN with a long random value you create. Then update the connector address in Claude to end with ?key= and that value.", "copy": "MCP_AUTH_TOKEN=PASTE_YOUR_OWN_VALUE_HERE" },
+        { "title": "Sign in to Gmail again", "text": "Open your server address followed by /oauth/start. Approve both permissions. Copy the new GOOGLE_TOKENS line from the Railway logs into the GOOGLE_TOKENS variable. Older logins do not allow reading mail." }
+      ]
+    },
+    {
+      "id": "2026-05-22",
+      "date": "2026-05-22",
+      "title": "HTML drafts, BCC and stable sessions",
+      "summary": "Commits from 2026-05-22 (5feba96 to 89b2dc5). Grouped by date. VERIFY that these shipped together.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        { "kind": "Added", "text": "Health check address /health." },
+        { "kind": "Added", "text": "create_draft accepts an HTML body and a BCC address. Plain text bodies get an automatic HTML copy." },
+        { "kind": "Fixed", "text": "The server is built once at start. This stops sessions from ending during tool calls." }
+      ],
+      "upgrade_steps": [
+        { "title": "Redeploy", "text": "Sync your fork on GitHub. Railway deploys again. Check that your From line in server.js is still yours." }
+      ]
+    },
+    {
+      "id": "2026-04-09",
+      "date": "2026-04-09",
+      "title": "First version with Google sign-in",
+      "summary": "First commits on 2026-04-09: repository created, MCP create_draft tool, Google sign-in routes and callback fix. Inferred from commit dates and messages. VERIFY.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "create_draft tool for one Gmail mailbox." },
+        { "kind": "Added", "text": "Google sign-in routes /oauth/start and /oauth/callback." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
