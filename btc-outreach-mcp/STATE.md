@@ -8,6 +8,6 @@ product_repo: keyona-rerev/btc-outreach-mcp
 - [x] 6 deployed (url: https://wizard-btc-outreach-mcp.netlify.app)
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
-- [ ] 9 product README link confirmed (or needs_repo)
-- [ ] 10 history lines logged
+- [x] 9 product README link confirmed (commit 4173c231b7ec7a48109c099afca48affd743aaa4)
+- [x] 10 history lines logged
 notes: product repo has no README.
