@@ -1,0 +1,125 @@
+{
+  "title": "Proposals Server setup",
+  "intro": "This wizard installs your own Proposals Server. The server shows HTML documents (proposals, invoices, one-pagers, slide decks) at simple web links. It also builds an index page that lists every document and lets you search it. You can lock single documents with a user name and password. The server runs on your own Railway account. The code comes from the repository keyona-rerev/proposals-server. It is a small Node.js and Express app. You make a clean copy of the code. The copy holds no documents from the original owner. You add your own documents later.",
+  "variables": [
+    { "key": "business_name", "label": "Your business name", "help": "Used in the page title of your index page.", "placeholder": "Acme Studio", "optional": true },
+    { "key": "github_username", "label": "Your GitHub username", "help": "The GitHub account that will own your copy of the code.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters." },
+    { "key": "repo_name", "label": "Name of your repository", "help": "Keep the default name unless you want a different one.", "placeholder": "proposals-server", "default": "proposals-server", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only." },
+    { "key": "railway_project_name", "label": "Railway project name", "help": "Any name you like. It is only a label inside Railway.", "placeholder": "proposals-server", "default": "proposals-server", "pattern": "^[A-Za-z0-9 _-]+$", "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only." },
+    { "key": "app_url", "label": "Your Railway public URL", "help": "Railway shows it after you generate a domain. It starts with https://. Do not add a slash at the end.", "placeholder": "https://proposals-server-production.up.railway.app", "pattern": "^https://[A-Za-z0-9.-]+$", "pattern_error": "Enter the URL that starts with https:// and has no slash at the end." },
+    { "key": "repo_url", "label": "Your repository address", "help": "Built from your GitHub name and repository name.", "derive": "https://github.com/{{github_username}}/{{repo_name}}" }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "This product is one small web server. It serves HTML files from a folder. You add a file, and the file gets a link.\n\nYou need these accounts and tools:\n- A GitHub account. It is free.\n- A Railway account. Railway charges for hosting. A small server costs a few dollars each month. Check the Railway price page before you start.\n- Git on your computer. Open a terminal and type git --version to check.\n\nYou do not need a database. You do not need an API key.\n\nYou will make passwords for locked documents in a later step. You will enter them only inside Railway. Never type a password into this wizard.",
+      "collect": ["business_name", "github_username"],
+      "checkbox_label": "I have a GitHub account, a Railway account and Git on my computer.",
+      "verify_hint": "You can sign in to github.com and railway.com. The command git --version prints a version number."
+    },
+    {
+      "title": "Make an empty repository on GitHub",
+      "instructions": "Open https://github.com/new in your browser.\n\nChoose your own account as the owner.\n\nEnter a repository name. The default is proposals-server.\n\nChoose Private. Your documents may hold business data. A private repository keeps the files hidden.\n\nDo NOT add a README, a .gitignore or a license. Leave the repository empty.\n\nClick Create repository.\n\nWrite the same name in the field below.",
+      "collect": ["repo_name"],
+      "checkbox_label": "I made an empty private repository.",
+      "verify_hint": "Your repository page at {{repo_url}} shows the quick setup instructions and no files."
+    },
+    {
+      "title": "Get a clean copy of the code",
+      "instructions": "The original repository holds documents that belong to other people. Do not fork it. A fork would copy those documents into your account. Make a clean copy instead.\n\nOpen a terminal in a folder where you keep projects.\n\nRun the first command. It downloads the code.\n\nRun the second command. It removes the original history so no other person's documents stay in your copy.\n\nThe next step removes the sample documents.",
+      "copy": [
+        { "label": "Download the code", "text": "git clone https://github.com/keyona-rerev/proposals-server.git {{repo_name}}" },
+        { "label": "Open the folder and remove the old history", "text": "cd {{repo_name}}\nrm -rf .git" },
+        { "label": "Windows PowerShell version of the remove command", "text": "cd {{repo_name}}\nRemove-Item -Recurse -Force .git" }
+      ],
+      "checkbox_label": "I have the code in a folder with no .git folder.",
+      "verify_hint": "The folder {{repo_name}} holds server.js and package.json. It holds no .git folder."
+    },
+    {
+      "title": "Remove the sample documents",
+      "instructions": "Keep these files and folders: server.js, package.json, protected.json, scripts, .github and .gitignore.\n\nDelete the files inside the proposals folder. Keep the proposals folder itself.\n\nDelete the files inside the assets/images folder. Keep the assets and images folders.\n\nDelete the file index.html in the main folder. The build makes a new one for you.\n\nThen open protected.json in a text editor. Replace its full content with the text in the copy block. This empties the list of locked documents.\n\nThe proposals folder must stay. The index builder fails without it. Add an empty file named .gitkeep-noop inside it so Git keeps the folder.",
+      "copy": [
+        { "label": "Delete sample files (macOS, Linux, Git Bash)", "text": "rm -rf proposals/* assets/images/* index.html\ntouch proposals/.gitkeep-noop assets/images/.gitkeep-noop" },
+        { "label": "Delete sample files (Windows PowerShell)", "text": "Remove-Item -Recurse -Force proposals\\*, assets\\images\\*, index.html\nNew-Item proposals\\.gitkeep-noop -ItemType File\nNew-Item assets\\images\\.gitkeep-noop -ItemType File" },
+        { "label": "New content for protected.json", "text": "{\n  \"_note\": \"Slugs listed in gated need a user name and password. Passwords are never stored here. Each locked slug reads one Railway variable named GATE_ plus the slug in capital letters with dashes changed to underscores. The value is username:password.\",\n  \"gated\": []\n}" }
+      ],
+      "checkbox_label": "I removed the sample documents and emptied protected.json.",
+      "verify_hint": "The proposals folder holds only .gitkeep-noop. The assets/images folder holds only .gitkeep-noop. protected.json shows an empty gated list. There is no index.html."
+    },
+    {
+      "title": "Add a first test document",
+      "instructions": "Make a small test document. It proves that the server and the index work.\n\nCreate a file named proposals/hello-test-1026.html with the content in the copy block.\n\nThe file name is the link name. The last four digits are the month and the year (MMYY). The index builder reads them as the date. Here 1026 means October 2026.\n\nThe index builder reads the comment at the top of the file. The comment sets the section, the title and the date on the index page. The section can be rerev, btc, prismm or any other word. The builder shows unknown words as their own section.",
+      "copy": [
+        { "label": "File proposals/hello-test-1026.html", "text": "<!-- meta: venture=mine; title=Hello Test; date=2026-10 -->\n<!DOCTYPE html>\n<html lang=\"en\">\n<head><meta charset=\"UTF-8\"><title>Hello Test</title></head>\n<body style=\"font-family: sans-serif; padding: 2rem;\">\n  <h1>It works</h1>\n  <p>This test document is served by my own Proposals Server.</p>\n</body>\n</html>" }
+      ],
+      "checkbox_label": "I created the test document.",
+      "verify_hint": "The file proposals/hello-test-1026.html exists in your folder."
+    },
+    {
+      "title": "Set your own names in the index builder",
+      "instructions": "The index builder has the names of the original owner's sections and a footer text. Change them to your own.\n\nOpen scripts/generate-index.js in a text editor.\n\nFind the block named VENTURE_TITLES. It maps a short word to a section title. Add a line for each word you use. Example: mine maps to the title you want to see.\n\nFind the text ReRev Labs in the page title and the header. Replace it with your business name {{business_name}}.\n\nFind the footer line that names the original repository. Replace it with your own repository name {{repo_name}}.\n\nSave the file. If you skip this step, the server still works. The page shows the original owner's brand name.",
+      "copy": [
+        { "label": "Example VENTURE_TITLES block", "text": "const VENTURE_TITLES = {\n  mine: 'My Documents',\n};" }
+      ],
+      "checkbox_label": "I set my own section names and brand name, or I chose to skip this step.",
+      "verify_hint": "The file scripts/generate-index.js no longer shows the original owner's brand name."
+    },
+    {
+      "title": "Push the code to your repository",
+      "instructions": "Run the commands in the copy block from inside your {{repo_name}} folder.\n\nThe first command makes a new Git history. The last command sends the code to your own repository at {{repo_url}}.\n\nThe repository holds an automatic job in .github/workflows. The job builds index.html each time you push a change to the proposals folder or to protected.json. You may need to allow GitHub Actions in the repository. Open the Actions tab and accept the prompt if you see one.",
+      "copy": [
+        { "label": "Make the first commit and push", "text": "git init -b main\ngit add .\ngit commit -m \"Initial Proposals Server\"\ngit remote add origin https://github.com/{{github_username}}/{{repo_name}}.git\ngit push -u origin main" }
+      ],
+      "checkbox_label": "I pushed the code to my repository.",
+      "verify_hint": "Your repository page at {{repo_url}} shows server.js, package.json and the proposals folder."
+    },
+    {
+      "title": "Build the index page",
+      "instructions": "The server needs an index.html file to show at the main address. The automatic job makes it. The job starts when a push changes the proposals folder. Your first push may not start it, because the sample documents were removed before the first commit.\n\nStart the job by hand. Run the command in the copy block on your computer. It needs Node.js version 18 or newer. Then commit and push the new index.html.\n\nAs a second option, open your repository on GitHub, open the Actions tab, and look for Update Proposals Index. The job has no manual start button, so use the command below.",
+      "copy": [
+        { "label": "Build the index and push it", "text": "node scripts/generate-index.js\ngit add index.html\ngit commit -m \"Build index\"\ngit push" }
+      ],
+      "checkbox_label": "I built index.html and pushed it.",
+      "verify_hint": "Your repository now holds a file named index.html. The page lists Hello Test."
+    },
+    {
+      "title": "Deploy on Railway",
+      "instructions": "Open https://railway.com/new in your browser.\n\nChoose Deploy from GitHub repo. Allow Railway to read your repositories if it asks.\n\nChoose {{repo_url}}.\n\nRailway finds package.json and runs npm start by itself. You do not need to set a port. Railway sets the PORT variable and the server reads it.\n\nRename the project to {{railway_project_name}} in Project Settings if you want.\n\nWait for the first deploy to finish. The status turns green.\n\nOpen the service, then Settings, then Networking. Click Generate Domain. Copy the https address that Railway shows. Paste it in the field below. Leave out the slash at the end.",
+      "collect": ["railway_project_name", "app_url"],
+      "checkbox_label": "The deploy finished and I made a public domain.",
+      "verify_hint": "The Railway deploy status is green. The logs show the line: Proposals server running on port."
+    },
+    {
+      "title": "Test the server",
+      "instructions": "Open {{app_url}} in your browser. You see the index page with the card Hello Test.\n\nClick the card. The test document opens. Its address is {{app_url}}/proposals/hello-test-1026.\n\nThe address works with or without .html at the end.\n\nOpen {{app_url}}/proposals/does-not-exist. You see the message Proposal not found. This is correct.\n\nIf the main page shows an error, the file index.html is missing from your repository. Go back to the step Build the index page.",
+      "checkbox_label": "The index page and the test document open.",
+      "verify_hint": "{{app_url}} lists Hello Test, and {{app_url}}/proposals/hello-test-1026 shows the text It works."
+    },
+    {
+      "title": "Add a real document",
+      "instructions": "Every document is one HTML file in the proposals folder. You can also use a folder. Put an index.html file inside the folder. The whole folder then works as one document, with its own images and pages.\n\nPut the file name in this style: name-MMYY.html. Example: acme-proposal-1026.html.\n\nAdd the meta comment at the top of the file. It sets the section, the title and the date on the index page.\n\nCommit and push the file. The automatic job rebuilds the index. Railway deploys the change by itself after the job finishes. This takes about two minutes.\n\nPut images in the assets/images folder. Link to them in your HTML with the path /assets/images/your-image.png. File names with spaces work, but names with dashes are safer.\n\nNever put a password, a key or private client data in a public document. Anyone with a link can open an unlocked document.",
+      "copy": [
+        { "label": "Meta comment for the top of a file", "text": "<!-- meta: venture=mine; title=My Proposal Title; date=2026-10 -->" },
+        { "label": "Push a new document", "text": "git add proposals assets\ngit commit -m \"Add document\"\ngit push" }
+      ],
+      "checkbox_label": "I added one real document and it opens at its link.",
+      "verify_hint": "The new document opens at {{app_url}}/proposals/ followed by its file name, and a card appears on {{app_url}}."
+    },
+    {
+      "title": "Lock a document with a password (optional)",
+      "instructions": "You can lock single documents. The server then asks for a user name and a password.\n\nStep 1. Open protected.json in your repository. Add the document name to the gated list. Use the file name without .html. For a folder, use the folder name.\n\nStep 2. Make the Railway variable name. Start with GATE_. Add the document name in capital letters. Change every dash to an underscore. Example: the name acme-proposal-1026 gives GATE_ACME_PROPOSAL_1026.\n\nStep 3. Open your service in Railway. Open the Variables tab. Add the variable. Set its value to username:password. Choose your own user name and a long password. Type the password only here in Railway. Never put it in your repository or in this wizard.\n\nStep 4. Commit and push protected.json. Railway deploys again.\n\nThe server fails closed. If a document is in the list but the Railway variable is missing, the server shows a Protected document message with code 403. It never shows the document open. If protected.json has a typo and cannot be read, the server blocks the whole proposals folder with code 503.\n\nLocked documents show a Protected badge on the index page. The index page itself is public. It shows the title of every document, also the locked ones. Use a neutral title for a locked document.",
+      "copy": [
+        { "label": "protected.json with one locked document", "text": "{\n  \"_note\": \"Passwords live in Railway variables, never here.\",\n  \"gated\": [\n    \"acme-proposal-1026\"\n  ]\n}" },
+        { "label": "Railway variable name and value format", "text": "GATE_ACME_PROPOSAL_1026=PASTE_YOUR_OWN_USERNAME:PASTE_YOUR_OWN_PASSWORD_HERE" }
+      ],
+      "checkbox_label": "I locked a test document, or I chose to skip this step.",
+      "verify_hint": "Open the locked link in a private browser window. The browser asks for a user name and a password. A wrong password shows the Protected document message."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "The code changes over time. Your copy has no link to the original, so you update it by hand.\n\nOpen the version history page of this wizard. It lists each version and what to do.\n\nTo update, open the original repository at https://github.com/keyona-rerev/proposals-server and read the newest commits. Copy the changes you want into server.js or scripts/generate-index.js in your own repository. Do not copy the proposals folder or the assets folder from the original.\n\nCommit and push your change. Railway deploys again by itself. If a build fails, open the Railway logs and read the last lines.\n\nTo make Railway deploy again without a code change, open the Deployments tab. Click the three dots on the newest deploy. Click Redeploy.\n\nTo find your current version, see the how to find your version text on the history page.",
+      "checkbox_label": "I know how to update my copy.",
+      "verify_hint": "You opened the version history page of this wizard."
+    }
+  ]
+}
