@@ -1,0 +1,18 @@
+{
+  "product": "Make a Playlist",
+  "current": "2026-10-22",
+  "how_to_find": "Open your fork on GitHub. Look at the date of the newest commit that came from the original repository (for example commit 20ea0cc dated 2026-08-05). The app has no version number in its code and no git tags were seen (VERIFY). Match that commit date to the entries below.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The product code is at commit 20ea0cc dated 2026-08-05 (Hold the background still on the manage page). Later changes will appear above this entry.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Setup wizard for Make a Playlist. It covers fork, Railway database and API, Netlify front end, brand and first test." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
