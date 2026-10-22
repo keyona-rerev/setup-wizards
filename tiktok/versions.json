@@ -1,0 +1,18 @@
+{
+  "product": "TikTok Transcript MCP",
+  "current": "2026-10-22",
+  "how_to_find": "Open your copy of the repo on GitHub. Look at the date of the newest commit on the main branch. The original repo (keyona-rerev/tiktoktransmcp) had its newest commit, 8101f46 (Pin httpx explicitly for the Apify client), on 2026-08-28. If your newest commit is the same, you are on the version in the baseline entry.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The product state at this date is the code in keyona-rerev/tiktoktransmcp at commit 8101f46 (2026-08-28). All commits in that repo are dated 2026-08-28. No tags or releases were checked. Git tags: VERIFY.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "Setup wizard for a client install on Railway."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
