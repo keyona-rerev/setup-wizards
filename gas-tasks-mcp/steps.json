@@ -1,0 +1,111 @@
+{
+  "title": "GAS Tasks MCP setup",
+  "intro": "GAS Tasks MCP lets Claude read and change your Google Tasks. It has two parts. Part one is a small Apps Script bridge in your Google account. Part two is a Node server (the repository gas-tasks-mcp) that runs on your Railway account. Claude talks to the server. The server talks to the bridge. Claude can then list task lists, list, create, update, complete and delete tasks. This wizard is for the gas-tasks-mcp server. It is not the same as the google-tasks-mcp helper. You install everything on your own accounts.",
+  "variables": [
+    {"key": "github_username", "label": "Your GitHub username", "help": "The name of your own GitHub account. You will fork the code there.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$", "pattern_error": "Use only letters, numbers and hyphens."},
+    {"key": "repo_name", "label": "Name for your copy of the repository", "help": "Keep the default unless you want another name.", "placeholder": "gas-tasks-mcp", "pattern": "^[A-Za-z0-9._-]+$", "pattern_error": "Use only letters, numbers, dots, hyphens and underscores.", "default": "gas-tasks-mcp"},
+    {"key": "railway_domain", "label": "Your Railway public domain", "help": "Railway shows it after you generate a domain. It looks like your-service.up.railway.app. Do not type https://.", "placeholder": "your-service.up.railway.app", "pattern": "^[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", "pattern_error": "Type only the domain, with no https:// and no path."},
+    {"key": "mcp_url", "label": "Your MCP address for Claude", "help": "This value follows from your Railway domain.", "derive": "https://{{railway_domain}}/mcp"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need four things before you start.\n1. A Google account that has Google Tasks.\n2. A GitHub account.\n3. A Railway account. Railway is a paid service after its trial. Check the Railway price page before you deploy.\n4. A Claude account that can add custom connectors.\nYou also need the template project link that ReRev Labs sent you. It opens the Apps Script bridge. If you do not have the link, ask ReRev Labs for it.",
+      "checkbox_label": "I have all four accounts and the template link.",
+      "verify_hint": "You can sign in to Google, GitHub, Railway and Claude."
+    },
+    {
+      "title": "Fork the server code",
+      "instructions": "Enter your GitHub username below. Then open the repository keyona-rerev/gas-tasks-mcp on GitHub. Click Fork. Create the fork under your own account. Use the name you choose below.",
+      "collect": ["github_username", "repo_name"],
+      "copy": [
+        {"label": "Your fork address", "text": "https://github.com/{{github_username}}/{{repo_name}}"}
+      ],
+      "checkbox_label": "My fork exists on my own GitHub account.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the files index.mjs and package.json."
+    },
+    {
+      "title": "Make your own copy of the bridge",
+      "instructions": "Open the template project link that ReRev Labs sent you. Then choose File, Make a copy. The copy opens in your own Google account. Rename the copy if you want. The code is in the file Tasksapi.",
+      "checkbox_label": "I have my own copy of the Apps Script bridge.",
+      "verify_hint": "The Apps Script editor shows your copy. The project is under your Google account."
+    },
+    {
+      "title": "Turn on the Tasks service and set your password",
+      "instructions": "Turn on the Google Tasks service first.\n1. In the editor, click the plus sign next to Services.\n2. Choose Google Tasks API.\n3. Keep the name Tasks. Click Add.\nNow set your shared password for the bridge.\n1. Click Project Settings (the gear icon).\n2. Go to Script Properties. Click Add script property.\n3. Type the property name GAS_TOKEN.\n4. For the value, type a long random string that you make up. Save it in your password manager.\nType this value only here. Do not paste it in this wizard, in chat or in GitHub. You will need the same value again in Railway.",
+      "copy": [
+        {"label": "Script property name", "text": "GAS_TOKEN"},
+        {"label": "Script property value", "text": "PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "checkbox_label": "The Tasks service is on and GAS_TOKEN is saved.",
+      "verify_hint": "Services lists Tasks. Script Properties lists GAS_TOKEN."
+    },
+    {
+      "title": "Deploy the bridge as a web app",
+      "instructions": "1. Open the file Tasksapi. In the function list, choose listTasklists. Click Run.\n2. Google asks for permission. Review it and allow it.\n3. Click Deploy, then New deployment.\n4. Click the gear icon. Choose Web app.\n5. Set Execute as to Me.\n6. Set Who has access to Anyone.\n7. Click Deploy.\n8. Copy the Web app URL. It ends with /exec. Keep it private.\nThe bridge only works with your GAS_TOKEN password. Without it, the bridge answers Unauthorized.",
+      "checkbox_label": "The web app is deployed and I copied the /exec URL.",
+      "verify_hint": "The deployment list shows a Web app with access set to Anyone."
+    },
+    {
+      "title": "Test the bridge",
+      "instructions": "Run this command in a terminal. Replace both placeholders with your own values. The answer must contain \"pong\". If the answer says Unauthorized, check that GAS_TOKEN has the same value in both places. If you see a Google sign-in page, check that Who has access is set to Anyone.",
+      "copy": [
+        {"label": "Test command", "text": "curl -L -X POST \"PASTE_YOUR_WEB_APP_URL_HERE\" -H \"Content-Type: application/json\" -d '{\"token\":\"PASTE_YOUR_OWN_VALUE_HERE\",\"action\":\"ping\"}'"}
+      ],
+      "checkbox_label": "The test answer contains pong.",
+      "verify_hint": "The answer looks like {\"success\":true,\"data\":{\"pong\":true,...}}."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "1. Sign in to Railway.\n2. Click New Project.\n3. Choose Deploy from GitHub repo.\n4. Allow Railway to read your GitHub account if it asks.\n5. Choose {{github_username}}/{{repo_name}}.\nRailway builds the project. The first build can fail until you add the variables in the next step. This is normal.",
+      "checkbox_label": "The Railway project exists and points to my fork.",
+      "verify_hint": "Railway shows a service that uses {{github_username}}/{{repo_name}}."
+    },
+    {
+      "title": "Add the Railway variables",
+      "instructions": "Open your Railway service. Click the Variables tab. Add the variables below. The server stops on start if the first two are missing. Enter the real values only inside Railway. Use the Web app URL from step 5 for TASKS_GAS_URL. Use the same password you saved as GAS_TOKEN for TASKS_GAS_TOKEN. Railway sets PORT for you, so you do not need to add it. Then redeploy the service.",
+      "copy": [
+        {"label": "TASKS_GAS_URL", "text": "TASKS_GAS_URL=PASTE_YOUR_WEB_APP_URL_HERE"},
+        {"label": "TASKS_GAS_TOKEN", "text": "TASKS_GAS_TOKEN=PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "checkbox_label": "Both variables are set in Railway and the service redeployed.",
+      "verify_hint": "The Railway deploy log says: Google Tasks MCP (Streamable HTTP) running on port."
+    },
+    {
+      "title": "Get your public domain",
+      "instructions": "1. In Railway, open the service. Click Settings.\n2. Under Networking, click Generate Domain.\n3. Copy the domain. Type it below, without https://.\nThe wizard builds your MCP address from it.",
+      "collect": ["railway_domain"],
+      "copy": [
+        {"label": "Health check address", "text": "https://{{railway_domain}}/health"},
+        {"label": "Your MCP address", "text": "{{mcp_url}}"}
+      ],
+      "checkbox_label": "I have my Railway domain.",
+      "verify_hint": "Open https://{{railway_domain}}/health. You see status ok and the service name google-tasks-mcp."
+    },
+    {
+      "title": "Add the connector in Claude",
+      "instructions": "1. Open Claude. Go to Settings, then Connectors.\n2. Choose Add custom connector.\n3. Type a name, for example GAS Tasks.\n4. Paste your MCP address.\n5. Save the connector.\nKeep this address private. The server has no sign-in of its own. Anyone with the address can use your tasks.",
+      "copy": [
+        {"label": "Your MCP address", "text": "{{mcp_url}}"}
+      ],
+      "checkbox_label": "The connector is added in Claude.",
+      "verify_hint": "Claude lists the connector and shows these tools: tasks_list_tasklists, tasks_list, tasks_create, tasks_update, tasks_complete, tasks_delete."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Open a new Claude chat. Turn on the GAS Tasks connector. Send the first message below. Claude must show your own task lists. Then send the second message. Claude must create a test task. Check Google Tasks. Delete the test task when you finish.",
+      "copy": [
+        {"label": "First message", "text": "List my Google Task lists."},
+        {"label": "Second message", "text": "Create a task called Test from Claude in my first task list."}
+      ],
+      "checkbox_label": "Claude listed my task lists and made a test task.",
+      "verify_hint": "The test task appears in Google Tasks."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "Open the version history page for this product. It shows your version and what changed. Find your version first. Compare it with the newest entry. Follow the upgrade steps for each newer entry. For the server, open your fork on GitHub, click Sync fork, then let Railway redeploy. For the bridge, copy the new code from the template into your project, then choose Deploy, Manage deployments, and edit your deployment to a new version. Keep the same web app URL.",
+      "checkbox_label": "I know where to find the version history.",
+      "verify_hint": "The history page opens and shows the newest version at the top."
+    }
+  ]
+}
