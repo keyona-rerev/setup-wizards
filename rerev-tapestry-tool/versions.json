@@ -1,0 +1,33 @@
+{
+  "product": "ReRev Tapestry Tool",
+  "current": "2026-10-22",
+  "how_to_find": "Open your fork on GitHub. Look at the date of the newest commit on the main branch. Compare it with the dates on this page. You can also open CHANGELOG.md in your repo. The README may still say v1.0 (VERIFY: README text is old).",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released on this date. The product repo keyona-rerev/rerev-tapestry-tool had its newest commit a30ddb3 on 2026-04-18 (CHANGELOG v4.0).",
+      "upgrade_type": "none",
+      "changes": [{"kind":"Added","text":"Setup wizard and version history page."}],
+      "upgrade_steps": []
+    },
+    {
+      "id": "2026-04-18",
+      "date": "2026-04-18",
+      "title": "Releases v1.0 to v4.0",
+      "summary": "All four releases in CHANGELOG.md carry the date 2026-04-18. They were made in one day. VERIFY: the exact order of use by clients.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind":"Added","text":"v1.0: three sections (the week, ICP fit grid, revenue mix), save, load, reset, export."},
+        {"kind":"Added","text":"v2.0: Execution tab with a matrix for each ICP."},
+        {"kind":"Added","text":"v3.0: Measure tab with rounds, targets and actuals, and refactor signals."},
+        {"kind":"Added","text":"v4.0: Warm path column with connector profile, ask template, forwardable email and saved warm contacts."}
+      ],
+      "upgrade_steps": [
+        {"title":"Export a backup","text":"Open your tool. Choose Export. Keep the JSON file."},
+        {"title":"Sync your fork","text":"Open your fork on GitHub. Choose Sync fork, then Update branch. Wait one minute for GitHub Pages."}
+      ]
+    }
+  ]
+}
