@@ -1,0 +1,127 @@
+{
+  "title": "Stakeholder Hub setup",
+  "intro": "Stakeholder Hub is a React and Vite website with pitch-deck pages, a fund page, an opportunities page and a contact page. It has no database and no server. You copy the code to your own GitHub account, change the brand, and host it on your own Netlify account. You need about 45 minutes. The product repo is keyona-rerev/stakeholder-hub. Its pages hold the original owner's fund and deck content as sample text. Replace that text with your own content before you share your site.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Business name",
+      "help": "The name shown on your site and in the page title.",
+      "placeholder": "Acme Capital",
+      "pattern": "^.{2,80}$",
+      "pattern_error": "Enter 2 to 80 characters."
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The account that will own your copy of the code.",
+      "placeholder": "acme-labs",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters."
+    },
+    {
+      "key": "repo_name",
+      "label": "Your repo name",
+      "help": "The name of your copy on GitHub.",
+      "placeholder": "stakeholder-hub",
+      "default": "stakeholder-hub",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Netlify site name",
+      "help": "Your site address will be this name plus .netlify.app. Use lowercase letters, numbers and hyphens.",
+      "placeholder": "acme-stakeholder-hub",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "site_url",
+      "label": "Your site address",
+      "help": "Built from your Netlify site name.",
+      "derive": "https://{{netlify_site_name}}.netlify.app"
+    },
+    {
+      "key": "brand_color",
+      "label": "Brand color (hex)",
+      "help": "Your main brand color, for example #0F766E.",
+      "placeholder": "#0F766E",
+      "pattern": "^#[0-9A-Fa-f]{6}$",
+      "pattern_error": "Enter a color like #0F766E."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "Open each link and sign in, or make a free account.\n\n1. A GitHub account: https://github.com\n2. A Netlify account: https://app.netlify.com\n3. Node.js version 18 or newer on your computer. This is only for the optional local preview. Get it at https://nodejs.org\n4. Your logo file, your brand color and your own text for each page.\n\nThe site is static. You do not need a database, a server or an API key.",
+      "checkbox_label": "I have a GitHub account and a Netlify account.",
+      "verify_hint": "You can sign in to both GitHub and Netlify."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Enter the values below. The wizard fills them into the later steps. Enter only public values here. Never enter a password or a token.",
+      "collect": ["business_name", "github_username", "repo_name", "netlify_site_name", "brand_color"],
+      "checkbox_label": "I entered all values.",
+      "verify_hint": "Your site address will be {{site_url}}."
+    },
+    {
+      "title": "Copy the code to your GitHub account",
+      "instructions": "1. Open https://github.com/keyona-rerev/stakeholder-hub\n2. Select Fork, at the top right.\n3. Set the owner to {{github_username}}.\n4. Set the repository name to {{repo_name}}.\n5. Select Create fork.\n\nThe repo uses the main branch. If the fork is not public, you can keep it private. Netlify can read private repos after you give it access.",
+      "checkbox_label": "My copy of the code is at github.com/{{github_username}}/{{repo_name}}.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see the folders src and public."
+    },
+    {
+      "title": "Preview on your computer (optional)",
+      "instructions": "Skip this step if you do not want a local preview. Open a terminal and run the commands below, one at a time.",
+      "copy": [
+        { "label": "Download your copy", "text": "git clone https://github.com/{{github_username}}/{{repo_name}}.git" },
+        { "label": "Go to the folder", "text": "cd {{repo_name}}" },
+        { "label": "Install packages", "text": "npm install" },
+        { "label": "Start the preview", "text": "npm run dev" }
+      ],
+      "checkbox_label": "I saw the site in my browser, or I skipped this step.",
+      "verify_hint": "The terminal shows a local address on port 8080. Open it in your browser. You see the home page."
+    },
+    {
+      "title": "Add your brand",
+      "instructions": "Change these files in your repo. You can edit them on GitHub with the pencil icon, or on your computer.\n\n1. index.html: change the page title and the description text to {{business_name}}.\n2. src/index.css and tailwind.config.ts: change the theme colors to {{brand_color}} and the colors that go with it. VERIFY the color names in these two files before you edit.\n3. src/assets/logo.png and src/assets/main-logo.png: replace with your logo. Keep the same file names.\n4. public/favicon.ico, public/favicon.png, public/favicon.svg and public/og-image.png: replace with your own icons.\n5. src/assets/team: delete the sample photos. Add your own team photos.\n6. src/components/Navbar.tsx and src/components/Footer.tsx: change the text and links.\n7. src/pages: open Index.tsx, CatalystFund.tsx, FundI.tsx, Opportunities.tsx and Contact.tsx. Replace the sample text with your own text.\n8. src/pages and public/pdfs: the deck pages and PDF files hold the original owner content. Delete the decks you do not need. If you delete a deck page, also delete its import and its Route line in src/App.tsx.\n\nDo not publish the sample content as your own.",
+      "copy": [
+        { "label": "Commit message", "text": "Brand the site for {{business_name}}" }
+      ],
+      "checkbox_label": "I replaced the logo, colors and text. I removed the sample content.",
+      "verify_hint": "Open the preview or your repo. You see {{business_name}} and {{brand_color}} in place of the sample brand."
+    },
+    {
+      "title": "Add the redirect file for page links",
+      "instructions": "The site uses page routes such as /contact. Without a redirect rule, a page refresh on these routes shows a Netlify 404. The product repo has no redirect file. VERIFY this in your copy of the repo.\n\n1. In your repo, create the file public/_redirects.\n2. Paste the line below as the only line.\n3. Commit the file to the main branch.",
+      "copy": [
+        { "label": "Content of public/_redirects", "text": "/*    /index.html   200" }
+      ],
+      "checkbox_label": "The file public/_redirects is in my repo.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}/blob/main/public/_redirects. You see one line."
+    },
+    {
+      "title": "Host the site on Netlify",
+      "instructions": "1. Open https://app.netlify.com and select Add new site, then Import an existing project.\n2. Select GitHub. Allow access to {{github_username}}/{{repo_name}}.\n3. Pick the repo {{repo_name}} and the branch main.\n4. Enter the build settings from the copy blocks below.\n5. Select Deploy.\n6. When the deploy ends, go to Site configuration, then Change site name. Enter {{netlify_site_name}}.\n\nThe site has no environment variables. Do not add any secret.",
+      "copy": [
+        { "label": "Build command", "text": "npm run build" },
+        { "label": "Publish directory", "text": "dist" },
+        { "label": "Site name", "text": "{{netlify_site_name}}" }
+      ],
+      "checkbox_label": "Netlify shows Published for my site.",
+      "verify_hint": "Open {{site_url}}. You see your home page."
+    },
+    {
+      "title": "Run the first test",
+      "instructions": "Test the live site.\n\n1. Open {{site_url}}. The home page shows {{business_name}}.\n2. Open each menu link: Catalyst Fund, Fund I, Opportunities and Contact. Each page loads.\n3. Open {{site_url}}/contact and refresh the page. The page loads again. If you see a Netlify 404, check the redirect file from the earlier step.\n4. Open each deck page you kept. Examples: /catalyst-deck and /foundation-deck. Check that no sample text is left.\n5. Open the site on your phone.\n\nCheck the Contact page too. VERIFY how its form or email link works in src/pages/Contact.tsx. Change it to your own contact details.",
+      "checkbox_label": "All pages load and show my own content.",
+      "verify_hint": "{{site_url}}/contact loads after a refresh."
+    },
+    {
+      "title": "Know how to update later",
+      "instructions": "Each time you push a commit to the main branch of {{github_username}}/{{repo_name}}, Netlify builds and publishes the site again.\n\nTo get new changes from the ReRev Labs product repo: open your fork on GitHub, select Sync fork, then Update branch. Check the Netlify deploy after that.\n\nTo see what changed in each version, open the version history page of this wizard. Compare the date of your newest commit with the history.",
+      "checkbox_label": "I know where the version history page is.",
+      "verify_hint": "The Netlify Deploys tab shows a new deploy after each commit."
+    }
+  ]
+}
