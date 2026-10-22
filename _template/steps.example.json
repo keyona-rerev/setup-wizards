@@ -1,0 +1,72 @@
+{
+  "title": "Example product setup wizard",
+  "intro": "This is a small example of the steps.json format. Copy it, rename it steps.json in your product folder, and replace the text.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Business name",
+      "help": "The name of your business. Used in the app title.",
+      "placeholder": "Acme Co",
+      "pattern": "^.{2,80}$",
+      "pattern_error": "Use 2 to 80 characters."
+    },
+    {
+      "key": "github_username",
+      "label": "GitHub username",
+      "help": "Your GitHub user name or organization name.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9-]{1,39}$",
+      "pattern_error": "Use letters, numbers and dashes only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Repository name",
+      "help": "The name of your copy of the repository.",
+      "placeholder": "example-product",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, dashes and underscores only."
+    },
+    {
+      "key": "repo_url",
+      "label": "Repository URL",
+      "help": "Worked out for you from your GitHub username and repository name.",
+      "derive": "https://github.com/{{github_username}}/{{repo_name}}"
+    },
+    {
+      "key": "support_email",
+      "label": "Support email (optional)",
+      "help": "You can skip this value.",
+      "placeholder": "help@example.com",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter an email address like help@example.com.",
+      "optional": true
+    }
+  ],
+  "steps": [
+    {
+      "title": "Tell the wizard about your business",
+      "instructions": "Enter your business name and GitHub details once. The wizard keeps them and fills them into the next steps.",
+      "collect": ["business_name", "github_username", "repo_name"],
+      "checkbox_label": "I entered my details",
+      "verify_hint": "The 'Your values' box at the top shows 3 values saved."
+    },
+    {
+      "title": "Make your own copy of the code",
+      "instructions": "Open the product repository on GitHub. Click Fork. Name your copy {{repo_name}} in the account {{github_username}}.",
+      "copy": [
+        {
+          "label": "Clone your copy",
+          "text": "git clone {{repo_url}}.git\ncd {{repo_name}}"
+        }
+      ],
+      "checkbox_label": "I forked the repository",
+      "verify_hint": "Open {{repo_url}} in your browser. You see {{business_name}}'s copy of the code."
+    },
+    {
+      "title": "Add your own keys in your own account",
+      "instructions": "Open the settings page of your hosting account. Add each key there. Never type a key into this wizard.",
+      "checkbox_label": "I added my keys in my own account",
+      "verify_hint": "The hosting dashboard lists every key name from the product README."
+    }
+  ]
+}
