@@ -1,0 +1,199 @@
+{
+  "title": "Set up Super Connector MCP",
+  "intro": "Super Connector MCP is a small Python server. It lets Claude read and write your own Super Connector data. It sits between Claude and your own Super Connector API. It gives Claude 29 tools: contacts, initiatives, sub-projects, stakeholders, action items, content ideas, buckets, follow-ups and events. You host it on your own Railway account. You keep your own GitHub copy of the code. You enter secrets only inside your own accounts. This wizard never asks for a secret.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Business name",
+      "help": "The name of your business. The wizard uses it to name the connector in Claude.",
+      "placeholder": "Acme Consulting",
+      "pattern": "^.{2,80}$",
+      "pattern_error": "Enter 2 to 80 characters."
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "Your own GitHub user name or organization name.",
+      "placeholder": "acme-consulting",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your copy of the repo",
+      "help": "The name your fork will have on GitHub.",
+      "placeholder": "super-connector-mcp",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only.",
+      "default": "super-connector-mcp"
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Railway project name",
+      "help": "The name of the Railway project that will run the server.",
+      "placeholder": "super-connector-mcp",
+      "pattern": "^[A-Za-z0-9 _-]{2,60}$",
+      "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only.",
+      "default": "super-connector-mcp"
+    },
+    {
+      "key": "api_url",
+      "label": "URL of your own Super Connector API",
+      "help": "The public https address of your own Super Connector API on Railway. Do not add a slash at the end.",
+      "placeholder": "https://your-super-connector-api.up.railway.app",
+      "pattern": "^https://[A-Za-z0-9.-]+(:[0-9]+)?$",
+      "pattern_error": "Start with https:// and do not add a slash or a path at the end."
+    },
+    {
+      "key": "railway_domain",
+      "label": "Railway domain of this MCP server",
+      "help": "The domain that Railway gives to this MCP service. Enter it without https:// and without a path.",
+      "placeholder": "your-mcp-production.up.railway.app",
+      "pattern": "^[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+      "pattern_error": "Enter the domain only. Do not add https:// or a path."
+    },
+    {
+      "key": "mcp_url",
+      "label": "MCP endpoint URL",
+      "help": "Built from your Railway domain.",
+      "derive": "https://{{railway_domain}}/mcp"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need these before you start.\n\n1. A GitHub account.\n2. A Railway account.\n3. A Claude account that can add custom connectors.\n4. Your own Super Connector API, already running on Railway. This MCP server does not store data. It only passes requests to that API. If you do not have the API yet, ask ReRev Labs for the Super Connector API wizard and finish it first.\n5. The API key of your own Super Connector API. Keep it ready inside your own Railway account. Do not paste it into this wizard.\n\nThis install takes about 20 minutes.",
+      "checkbox_label": "I have all five items.",
+      "verify_hint": "You can open your GitHub, Railway and Claude accounts, and your Super Connector API is running."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Enter the names below. The wizard fills them into the later steps. Enter each value one time only.",
+      "collect": ["business_name", "github_username", "repo_name", "railway_project_name"],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "All four fields show a green check."
+    },
+    {
+      "title": "Find your Super Connector API address",
+      "instructions": "Open your own Railway project for the Super Connector API. Open the API service. Open Settings, then Networking. Copy the public domain. Add https:// before it. Enter the full address below. Do not add a slash at the end.\n\nThe MCP server calls the API with an API key in the X-API-Key header. The key is a secret. You set it in Step 6, inside Railway only.",
+      "collect": ["api_url"],
+      "copy": [
+        {
+          "label": "Health check of your API (terminal)",
+          "text": "curl -i {{api_url}}/health"
+        }
+      ],
+      "checkbox_label": "My API address is saved and the health check answers.",
+      "verify_hint": "The health check returns HTTP 200. If it returns 401 or 403, the API needs its key in the X-API-Key header (VERIFY with the API wizard). If it does not answer, fix the API first."
+    },
+    {
+      "title": "Make your own copy of the code",
+      "instructions": "Open the template repo: https://github.com/keyona-rerev/super-connector-mcp\n\n1. Choose Fork.\n2. Set the owner to {{github_username}}.\n3. Set the repository name to {{repo_name}}.\n4. Choose Create fork.\n\nThe repo holds five files: server.py, requirements.txt, Procfile, runtime.txt and README.md. Do not edit them for a normal install.",
+      "copy": [
+        {
+          "label": "Your fork address",
+          "text": "https://github.com/{{github_username}}/{{repo_name}}"
+        }
+      ],
+      "checkbox_label": "My fork exists in my own GitHub account.",
+      "verify_hint": "The address above opens your fork. You see server.py in the file list."
+    },
+    {
+      "title": "Create the Railway service",
+      "instructions": "1. Open Railway. Choose New Project.\n2. Choose Deploy from GitHub repo.\n3. Pick {{github_username}}/{{repo_name}}. Allow Railway to read that repo if it asks.\n4. Rename the project to {{railway_project_name}}.\n\nRailway reads runtime.txt (Python 3.11) and requirements.txt (mcp and httpx). It starts the server with the Procfile line shown below. The first deploy will start but cannot reach your API yet. You fix that in the next step.",
+      "copy": [
+        {
+          "label": "Start command (already in the Procfile)",
+          "text": "web: python server.py"
+        }
+      ],
+      "checkbox_label": "The Railway service exists and the build ran.",
+      "verify_hint": "Railway shows a deployment for {{github_username}}/{{repo_name}}. The build log shows the packages installed."
+    },
+    {
+      "title": "Set the variables in Railway",
+      "instructions": "Open your service in Railway. Open the Variables tab. Add the two variables below.\n\n1. SC_RAILWAY_URL is your Super Connector API address. It is not a secret.\n2. SC_API_KEY is the API key of your own Super Connector API. It is a secret. Paste the value only in the Railway Variables tab. Do not paste it in chat, in email or in this wizard.\n\nDo not set PORT. Railway sets it. Railway redeploys the service after you save.",
+      "copy": [
+        {
+          "label": "Variable 1 (public)",
+          "text": "SC_RAILWAY_URL={{api_url}}"
+        },
+        {
+          "label": "Variable 2 (secret, enter in Railway only)",
+          "text": "SC_API_KEY=PASTE_YOUR_OWN_VALUE_HERE"
+        }
+      ],
+      "checkbox_label": "I saved both variables in Railway and the service redeployed.",
+      "verify_hint": "The Variables tab lists SC_RAILWAY_URL and SC_API_KEY. The new deployment shows Active. If you do not set SC_RAILWAY_URL, the server calls the ReRev Labs default API address from the code. Always set it."
+    },
+    {
+      "title": "Give the service a public domain",
+      "instructions": "1. In Railway, open your service. Open Settings, then Networking.\n2. Choose Generate Domain.\n3. Copy the domain. Enter it below without https:// and without a path.\n\nThe server listens on the port that Railway gives it. Railway routes the domain to that port.",
+      "collect": ["railway_domain"],
+      "copy": [
+        {
+          "label": "Your MCP endpoint",
+          "text": "{{mcp_url}}"
+        }
+      ],
+      "checkbox_label": "My domain is saved.",
+      "verify_hint": "The endpoint above ends in /mcp. The transport is streamable HTTP."
+    },
+    {
+      "title": "Test that the server runs",
+      "instructions": "Run the command below in a terminal. A browser-style GET is not a full MCP call. A reply from the server means that it runs. Any HTTP answer, even an error code such as 400, 405 or 406, is a good sign. A timeout or a 502 means that the service is down. If it is down, open the Railway deploy logs and look for errors.",
+      "copy": [
+        {
+          "label": "Reachability test (terminal)",
+          "text": "curl -i {{mcp_url}}"
+        }
+      ],
+      "checkbox_label": "The server answered.",
+      "verify_hint": "You get an HTTP answer from {{mcp_url}}. The exact code is VERIFY (the code does not show what a plain GET returns)."
+    },
+    {
+      "title": "Add the server to Claude",
+      "instructions": "1. Open Claude. Open Settings, then Connectors.\n2. Choose Add custom connector.\n3. Name it: {{business_name}} Super Connector.\n4. Paste the endpoint address from the copy block below.\n5. Save. Start a new chat. Claude does not show new tools in a chat that was open before you added them.\n\nImportant: the server code has no password check on the MCP address. The API key stays on the server side only. Anyone who has your endpoint address can use the 29 tools. Do not share the address. Do not post it in public places.",
+      "copy": [
+        {
+          "label": "Connector name",
+          "text": "{{business_name}} Super Connector"
+        },
+        {
+          "label": "Connector address",
+          "text": "{{mcp_url}}"
+        }
+      ],
+      "checkbox_label": "The connector is saved and I started a new chat.",
+      "verify_hint": "Claude lists the connector as connected and shows tools that start with sc_."
+    },
+    {
+      "title": "Run your first test",
+      "instructions": "In the new chat, send the message below. Claude calls the health tool. The tool calls your API at /health. A good answer shows that Claude, this server and your API all work together.\n\nThen try one read tool, for example: list my initiatives. Do not use delete tools in a test. The delete tools remove data for good.",
+      "copy": [
+        {
+          "label": "First test message for Claude",
+          "text": "Use the sc_health_check tool and tell me the result."
+        },
+        {
+          "label": "Second test message for Claude",
+          "text": "Use sc_list_initiatives and show me the names only."
+        }
+      ],
+      "checkbox_label": "The health check passed.",
+      "verify_hint": "Claude shows the API health answer. If you see Error 401 or 403, the SC_API_KEY value in Railway does not match your API. Fix it in Railway Variables. If you see a connection error, check SC_RAILWAY_URL."
+    },
+    {
+      "title": "Keep it up to date",
+      "instructions": "Open the version history page to see what changed and how to upgrade. Find your own version first: open your fork on GitHub and read the date of your newest commit. Compare it to the list on the history page.\n\nTo update: on your fork page choose Sync fork, then Update branch. Railway redeploys by itself. Then start a new Claude chat so Claude loads any new tools.",
+      "copy": [
+        {
+          "label": "Version history page",
+          "text": "history.html"
+        }
+      ],
+      "checkbox_label": "I know how to find my version and update.",
+      "verify_hint": "You can point to your newest commit date on {{github_username}}/{{repo_name}}."
+    }
+  ]
+}
