@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ReRev Labs Setup Wizards</title>
+<meta name="description" content="Every ReRev Labs product setup wizard in one list.">
+<style>
+:root{--bg:#f7f5f0;--ink:#14213d;--muted:#5b6478;--accent:#0f766e;--line:#d9d4c7;--card:#fff;--warn:#b45309;--soft:#e6f2f0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101826;--ink:#eef1f6;--muted:#a3adc2;--accent:#5eead4;--line:#2a3550;--card:#172033;--warn:#fbbf24;--soft:#12332f}}
+:root[data-theme="dark"]{--bg:#101826;--ink:#eef1f6;--muted:#a3adc2;--accent:#5eead4;--line:#2a3550;--card:#172033;--warn:#fbbf24;--soft:#12332f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:32px 16px 64px}
+h1{font-family:Newsreader,Georgia,serif;font-size:2.1rem;margin:.1em 0 .2em}
+h2{font-family:Newsreader,Georgia,serif;font-size:1.35rem;margin:1.8em 0 .5em;border-bottom:1px solid var(--line);padding-bottom:.25em}
+.lead{color:var(--muted);max-width:60ch;margin:0 0 1.2em}
+.eyebrow{color:var(--accent);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.78rem}
+#q{width:100%;max-width:420px;padding:.65em .8em;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+#q:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-size:1.02rem}
+.repo{font:.82rem ui-monospace,Menlo,monospace;color:var(--muted);word-break:break-all}
+.links{display:flex;gap:14px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+a{color:var(--accent);font-weight:600}
+.note{font-size:.85rem;color:var(--warn)}
+.count{color:var(--muted);font-size:.9rem;margin:.6em 0}
+.miss{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.miss ul{margin:.4em 0;padding-left:1.2em;columns:2;column-gap:2em}
+@media(max-width:560px){.miss ul{columns:1}h1{font-size:1.7rem}}
+footer{margin-top:2.5em;color:var(--muted);font-size:.9rem}
+.hidden{display:none}
+</style></head><body><div class="wrap">
+<div class="eyebrow">ReRev Labs</div>
+<h1>Setup wizards</h1>
+<p class="lead">Pick a product. The wizard walks you through the install on your own accounts, one step at a time. Each wizard also has a version history page for upgrades.</p>
+<label for="q" class="count" style="display:block">Search products</label>
+<input id="q" type="search" placeholder="Type a product or repo name" autocomplete="off">
+<div id="count" class="count" aria-live="polite"></div>
+<div id="out"></div>
+<h2>Not built yet</h2>
+<div class="miss"><p style="margin:.2em 0">These Apps Script products have no wizard yet. They need a repo and an Apps Script read of the project. See the gaps list.</p><ul id="miss"></ul></div>
+<footer>Lists: <a href="https://github.com/keyona-rerev/setup-wizards/blob/main/products.json">products.json</a> &middot; <a href="https://github.com/keyona-rerev/setup-wizards/blob/main/GAPS.md">GAPS.md</a> &middot; <a href="https://github.com/keyona-rerev/setup-wizards/blob/main/INSTALLS.md">INSTALLS.md</a> (which version each client has). Verified 2026-10-22.</footer>
+</div>
+<script>
+var DATA=[{"cat": "MCP servers", "items": [{"slug": "youtube", "name": "YouTube MCP", "repo": "keyona-rerev/youtube-mcp-server", "url": "https://wizard-youtube.netlify.app", "history": true, "note": ""}, {"slug": "tiktok", "name": "TikTok Transcript MCP", "repo": "keyona-rerev/tiktoktransmcp", "url": "https://wizard-tiktok.netlify.app", "history": true, "note": ""}, {"slug": "github-mcp", "name": "GitHub MCP (client fork)", "repo": "keyona-rerev/founder-fork-github-mcp-server", "url": "https://wizard-github-mcp.netlify.app", "history": true, "note": ""}, {"slug": "open-loops-mcp", "name": "Open Loops MCP", "repo": "keyona-rerev/open-loops-mcp", "url": "https://wizard-open-loops-mcp.netlify.app", "history": true, "note": ""}, {"slug": "btc-outreach-mcp", "name": "BTC Outreach MCP", "repo": "keyona-rerev/btc-outreach-mcp", "url": "https://wizard-btc-outreach-mcp.netlify.app", "history": true, "note": ""}, {"slug": "prismm-outreach-mcp", "name": "Prismm Outreach MCP", "repo": "keyona-rerev/prismm-outreach-mcp", "url": "https://wizard-prismm-outreach-mcp.netlify.app", "history": true, "note": ""}, {"slug": "gas-dev-mcp", "name": "GAS Developer MCP", "repo": "keyona-rerev/gas-dev-mcp", "url": "https://wizard-gas-dev-mcp.netlify.app", "history": true, "note": ""}, {"slug": "gas-tasks-mcp", "name": "GAS Tasks MCP", "repo": "keyona-rerev/gas-tasks-mcp", "url": "https://wizard-gas-tasks-mcp.netlify.app", "history": true, "note": ""}, {"slug": "google-tasks-mcp", "name": "Google Tasks MCP for Claude", "repo": "keyona-rerev/gas-tasks-mcp", "url": "https://wizard-google-tasks-mcp.netlify.app", "history": true, "note": ""}, {"slug": "gas-sheets-mcp", "name": "GAS Sheets MCP", "repo": "keyona-rerev/gas-sheets-mcp", "url": "https://wizard-gas-sheets-mcp.netlify.app", "history": true, "note": ""}, {"slug": "super-connector-mcp", "name": "Super Connector MCP", "repo": "keyona-rerev/super-connector-mcp", "url": "https://wizard-super-connector-mcp.netlify.app", "history": true, "note": ""}]}, {"cat": "Knowledge and onboarding", "items": [{"slug": "insight-forge", "name": "Insight Forge", "repo": "keyona-rerev/knowledge-loom-prismm", "url": "https://insight-forge-setup-wizard.netlify.app", "history": true, "note": ""}, {"slug": "business-onboarding-intake", "name": "Business Onboarding Intake", "repo": "keyona-rerev/business-onboarding-intake", "url": "https://wizard-business-onboarding-intake.netlify.app", "history": true, "note": ""}, {"slug": "mofu-analyzer", "name": "MOFU Content Analyzer", "repo": "keyona-rerev/mofu-content-analyzer", "url": "https://wizard-mofu-analyzer.netlify.app", "history": true, "note": ""}]}, {"cat": "Content and publishing", "items": [{"slug": "make-a-playlist", "name": "Make a Playlist", "repo": "keyona-rerev/Make-a-playlist", "url": "https://wizard-make-a-playlist.netlify.app", "history": true, "note": ""}, {"slug": "proposals-server", "name": "Proposals Server", "repo": "keyona-rerev/proposals-server", "url": "https://wizard-proposals-server.netlify.app", "history": true, "note": ""}, {"slug": "html-publisher", "name": "HTML Publisher", "repo": "keyona-rerev/founder-fork-html-publisher", "url": "https://wizard-html-publisher.netlify.app", "history": true, "note": ""}, {"slug": "prismm-sequence-review", "name": "Prismm Sequence Review", "repo": "keyona-rerev/prismm-sequence-review", "url": "https://wizard-prismm-sequence-review.netlify.app", "history": true, "note": ""}, {"slug": "prismm-renderer", "name": "Prismm Renderer", "repo": "keyona-rerev/prismm-renderer", "url": "https://wizard-prismm-renderer.netlify.app", "history": true, "note": ""}]}, {"cat": "Platform apps", "items": [{"slug": "wayfinder", "name": "Wayfinder (project dashboard and Tool Registry)", "repo": "keyona-rerev/wayfinder", "url": "https://wizard-wayfinder.netlify.app", "history": true, "note": ""}, {"slug": "super-connector", "name": "Super Connector (app and API)", "repo": "keyona-rerev/super-connector-app + keyona-rerev/super-connector-api", "url": "https://wizard-super-connector.netlify.app", "history": true, "note": ""}, {"slug": "stakeholder-hub", "name": "Stakeholder Hub", "repo": "keyona-rerev/stakeholder-hub", "url": "https://wizard-stakeholder-hub.netlify.app", "history": true, "note": ""}]}, {"cat": "Small web tools", "items": [{"slug": "capacity-cart", "name": "Capacity Cart", "repo": "keyona-rerev/capacity-cart", "url": "https://wizard-capacity-cart.netlify.app", "history": true, "note": ""}, {"slug": "rerev-tapestry-tool", "name": "ReRev Tapestry Tool", "repo": "keyona-rerev/rerev-tapestry-tool", "url": "https://wizard-rerev-tapestry-tool.netlify.app", "history": true, "note": ""}, {"slug": "linkedin-warm-intro-finder", "name": "LinkedIn Warm Intro Finder", "repo": "keyona-rerev/linkedin-warm-intro-finder", "url": "https://wizard-warm-intro-finder.netlify.app", "history": true, "note": ""}, {"slug": "online-report-card", "name": "Online Report Card", "repo": "keyona-rerev/online-report-card", "url": "https://wizard-online-report-card.netlify.app", "history": true, "note": ""}, {"slug": "eligibility-screen", "name": "Eligibility Screen", "repo": "keyona-rerev/eligibility-screen", "url": "https://wizard-eligibility-screen.netlify.app", "history": true, "note": ""}, {"slug": "btc-comms-review", "name": "BTC Comms Review", "repo": "keyona-rerev/btc-comms-review", "url": "https://wizard-btc-comms-review.netlify.app", "history": true, "note": ""}, {"slug": "rerev-comms-review", "name": "ReRev Comms Review", "repo": "keyona-rerev/rerev-comms-review", "url": "https://wizard-rerev-comms-review.netlify.app", "history": true, "note": ""}]}, {"cat": "Booking", "items": [{"slug": "or-booking-engine", "name": "OR Booking Engine", "repo": "keyona-rerev/template-fork-custom-prismm-booking-", "url": "https://wizard-or-booking-engine.netlify.app", "history": true, "note": ""}, {"slug": "two-person-booking", "name": "Two-Person Booking Link", "repo": "none", "url": "https://btc-booking-link-setup-wizard.netlify.app", "history": false, "note": ""}]}, {"cat": "Skills", "items": [{"slug": "i-have-adhd", "name": "I Have ADHD (Claude skill)", "repo": "keyona-rerev/i-have-adhd", "url": "https://wizard-i-have-adhd.netlify.app", "history": true, "note": ""}, {"slug": "claude-skillz", "name": "Claude Skillz (skill collection)", "repo": "keyona-rerev/claude-skillz", "url": "https://wizard-claude-skillz.netlify.app", "history": true, "note": ""}]}];
+var MISSING=[["task-agent", "Task Agent"], ["post-meeting-engine", "Post-Meeting Intelligence Engine"], ["piper", "Piper"], ["inbox-nudger", "Inbox Nudger"], ["sxsw-checkin-emailer", "SXSW Goal Check-In Emailer"], ["engagement-loop", "ReRev Engagement Loop"], ["content-engine", "ReRev Content Engine"], ["network-crm", "Network CRM"], ["email-temperature-analyzer", "Email Temperature Analyzer"], ["netlify-deploy-bridge", "Netlify Deploy Bridge"], ["relationship-intelligence-system", "Relationship Intelligence System"], ["cold-outreach-pwa", "PWA for Cold Outreach"], ["invoice-field-updater", "Invoice Field Updater"]];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function render(f){
+  f=(f||"").toLowerCase();var n=0,html="";
+  DATA.forEach(function(g){
+    var items=g.items.filter(function(i){return !f||(i.name+" "+i.slug+" "+i.repo).toLowerCase().indexOf(f)>=0});
+    if(!items.length)return;
+    html+="<h2>"+esc(g.cat)+"</h2><div class=\"grid\">";
+    items.forEach(function(i){n++;
+      html+="<div class=\"card\"><h3>"+esc(i.name)+"</h3><div class=\"repo\">"+esc(i.repo==="none"?"no repo (Apps Script)":i.repo)+"</div>"+(i.note?"<div class=\"note\">"+esc(i.note)+"</div>":"")+"<div class=\"links\"><a href=\""+esc(i.url)+"\">Open wizard</a>"+(i.history?"<a href=\""+esc(i.url.replace(/\/$/,""))+"/history.html\">Version history</a>":"")+"</div></div>";
+    });
+    html+="</div>";
+  });
+  document.getElementById("out").innerHTML=html||"<p class=\"lead\">No product matches.</p>";
+  document.getElementById("count").textContent=n+" wizards";
+}
+document.getElementById("q").addEventListener("input",function(e){render(e.target.value)});
+document.getElementById("miss").innerHTML=MISSING.map(function(m){return "<li>"+esc(m[1])+"</li>"}).join("");
+render("");
+</script></body></html>
