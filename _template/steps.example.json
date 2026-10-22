@@ -45,10 +45,10 @@
   "steps": [
     {
       "title": "Tell the wizard about your business",
-      "instructions": "Enter your business name and GitHub details once. The wizard keeps them and fills them into the next steps.",
-      "collect": ["business_name", "github_username", "repo_name"],
+      "instructions": "Enter your business name and GitHub details once. The wizard keeps them and fills them into the next steps. The support email is optional. You can skip it.",
+      "collect": ["business_name", "github_username", "repo_name", "support_email"],
       "checkbox_label": "I entered my details",
-      "verify_hint": "The 'Your values' box at the top shows 3 values saved."
+      "verify_hint": "The 'Your values' box at the top shows at least 3 values saved."
     },
     {
       "title": "Make your own copy of the code",
