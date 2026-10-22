@@ -1,0 +1,207 @@
+{
+  "title": "Capacity Cart setup",
+  "intro": "This wizard installs your own copy of the Capacity Cart. The Capacity Cart is a web page for workshops. Each guest answers questions about five data streams: participant, donor, money, activity and story data. Each guest picks the capture moves they want. The page saves the answers in your database. It emails the guest a plan, with a copy to you. It also gives the guest a live plan page. The code comes from the repository keyona-rerev/capacity-cart. It has one HTML page, one plan page and two Netlify functions. It runs on your own GitHub, Railway, Resend and Netlify accounts. You need four free or low cost accounts and about 45 minutes.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your organization name",
+      "help": "Guests see this name after you brand the page. It is also used in the email sender name.",
+      "placeholder": "Acme Community Group"
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The GitHub account that will own your copy of the code.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name of your copy of the repository",
+      "help": "Keep the default name unless you want a different one.",
+      "placeholder": "capacity-cart",
+      "default": "capacity-cart",
+      "pattern": "^[A-Za-z0-9._-]+$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "railway_project_name",
+      "label": "Railway project name",
+      "help": "Any name you like. It is only a label inside Railway.",
+      "placeholder": "capacity-cart-backend",
+      "default": "capacity-cart-backend"
+    },
+    {
+      "key": "postgrest_url",
+      "label": "Public address of your database API",
+      "help": "You get this address in the database API step. It starts with https:// and has no slash at the end.",
+      "placeholder": "https://your-postgrest.up.railway.app",
+      "pattern": "^https://[^/\\s]+$",
+      "pattern_error": "Start with https:// and do not add a slash at the end."
+    },
+    {
+      "key": "from_email",
+      "label": "Sender address for plan emails",
+      "help": "An address on a domain you verified in Resend.",
+      "placeholder": "hello@yourdomain.org",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a full email address."
+    },
+    {
+      "key": "copy_to_email",
+      "label": "Address that gets a copy of every plan",
+      "help": "Your own inbox. Replies from guests go here too.",
+      "placeholder": "you@yourdomain.org",
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a full email address."
+    },
+    {
+      "key": "session_slug",
+      "label": "Workshop label",
+      "help": "A short label saved with each guest row. It lets you tell workshops apart.",
+      "placeholder": "spring-workshop-2027",
+      "default": "capacity-cart-workshop",
+      "pattern": "^[a-z0-9-]+$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "logo_url",
+      "label": "Link to your logo image",
+      "help": "A public link to a PNG or SVG. Leave it empty to keep the ReRev Labs logo until you have one.",
+      "placeholder": "https://yourdomain.org/logo.png",
+      "optional": true
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Netlify site name",
+      "help": "This becomes your address: name.netlify.app. Use lowercase letters, numbers and hyphens.",
+      "placeholder": "acme-capacity-cart",
+      "pattern": "^[a-z0-9-]+$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "app_url",
+      "label": "Your live address",
+      "derive": "https://{{netlify_site_name}}.netlify.app"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check your accounts",
+      "instructions": "You need four accounts. Create any that you do not have.\n\n1. GitHub, at github.com. This holds your copy of the code.\n2. Railway, at railway.com. This runs your database. Railway can charge a small usage fee. Check the plan before you add a card.\n3. Resend, at resend.com. This sends the plan emails. You need a domain you control so that Resend can send from your address.\n4. Netlify, at netlify.com. This hosts the page and the two functions.\n\nEnter your organization name and your GitHub username below. You will see them again in later steps.",
+      "collect": [
+        "business_name",
+        "github_username"
+      ],
+      "checkbox_label": "I have all four accounts.",
+      "verify_hint": "You can sign in to GitHub, Railway, Resend and Netlify."
+    },
+    {
+      "title": "Fork the code",
+      "instructions": "1. Open https://github.com/keyona-rerev/capacity-cart in your browser.\n2. Choose Fork, at the top right.\n3. Set the owner to {{github_username}}.\n4. Enter the repository name below. Keep the default if you want.\n5. Choose Create fork.\n\nYour copy has these parts: index.html (the guest page), plan.html (the live plan page), netlify/functions/submit.js and netlify/functions/get-plan.js (the two functions), netlify.toml, and schema.sql (the database table).",
+      "collect": [
+        "repo_name"
+      ],
+      "checkbox_label": "I have my own fork.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see index.html, plan.html, schema.sql and a netlify folder."
+    },
+    {
+      "title": "Create the database",
+      "instructions": "The page saves each guest answer in a Postgres table. You create the database on Railway.\n\n1. In Railway, choose New Project.\n2. Name the project below. Choose Provision PostgreSQL.\n3. Open the new Postgres service. Open the Data tab.\n4. Open the file schema.sql in your fork. Copy all of it.\n5. Paste it in the Railway query box. Run it.\n6. Run the block below. It makes a limited role for the database API. The role cannot sign in. It allows only the actions that the two functions need.",
+      "collect": [
+        "railway_project_name"
+      ],
+      "copy": [
+        {
+          "label": "Role and permissions (run after schema.sql)",
+          "text": "create role web_anon nologin;\ngrant usage on schema public to web_anon;\ngrant insert, select on capacity_carts to web_anon;\ncreate policy cart_insert on capacity_carts for insert to web_anon with check (true);\ncreate policy cart_read on capacity_carts for select to web_anon using (token is not null);"
+        }
+      ],
+      "checkbox_label": "The table capacity_carts exists and the role is created.",
+      "verify_hint": "Run: select count(*) from capacity_carts; It returns 0. VERIFY: Railway menu names can change. Look for the Data tab or the Query tab."
+    },
+    {
+      "title": "Add the database API",
+      "instructions": "The two functions talk to the database through PostgREST. PostgREST turns your table into a web address. You run it as a second service in the same Railway project, {{railway_project_name}}.\n\n1. In the project, choose New, then Docker Image.\n2. Enter the image name from the first copy block.\n3. Open the Variables tab of the new service. Add the three variables from the second copy block.\n4. For the first variable, choose Add a Reference. Pick the DATABASE_URL of your Postgres service. If Railway shows only a value, paste your own database link there. Never share that link.\n5. Open the Settings tab. Under Networking, choose Generate Domain. Use port 3000.\n6. Wait for the service to show Active.\n7. Copy the new public address. Paste it below. Remove any slash at the end.\n\nKeep in mind: anyone who knows this address can read rows that have a token. Do not post it in public.",
+      "collect": [
+        "postgrest_url"
+      ],
+      "copy": [
+        {
+          "label": "Docker image",
+          "text": "postgrest/postgrest"
+        },
+        {
+          "label": "Variables for the PostgREST service",
+          "text": "PGRST_DB_URI=PASTE_YOUR_OWN_VALUE_HERE\nPGRST_DB_SCHEMAS=public\nPGRST_DB_ANON_ROLE=web_anon\nPGRST_SERVER_PORT=3000"
+        }
+      ],
+      "checkbox_label": "The database API is active and I pasted its address.",
+      "verify_hint": "Open {{postgrest_url}}/capacity_carts?limit=1 in your browser. You see [] or a short list. VERIFY: port and variable names come from the PostgREST docs. Check them if the service does not start."
+    },
+    {
+      "title": "Set up email with Resend",
+      "instructions": "The page sends each plan by email through Resend.\n\n1. In Resend, open Domains. Add your domain. Add the DNS records that Resend shows you.\n2. Wait until the domain shows Verified.\n3. Open API Keys. Create a key with permission to send. Keep the key in Resend until the deploy step. Do not paste it in this wizard.\n4. Enter the sender address and the copy address below. The sender address must use your verified domain.\n\nGuests get the plan from the sender address. Replies and a blind copy go to the copy address.",
+      "collect": [
+        "from_email",
+        "copy_to_email"
+      ],
+      "checkbox_label": "My domain is verified and I have an API key ready.",
+      "verify_hint": "Resend shows your domain as Verified. The sender address is {{from_email}}."
+    },
+    {
+      "title": "Brand the page",
+      "instructions": "The page still says ReRev Labs. Change it to your organization, {{business_name}}.\n\n1. In your fork, open index.html. Choose the pencil icon to edit.\n2. Find each line in the first copy block. Change the text to your own.\n3. Find the line that starts const SESSION. Replace its value with the workshop label from the second copy block.\n4. If you have a logo link, replace the image address that starts with https://res.cloudinary.com with your logo link.\n5. Do not change netlify/functions/submit.js. The sender and copy addresses come from settings in the deploy step.\n6. Choose Commit changes.\n\nEnter your workshop label and, if you have one, your logo link below.",
+      "collect": [
+        "session_slug",
+        "logo_url"
+      ],
+      "copy": [
+        {
+          "label": "Text to find and change",
+          "text": "ReRev Labs · Workshop\nReRev Labs · Workshop Edition\nKeyona has it too, and will follow up on what you flagged.\nrerev.io"
+        },
+        {
+          "label": "Workshop label line",
+          "text": "const SESSION='{{session_slug}}';"
+        }
+      ],
+      "checkbox_label": "I changed the text and committed the change.",
+      "verify_hint": "Open index.html on GitHub. The word ReRev no longer shows in the text that guests read, and the SESSION line shows {{session_slug}}. The same text may also appear in plan.html. VERIFY: check plan.html and the email text in netlify/functions/submit.js for more ReRev Labs and Keyona text."
+    },
+    {
+      "title": "Deploy on Netlify",
+      "instructions": "1. In Netlify, choose Add new project, then Import an existing project.\n2. Choose GitHub. Pick {{github_username}}/{{repo_name}}.\n3. Leave the build settings as they are. The file netlify.toml sets them.\n4. Before you deploy, open Site configuration, then Environment variables. Add the four variables in the copy block. Use your own values.\n5. For RESEND_API_KEY, paste your Resend key here, inside Netlify only. Mark it as secret.\n6. Open Site configuration, Change site name. Enter the name below.\n7. Choose Deploy.",
+      "collect": [
+        "netlify_site_name"
+      ],
+      "copy": [
+        {
+          "label": "Netlify environment variables",
+          "text": "POSTGREST_URL={{postgrest_url}}\nRESEND_API_KEY=PASTE_YOUR_OWN_VALUE_HERE\nCART_FROM={{business_name}} <{{from_email}}>\nCART_COPY_TO={{copy_to_email}}"
+        }
+      ],
+      "checkbox_label": "The deploy finished with no errors.",
+      "verify_hint": "Open {{app_url}}. You see the start screen with a name box and an email box. If the site name is taken, Netlify asks for another name."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "1. Open {{app_url}} in your browser.\n2. Enter a first name and your own email address. Choose Start.\n3. Fill in the four questions. Choose Save and start.\n4. Answer the questions in one stream. Add two capture moves.\n5. Scroll to the end. Choose Email me my plan.\n6. Check your inbox. Look for the plan email. It comes from {{from_email}}.\n7. Choose View and download your plan in the email. The live plan page opens.\n8. Check your copy inbox, {{copy_to_email}}. It has a blind copy.\n9. In Railway, open the Data tab of Postgres. Run the query in the copy block. You see two rows: one intake and one checkout.\n\nIf the email does not arrive, check the Netlify function logs. The page still shows a confirmation, because the page is built to fail soft.",
+      "copy": [
+        {
+          "label": "Check the saved rows",
+          "text": "select stage, name, organization, session_slug, created_at from capacity_carts order by created_at desc limit 5;"
+        }
+      ],
+      "checkbox_label": "I got the email and the live plan page opened.",
+      "verify_hint": "The query shows an intake row and a checkout row with {{session_slug}}. The plan link in the email starts with {{app_url}}/plan."
+    },
+    {
+      "title": "Keep your copy up to date",
+      "instructions": "The ReRev Labs team improves the Capacity Cart from time to time. Open the version history page of this wizard. It lists each change and what to do for it.\n\nTo get a change:\n1. Open your fork on GitHub.\n2. Choose Sync fork, then Update branch. If GitHub shows a conflict, you edited a file that also changed. Keep your branding text and accept the new code.\n3. Netlify deploys the new code by itself.\n4. Run the first test again.\n\nTo find your version, open your fork and read the date of the newest commit that came from keyona-rerev/capacity-cart.",
+      "checkbox_label": "I know how to check for updates.",
+      "verify_hint": "You can open the version history page and find the newest version."
+    }
+  ]
+}
