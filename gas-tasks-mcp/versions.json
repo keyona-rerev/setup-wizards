@@ -1,0 +1,18 @@
+{
+  "product": "GAS Tasks MCP",
+  "current": "2026-10-22",
+  "how_to_find": "Open your fork of gas-tasks-mcp on GitHub. Read the date of the newest commit on the main branch. Compare it with the commits listed here. For the Apps Script bridge, open your project, click Deploy, then Manage deployments. Read the version number and description.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The product repository keyona-rerev/gas-tasks-mcp on branch main had its newest commit 4ac0b0d on 2026-04-22 (Streamable HTTP transport). The Apps Script bridge Google Tasks MCP for Claude had web app deployment version 2 from 2026-03-11 and was last changed 2026-03-11. No tags or releases were seen. The repository has no README.",
+      "upgrade_type": "none",
+      "changes": [
+        {"kind": "Added", "text": "Step-by-step setup wizard and version history page."}
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
