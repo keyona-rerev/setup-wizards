@@ -1,0 +1,159 @@
+{
+  "title": "OR Booking Engine: set up your own copy",
+  "intro": "The OR Booking Engine is a booking page for your own site. A visitor picks a time and books it. The time goes on your Google Calendar. The page checks your calendars live, so it shows only free times. The engine has two parts. The first part is a Google Apps Script project. It holds your settings and answers the page with data. The second part is a static web page on Netlify. Visitors see only this page. It has no Google banner. This wizard installs both parts on your own accounts. You need a Google account, a GitHub account and a Netlify account. The setup takes about 40 minutes. ReRev Labs sent you a link to the template Apps Script project. Keep that link ready.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your business or team name",
+      "help": "The name you use for this booking page. You use it as a label in your own notes.",
+      "placeholder": "Acme Advisors"
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "Look at the top right of github.com after you sign in.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name for your GitHub repository",
+      "help": "This is the name your fork will have. You can keep the default.",
+      "placeholder": "my-booking-page",
+      "default": "template-fork-custom-prismm-booking-",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Name for your Netlify site",
+      "help": "This becomes your page address. Use lowercase letters, numbers and hyphens. The name must be free on Netlify.",
+      "placeholder": "acme-booking",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,50}$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "app_url",
+      "label": "Your booking page address",
+      "help": "The wizard builds this from your Netlify site name.",
+      "derive": "https://{{netlify_site_name}}.netlify.app"
+    },
+    {
+      "key": "exec_url",
+      "label": "Your Apps Script web app address (ends in /exec)",
+      "help": "You get this address in the step where you deploy the web app. It is public. It is not a password.",
+      "placeholder": "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec",
+      "pattern": "^https://script\\.google\\.com/macros/s/[A-Za-z0-9_-]+/exec$",
+      "pattern_error": "The address must start with https://script.google.com/macros/s/ and end with /exec."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need three free accounts and one link.\n\n1. A Google account. It owns your copy of the Apps Script project and your calendars.\n2. A GitHub account. It holds your copy of the page code.\n3. A Netlify account. It shows the page to visitors.\n4. The template project link that ReRev Labs sent you.\n\nAlso decide which Google calendars the engine must check. Each calendar owner must be able to share that calendar with you.\n\nThe engine has two addresses. Visitors use the Netlify address. You use the Apps Script address to open the setup page. Visitors never see the Apps Script address.",
+      "checkbox_label": "I have the three accounts and the template link.",
+      "verify_hint": "You can sign in to Google, GitHub and Netlify."
+    },
+    {
+      "title": "Choose your names",
+      "instructions": "Enter the names for your copy. The wizard fills them into the next steps. Do not enter passwords or secret values here.",
+      "collect": ["business_name", "github_username", "repo_name", "netlify_site_name"],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "Your booking page address will be {{app_url}}."
+    },
+    {
+      "title": "Make your copy of the Apps Script project",
+      "instructions": "Do the Apps Script side first. Finish it before you touch GitHub.\n\n1. Open the template project link that ReRev Labs sent you.\n2. On the left menu, click Overview. If the menu shows only icons, point at the icons to see the labels.\n3. In the top right corner, click the copy button. Google makes a new project in your own account.\n4. Rename your copy. Use the name {{business_name}} Booking Engine.\n\nThe copy is your own project. Changes you make do not touch the template.",
+      "checkbox_label": "I have my own copy of the project.",
+      "verify_hint": "Your project list shows {{business_name}} Booking Engine."
+    },
+    {
+      "title": "Add the Calendar service",
+      "instructions": "A fresh copy can fail with a 403 error on calendar access. Add the service now to avoid this.\n\n1. In your copy, open the Editor.\n2. Next to Services, click the plus sign.\n3. Choose Google Calendar API.\n4. Click Add.\n\nIf the list shows the service already, skip this step.",
+      "checkbox_label": "The Calendar API service is in my project.",
+      "verify_hint": "The Services list shows Calendar."
+    },
+    {
+      "title": "Deploy the web app and copy its address",
+      "instructions": "1. In your copy, click Deploy, then New deployment.\n2. Click the gear icon. Choose Web app.\n3. Set Execute as to Me.\n4. Set Who has access to Anyone. The booking page must reach the project without a login. VERIFY: check the access setting in the template project against this line.\n5. Click Deploy. Approve the permissions when Google asks.\n6. Copy the Web app URL. It ends in /exec.\n7. Paste it below.\n\nThe address is public. It is not a secret. Do not put your Script Properties in this field.",
+      "collect": ["exec_url"],
+      "checkbox_label": "I pasted my /exec address.",
+      "verify_hint": "Your address is {{exec_url}}."
+    },
+    {
+      "title": "Run the first setup function",
+      "instructions": "1. In your copy, open the Editor.\n2. In the function list at the top, choose runInitSetup.\n3. Click Run. Approve the permissions if Google asks.\n\nThis function finds your account email and saves it as the script property SCRIPT_OWNER_EMAIL. It also saves the setup address as the script property SETUP_URL. You set no password. VERIFY: the function names and property names come from the repo SETUP.md. The Apps Script source was not read in this audit.\n\nTo see the properties, open Project Settings, then Script Properties.",
+      "copy": [
+        { "label": "Function to run", "text": "runInitSetup" }
+      ],
+      "checkbox_label": "runInitSetup finished with no error.",
+      "verify_hint": "Script Properties show SCRIPT_OWNER_EMAIL and SETUP_URL."
+    },
+    {
+      "title": "Fill in the setup page",
+      "instructions": "1. Open this address in your browser. Add nothing after /exec.\n2. The setup page opens. It shows a Google banner. This is normal. Only you see this page. Visitors never see it.\n3. Find the email shown as the owner email on the page.\n4. In Google Calendar, share each calendar the engine must check with that email. Give it permission to make changes to events, so it can add bookings.\n5. On the setup page, enter the host or pool, the working hours and the page text.\n6. Save the setup.\n\nIf you share the setup address with a team member, they do the same.",
+      "copy": [
+        { "label": "Setup page address", "text": "{{exec_url}}" }
+      ],
+      "checkbox_label": "I shared my calendars and saved the setup.",
+      "verify_hint": "The setup page shows your saved settings after a reload."
+    },
+    {
+      "title": "Check calendar access",
+      "instructions": "1. In your copy, open the Editor.\n2. In the function list, choose diagnoseCalendarAccess.\n3. Click Run.\n4. Open the Execution log. Every calendar must show as readable.\n\nIf a calendar shows an error, ask its owner to share it again. Then run the function again.",
+      "copy": [
+        { "label": "Function to run", "text": "diagnoseCalendarAccess" }
+      ],
+      "checkbox_label": "Every calendar shows as readable.",
+      "verify_hint": "The log shows no access error."
+    },
+    {
+      "title": "Fork the page code on GitHub",
+      "instructions": "1. Open https://github.com/keyona-rerev/template-fork-custom-prismm-booking-\n2. Click Fork, at the top right.\n3. Set the owner to {{github_username}}.\n4. Set the repository name to {{repo_name}}.\n5. Click Create fork.\n\nGitHub shows a link back to the original repository. This is normal.\n\nThe repo holds one page file, index.html. It also holds a SETUP.md file.",
+      "copy": [
+        { "label": "Template repository address", "text": "https://github.com/keyona-rerev/template-fork-custom-prismm-booking-" },
+        { "label": "Your fork address", "text": "https://github.com/{{github_username}}/{{repo_name}}" }
+      ],
+      "checkbox_label": "I have my own fork.",
+      "verify_hint": "Open {{github_username}}/{{repo_name}} on GitHub. You see index.html."
+    },
+    {
+      "title": "Point the page at your backend",
+      "instructions": "This is the only required edit.\n\n1. Open your fork on GitHub.\n2. Open the file index.html.\n3. Click the pencil icon to edit.\n4. Find the line that starts with var API_BASE.\n5. Replace the whole line with the line in the copy block below.\n6. Click Commit changes.\n\nIf you skip this edit, the page shows a red error. It does not call a wrong address.\n\nOptional branding: the page also holds a favicon link and the logo alt text. The logo image itself comes from your setup page settings. VERIFY: check the favicon line in index.html and replace it if you want your own icon.",
+      "copy": [
+        { "label": "Replacement line for index.html", "text": "var API_BASE = '{{exec_url}}';" }
+      ],
+      "checkbox_label": "I committed the new API_BASE line.",
+      "verify_hint": "The index.html file on GitHub shows your /exec address."
+    },
+    {
+      "title": "Put the page online with Netlify",
+      "instructions": "Use the Git-linked way. Netlify then redeploys on every push.\n\n1. Open app.netlify.com. Sign in.\n2. Click Add new site, then Import an existing project.\n3. Choose Deploy with GitHub. Allow the connection if asked.\n4. Choose your fork {{github_username}}/{{repo_name}}.\n5. Leave the build command empty.\n6. Leave the publish directory as /.\n7. Click Deploy.\n8. Open Site configuration, then Change site name. Enter {{netlify_site_name}}.\n\nFast way with no Git link: click Add new site, then Deploy manually. Drag your edited index.html onto the drop zone.\n\nNetlify gives you an address that ends in netlify.app.",
+      "copy": [
+        { "label": "Build command", "text": "(leave empty)" },
+        { "label": "Publish directory", "text": "/" }
+      ],
+      "checkbox_label": "My site is live on Netlify.",
+      "verify_hint": "{{app_url}} opens a page. It shows a title and a time picker."
+    },
+    {
+      "title": "Test a booking",
+      "instructions": "1. Open {{app_url}}.\n2. Wait for the days and times to appear. The page says Live as of with a time.\n3. Click a day. Click a time.\n4. Enter a test name and your own email.\n5. Click Confirm booking.\n6. Open your Google Calendar. The test event must be there.\n7. Delete the test event.\n\nIf the page shows API_BASE not configured, repeat the step Point the page at your backend. If the page shows an error about loading, check that the web app access is set to Anyone.",
+      "checkbox_label": "A test booking appeared on my calendar.",
+      "verify_hint": "The calendar shows the test event. The page showed no red error."
+    },
+    {
+      "title": "Use your own domain (optional)",
+      "instructions": "Your page works on {{app_url}} already. You can skip this step.\n\n1. In Netlify, open your site. Click Domain management.\n2. Click Add a domain. Enter an address such as book.example.com.\n3. Netlify shows a CNAME target. Add that record at your domain provider.\n4. Wait for Netlify to show the domain as ready.",
+      "checkbox_label": "I finished or skipped the custom domain.",
+      "verify_hint": "Your own address opens the booking page."
+    },
+    {
+      "title": "Know how to update",
+      "instructions": "ReRev Labs may improve the OR Booking Engine over time. Each change gets an entry on the version history page.\n\n1. Open the version history page of this wizard. Add /history.html to the address of this wizard.\n2. Find your version with the help text on that page.\n3. Follow the upgrade steps for each newer version.\n\nImportant: the page and the Apps Script project are linked only by your /exec address. If you deploy a new Apps Script web app and get a new /exec address, edit API_BASE in index.html again. Then let Netlify redeploy. If you only update the same deployment, you change nothing in the page.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "The history page lists at least one version."
+    }
+  ]
+}
