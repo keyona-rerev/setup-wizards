@@ -1,0 +1,18 @@
+{
+  "product": "Proposals Server",
+  "current": "2026-10-22",
+  "how_to_find": "Your repository was made as a clean copy, so it has no link to the original history. Open the file server.js in your repository and compare it with the file in keyona-rerev/proposals-server. The newest commit that changed the code files in the original repository when this wizard was released is 56cd3b0, dated 2026-10-20. The repository has no git tags that this wizard could see (VERIFY). The package.json version is 1.0.0 and does not change with each version.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released on this date. The product at this date is an Express server (server.js) that serves HTML documents from the proposals folder and files from the assets folder, builds an index page with scripts/generate-index.js through a GitHub Actions job, and locks chosen documents with a user name and password from Railway variables listed in protected.json. The newest commit seen in keyona-rerev/proposals-server is 56cd3b0, dated 2026-10-20.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Setup wizard for a clean-copy install on your own GitHub and Railway accounts." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
