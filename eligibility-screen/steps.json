@@ -1,0 +1,187 @@
+{
+  "title": "Eligibility Screen setup",
+  "intro": "This wizard installs your own copy of the Eligibility Screen. The Eligibility Screen is a web page for families of student athletes. A parent enters a name, an email, a division target (DI or DII), the number of core courses done, the core GPA and the graduation year. The page applies fixed NCAA initial-eligibility rules. It shows an On Track, At Risk or Off Track read with flags and next steps. Each run saves a lead in your database. It emails the parent a link to a result card. It also emails you. The code comes from the repository keyona-rerev/eligibility-screen. It has two pages and two Netlify functions. It runs on your own GitHub, Supabase, Netlify, Cloudflare and Resend accounts. The result is a risk screen only. It is not an official ruling. The NCAA Eligibility Center makes the official decision. You need about 45 minutes.",
+  "variables": [
+    {
+      "key": "business_name",
+      "label": "Your business or program name",
+      "help": "You use this name to replace the original brand name on the pages and in the emails.",
+      "placeholder": "Acme Recruiting Help"
+    },
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The GitHub account that will own your copy of the code.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use letters, numbers and hyphens only. Maximum 39 characters."
+    },
+    {
+      "key": "repo_name",
+      "label": "Name of your copy of the repository",
+      "help": "Keep the default name unless you want a different one.",
+      "placeholder": "eligibility-screen",
+      "default": "eligibility-screen",
+      "pattern": "^[A-Za-z0-9._-]+$",
+      "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."
+    },
+    {
+      "key": "supabase_project_ref",
+      "label": "Supabase project reference",
+      "help": "Open your Supabase project. Go to Project Settings, then General. Copy the Project ID. It has 20 lowercase letters.",
+      "placeholder": "abcdefghijklmnopqrst",
+      "pattern": "^[a-z0-9]{20}$",
+      "pattern_error": "The project reference has exactly 20 lowercase letters and numbers."
+    },
+    {
+      "key": "supabase_url",
+      "label": "Supabase project URL",
+      "help": "The wizard builds this from your project reference.",
+      "derive": "https://{{supabase_project_ref}}.supabase.co"
+    },
+    {
+      "key": "netlify_site_name",
+      "label": "Netlify site name",
+      "help": "Choose a short name. Use lowercase letters, numbers and hyphens. Netlify uses it in your page address. The name must be free on Netlify.",
+      "placeholder": "my-eligibility-screen",
+      "pattern": "^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$",
+      "pattern_error": "Use lowercase letters, numbers and hyphens only."
+    },
+    {
+      "key": "app_url",
+      "label": "Your page address",
+      "help": "The wizard builds this from your Netlify site name.",
+      "derive": "https://{{netlify_site_name}}.netlify.app"
+    },
+    {
+      "key": "from_email",
+      "label": "Sender address for parent emails",
+      "help": "An address on a domain you verified in Resend. You can skip this if you do not want emails.",
+      "placeholder": "Your Brand <reports@yourdomain.com>",
+      "optional": true
+    },
+    {
+      "key": "notify_email",
+      "label": "Your email for lead alerts",
+      "help": "You get one email here for each new lead. You can skip this if you do not want emails.",
+      "placeholder": "you@yourdomain.com",
+      "optional": true,
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+      "pattern_error": "Enter a valid email address."
+    },
+    {
+      "key": "turnstile_site_id",
+      "label": "Cloudflare Turnstile site key (public value)",
+      "help": "You get this value when you create the Turnstile widget. It is a public value. Do not enter the secret key here.",
+      "placeholder": "0x4AAAAAAA...",
+      "pattern": "^0x[A-Za-z0-9_-]{10,}$",
+      "pattern_error": "The site key starts with 0x."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "Open these free accounts. Sign in to each one.\n\n- GitHub (to hold your copy of the code)\n- Supabase (the database for leads and result cards)\n- Netlify (to host the pages and the two functions)\n- Cloudflare (for the Turnstile spam check)\n- Resend (to send emails). This one is optional.\n- Anthropic (for an API key). This one is optional. Without it, the page uses fixed plain-language text.\n\nEnter the name of your business or program. Enter your GitHub username.",
+      "collect": ["business_name", "github_username"],
+      "checkbox_label": "I am signed in to my accounts.",
+      "verify_hint": "You can open github.com, supabase.com, netlify.com and dash.cloudflare.com as {{github_username}} or as your business {{business_name}}."
+    },
+    {
+      "title": "Copy the code to your GitHub",
+      "instructions": "Open the repository keyona-rerev/eligibility-screen on GitHub. Click Fork. Choose your own account. Choose the repository name below. Do not rename the files.\n\nIf you cannot fork, ask ReRev Labs for a copy.",
+      "collect": ["repo_name"],
+      "copy": [
+        { "label": "Source repository", "text": "https://github.com/keyona-rerev/eligibility-screen" },
+        { "label": "Your copy after the fork", "text": "https://github.com/{{github_username}}/{{repo_name}}" }
+      ],
+      "checkbox_label": "My copy of the repository exists.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{repo_name}}. You see index.html, report.html, supabase.sql and a netlify folder."
+    },
+    {
+      "title": "Create the database table",
+      "instructions": "Create a new project in Supabase, or pick one you already own. Enter its project reference below.\n\nOpen the SQL Editor in Supabase. Paste the SQL below. Click Run. This makes one table for leads and result cards. The table is private. Only your server code can read it.\n\nThis step never needs a key in this wizard. You will put the Supabase service key in Netlify later.",
+      "collect": ["supabase_project_ref"],
+      "copy": [
+        {
+          "label": "SQL to run in the Supabase SQL Editor",
+          "text": "create table if not exists eligibility_reports (\n  id          bigint generated always as identity primary key,\n  created_at  timestamptz default now(),\n  full_name   text not null,\n  email       text not null,\n  division    text,\n  core_done   int,\n  core_gpa    numeric,\n  grad_year   int,\n  verdict     text,\n  report      jsonb,\n  ip          text,\n  token       text unique\n);\n\ncreate index if not exists eligibility_created_idx on eligibility_reports (created_at desc);\ncreate index if not exists eligibility_cache_idx   on eligibility_reports (email, division, core_gpa, created_at desc);\ncreate index if not exists eligibility_ip_idx      on eligibility_reports (ip, created_at desc);\n\nalter table eligibility_reports enable row level security;"
+        },
+        { "label": "Your Supabase project URL", "text": "{{supabase_url}}" }
+      ],
+      "checkbox_label": "The SQL ran without an error.",
+      "verify_hint": "In Table Editor, you see the table eligibility_reports. It has the columns full_name, email, division, core_done, core_gpa, grad_year, verdict, report, ip and token."
+    },
+    {
+      "title": "Create your Netlify site",
+      "instructions": "Open Netlify. Click Add new project, then Import an existing project. Choose GitHub. Pick your repository {{repo_name}}. Do not change the build settings. The file netlify.toml sets them. Choose your site name below. Click Deploy.\n\nThe first deploy works but the tool will not run yet. You add the settings in the next steps.",
+      "collect": ["netlify_site_name"],
+      "copy": [
+        { "label": "Your page address", "text": "{{app_url}}" }
+      ],
+      "checkbox_label": "Netlify finished the first deploy.",
+      "verify_hint": "Open {{app_url}}. You see the eligibility form."
+    },
+    {
+      "title": "Create the Turnstile spam check",
+      "instructions": "Open the Cloudflare dashboard. Go to Turnstile. Click Add widget. Give it any name. Add the hostname below. Choose the Managed mode. Click Create.\n\nCloudflare shows a site key and a secret key. Copy the site key into the field below. The site key is public. Keep the secret key private. You paste the secret key only in Netlify, in a later step.",
+      "collect": ["turnstile_site_id"],
+      "copy": [
+        { "label": "Hostname for the widget", "text": "{{netlify_site_name}}.netlify.app" }
+      ],
+      "checkbox_label": "The Turnstile widget exists and I saved the secret key in a safe place.",
+      "verify_hint": "In Cloudflare, Turnstile lists a widget with the hostname {{netlify_site_name}}.netlify.app."
+    },
+    {
+      "title": "Set up email (optional)",
+      "instructions": "Skip this step if you do not want emails. The tool still saves each lead and shows the result card.\n\nOpen Resend. Add and verify your sending domain. Create an API key. Do not paste the key here. You paste it in Netlify later.\n\nEnter the sender address and the address that gets lead alerts. Use the same domain you verified.",
+      "collect": ["from_email", "notify_email"],
+      "checkbox_label": "I finished the email setup or I chose to skip it.",
+      "verify_hint": "Resend shows your domain as Verified. You chose the sender {{from_email}} and the alert address {{notify_email}}, or you skipped both."
+    },
+    {
+      "title": "Add your brand and the Turnstile site key",
+      "instructions": "Open your repository {{repo_name}} on GitHub. Edit the file index.html.\n\n1. Find the text YOUR_TURNSTILE_SITE_KEY. Replace it with the site key from the Turnstile step.\n2. Replace the brand name Athlete Site with {{business_name}}. Also replace the link to athlete-site.com with your own link. The brand appears in the page title, the card header, the call-to-action box and the footer.\n3. Open report.html. Make the same brand changes.\n4. Open netlify/functions/eligibility.js. Replace the brand text Athlete Site in the parent email and in the lead alert subject.\n\nCommit each change to the main branch.",
+      "copy": [
+        { "label": "The line to find in index.html", "text": "<div class=\"cf-turnstile\" data-sitekey=\"YOUR_TURNSTILE_SITE_KEY\" data-theme=\"dark\"></div>" },
+        { "label": "The same line with your site key", "text": "<div class=\"cf-turnstile\" data-sitekey=\"{{turnstile_site_id}}\" data-theme=\"dark\"></div>" }
+      ],
+      "checkbox_label": "I saved my changes in GitHub.",
+      "verify_hint": "In index.html, the text YOUR_TURNSTILE_SITE_KEY is gone. The line shows {{turnstile_site_id}}."
+    },
+    {
+      "title": "Add the settings in Netlify",
+      "instructions": "Open your site {{netlify_site_name}} in Netlify. Go to Site configuration, then Environment variables. Add each variable below.\n\nPaste your own values in place of the placeholders. The Supabase service key is on the API page of your Supabase project. Use the service role key, not the anon key. Never put any key in GitHub, in the page or in this wizard.\n\nThe variables EMAIL_FROM, EMAIL_REPLY_TO and LEAD_NOTIFY_TO have a built-in fallback address that belongs to ReRev Labs. Always set them if you use email.\n\nThe variables ANTHROPIC_API_KEY, RESEND_API_KEY and the three email variables are optional.",
+      "copy": [
+        { "label": "SUPABASE_URL", "text": "SUPABASE_URL={{supabase_url}}" },
+        { "label": "SUPABASE_SERVICE_KEY (paste your own value)", "text": "SUPABASE_SERVICE_KEY=PASTE_YOUR_OWN_VALUE_HERE" },
+        { "label": "TURNSTILE_SECRET (paste your own value)", "text": "TURNSTILE_SECRET=PASTE_YOUR_OWN_VALUE_HERE" },
+        { "label": "DAILY_CAP (maximum screens per day)", "text": "DAILY_CAP=200" },
+        { "label": "ANTHROPIC_API_KEY (optional, paste your own value)", "text": "ANTHROPIC_API_KEY=PASTE_YOUR_OWN_VALUE_HERE" },
+        { "label": "RESEND_API_KEY (optional, paste your own value)", "text": "RESEND_API_KEY=PASTE_YOUR_OWN_VALUE_HERE" },
+        { "label": "EMAIL_FROM (optional)", "text": "EMAIL_FROM={{from_email}}" },
+        { "label": "EMAIL_REPLY_TO (optional)", "text": "EMAIL_REPLY_TO={{notify_email}}" },
+        { "label": "LEAD_NOTIFY_TO (optional)", "text": "LEAD_NOTIFY_TO={{notify_email}}" }
+      ],
+      "checkbox_label": "I added all the variables in Netlify.",
+      "verify_hint": "Netlify lists SUPABASE_URL, SUPABASE_SERVICE_KEY, TURNSTILE_SECRET and DAILY_CAP. It lists the optional ones you chose."
+    },
+    {
+      "title": "Deploy again",
+      "instructions": "In Netlify, open Deploys. Click Trigger deploy, then Deploy site. Wait until the status is Published.\n\nThe code reads the settings only at deploy time and run time. A new deploy makes sure it uses your page edits and your settings.",
+      "checkbox_label": "The new deploy is Published.",
+      "verify_hint": "Open {{app_url}}. The Turnstile box appears above the Run button. Your brand name shows on the page."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Open {{app_url}}. Enter a test name and your own email. Pick Division I. Enter 9 core courses, a core GPA of 3.1 and a graduation year two to three years from now. Complete the Turnstile check. Click Run the screen.\n\nYou see a result card with a risk read. Click the link to view and download the card. If you set up email, check your inbox for the parent email and the lead alert.",
+      "checkbox_label": "The result card, the saved lead and the emails work.",
+      "verify_hint": "The card shows On Track, At Risk or Off Track. In Supabase, the table eligibility_reports has one new row. If the page shows 'not fully configured', check SUPABASE_URL and SUPABASE_SERVICE_KEY in Netlify. If the check says it cannot verify you, check the Turnstile site key and the hostname {{netlify_site_name}}.netlify.app."
+    },
+    {
+      "title": "Learn how to update",
+      "instructions": "ReRev Labs publishes a version history for this product. Open the history page that came with this wizard. Compare the newest version with your own version. Your version is the date of the newest commit that you copied from keyona-rerev/eligibility-screen.\n\nTo update, open your repository {{repo_name}} on GitHub. Click Sync fork. Netlify then deploys the new code. Check the history page for extra steps, for example a database change. Your own edits of the brand text can cause a merge conflict. Keep a note of your edits.",
+      "checkbox_label": "I know where the version history is and how to sync my copy.",
+      "verify_hint": "You can open the history page and find your version."
+    }
+  ]
+}
