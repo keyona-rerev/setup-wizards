@@ -1,0 +1,123 @@
+{
+  "title": "Super Connector (app and API) setup",
+  "intro": "Super Connector is a relationship tool. It has two parts that you install together. The API is a Python FastAPI server on Railway. It stores contacts, organizations, initiatives, buckets and notes in a Postgres database with pgvector. It uses Voyage AI to make search vectors and Claude to research contacts and draft outreach. The app is a static web dashboard that talks to your API. You run both on your own accounts. This wizard takes about 60 minutes. You need a GitHub account, a Railway account, an Anthropic API account and a Voyage AI account. Railway, Anthropic and Voyage AI can charge you money. The dashboard stores an access code in a browser file, so treat the dashboard address as private. At the end, you connect Claude with the separate Super Connector MCP wizard.",
+  "variables": [
+    {"key": "owner_name", "label": "Your name", "help": "The name you want Claude to use when it drafts messages for you.", "placeholder": "Your Name", "pattern": "^[A-Za-z .'-]{2,60}$", "pattern_error": "Use letters, spaces, dots, apostrophes and hyphens only."},
+    {"key": "github_username", "label": "Your GitHub username", "help": "Your own GitHub account name.", "placeholder": "your-github-name", "pattern": "^[A-Za-z0-9-]{1,39}$", "pattern_error": "Use letters, numbers and hyphens only."},
+    {"key": "api_repo_name", "label": "Name for your copy of the API repo", "help": "The name of the API repo in your GitHub account.", "placeholder": "super-connector-api", "default": "super-connector-api", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "app_repo_name", "label": "Name for your copy of the app repo", "help": "The name of the dashboard repo in your GitHub account.", "placeholder": "super-connector-app", "default": "super-connector-app", "pattern": "^[A-Za-z0-9._-]{1,100}$", "pattern_error": "Use letters, numbers, dots, hyphens and underscores only."},
+    {"key": "railway_project_name", "label": "Railway project name", "help": "Any name you like for the project on Railway.", "placeholder": "super-connector", "default": "super-connector", "pattern": "^[A-Za-z0-9 _-]{1,60}$", "pattern_error": "Use letters, numbers, spaces, hyphens and underscores only."},
+    {"key": "api_url", "label": "Your Railway API address", "help": "Railway shows this after you make a public domain. It starts with https://. Do not add a slash at the end.", "placeholder": "https://your-api.up.railway.app", "pattern": "^https://[A-Za-z0-9.-]+$", "pattern_error": "Start with https:// and do not add a slash at the end."},
+    {"key": "app_url", "label": "Your dashboard address", "help": "GitHub Pages builds this address from your username and repo name.", "derive": "https://{{github_username}}.github.io/{{app_repo_name}}/"}
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need four accounts. (1) GitHub. (2) Railway, on a plan that can run a service and a Postgres database. (3) An Anthropic API account with billing on. (4) A Voyage AI account with an API key. Open each site and sign in now. Super Connector sends contact text to Anthropic and Voyage AI. Make sure you may share that data with them. Do not put real contacts in the system until the test step is done.",
+      "checkbox_label": "I have all four accounts and I am signed in.",
+      "verify_hint": "You can open the GitHub, Railway, Anthropic Console and Voyage AI dashboards."
+    },
+    {
+      "title": "Enter your names",
+      "instructions": "Enter the values below. The wizard fills them into the next steps. Do not enter passwords or API keys here. You enter those only inside Railway and in your own repo.",
+      "collect": ["owner_name", "github_username", "api_repo_name", "app_repo_name", "railway_project_name"],
+      "checkbox_label": "I entered my names.",
+      "verify_hint": "Each field shows a green check."
+    },
+    {
+      "title": "Fork the API repo",
+      "instructions": "Open the API repo that ReRev Labs gave you access to. If you have no link, VERIFY with ReRev Labs which repo to copy. Choose Fork, then Create a new fork. Set the owner to {{github_username}}. Set the repo name to {{api_repo_name}}. The API repo holds the Python code, a Procfile and requirements.txt. It has no README and no .env.example file.",
+      "checkbox_label": "My copy of the API repo exists.",
+      "verify_hint": "https://github.com/{{github_username}}/{{api_repo_name}} opens and shows main.py, db.py and Procfile."
+    },
+    {
+      "title": "Fork the app repo",
+      "instructions": "Open the dashboard repo that ReRev Labs gave you access to. Choose Fork, then Create a new fork. Set the owner to {{github_username}}. Set the repo name to {{app_repo_name}}. The app repo holds plain HTML and JavaScript files. It has no build step.",
+      "checkbox_label": "My copy of the app repo exists.",
+      "verify_hint": "https://github.com/{{github_username}}/{{app_repo_name}} opens and shows index.html and config.js."
+    },
+    {
+      "title": "Change the Claude prompts to your own profile",
+      "instructions": "The API code has the profile text of the original owner inside its prompts. You must change it before you use the enrich or draft features. In your API repo, open enricher.py. Find the lines that start with \"Keyona's background:\" and \"Who Keyona is:\". Replace the name and the list of ventures with your own name ({{owner_name}}) and your own work. Do the same in drafter.py. Search both files for the original owner's first name and replace every match. Do not change any other code. Commit the changes to the main branch.",
+      "checkbox_label": "I changed the profile text in enricher.py and drafter.py.",
+      "verify_hint": "A search in your API repo for the original owner's first name finds no prompt text."
+    },
+    {
+      "title": "Create the Railway project and the database",
+      "instructions": "Open Railway. Choose New Project. Name it {{railway_project_name}}. Add a Postgres database that supports the pgvector extension. Railway has a pgvector database template. VERIFY in Railway that the template you pick lists pgvector. The API runs CREATE EXTENSION vector on start. It will fail on a database that does not allow that extension.",
+      "checkbox_label": "My Railway project has a pgvector Postgres database.",
+      "verify_hint": "The Railway project shows one Postgres service with status Active."
+    },
+    {
+      "title": "Deploy the API service",
+      "instructions": "In the same Railway project, choose New, then GitHub Repo. Pick {{github_username}}/{{api_repo_name}}. Railway reads requirements.txt and .python-version (Python 3.12). It starts the API with the command in the Procfile. Do not add variables yet. The first deploy will fail until you do step 8. That is normal.",
+      "copy": [
+        {"label": "Start command in the Procfile (do not change)", "text": "web: uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"}
+      ],
+      "checkbox_label": "The API service exists in my Railway project.",
+      "verify_hint": "Railway shows a service linked to {{github_username}}/{{api_repo_name}}."
+    },
+    {
+      "title": "Set the API variables",
+      "instructions": "Open the API service, then Variables. Add the four variables below. Make up a long random access code for SC_API_KEY and keep it in your password manager. You use it again in step 10. Paste your own Anthropic and Voyage AI keys. For DATABASE_URL, use a reference to the Postgres service in your project. The code connects with SSL required. If the API cannot connect, VERIFY and use the database public address from the Postgres service instead of the private one. Never post these values in chat, email or GitHub.",
+      "copy": [
+        {"label": "DATABASE_URL (Railway reference)", "text": "${{Postgres.DATABASE_URL}}"},
+        {"label": "SC_API_KEY (your own long random access code)", "text": "PASTE_YOUR_OWN_VALUE_HERE"},
+        {"label": "VOYAGE_API_KEY (from your Voyage AI account)", "text": "PASTE_YOUR_OWN_VALUE_HERE"},
+        {"label": "ANTHROPIC_API_KEY (from your Anthropic Console)", "text": "PASTE_YOUR_OWN_VALUE_HERE"}
+      ],
+      "checkbox_label": "I set all four variables in Railway.",
+      "verify_hint": "Railway shows DATABASE_URL, SC_API_KEY, VOYAGE_API_KEY and ANTHROPIC_API_KEY on the API service. Railway redeploys."
+    },
+    {
+      "title": "Make a public address and test the API",
+      "instructions": "Open the API service, then Settings, then Networking. Choose Generate Domain. Copy the address. Enter it below. Then open the health address in your browser. It must answer without an error. The API makes its database tables on its first start.",
+      "collect": ["api_url"],
+      "copy": [
+        {"label": "Health address", "text": "{{api_url}}/health"}
+      ],
+      "checkbox_label": "The health address answers.",
+      "verify_hint": "{{api_url}}/health shows a short OK style answer. If you see an error page, open Railway, then Deployments, then View logs."
+    },
+    {
+      "title": "Point the app at your API",
+      "instructions": "In your app repo, open config.js. It names the API address and the access code in two places. First, at the top, the line with window.SC_API_KEY and the line with CONFIG.API_BASE. Second, inside the search patch, the lines with BASE and KEY. Replace all four values with your own. Use the same access code you set as SC_API_KEY in Railway. Other app files may also name the API address. VERIFY by searching your app repo for the word railway and fix every match. Commit to the main branch. Warning: the access code sits in a public browser file. Anyone who can open your dashboard can read it. Keep the dashboard address private and use a code you can change later.",
+      "copy": [
+        {"label": "Top of config.js", "text": "window.SC_API_KEY = \"PASTE_YOUR_OWN_VALUE_HERE\";\nCONFIG.API_BASE = \"{{api_url}}\";"},
+        {"label": "Search patch lines in config.js", "text": "var BASE = '{{api_url}}';\nvar KEY  = 'PASTE_YOUR_OWN_VALUE_HERE';"}
+      ],
+      "checkbox_label": "I changed config.js and committed it.",
+      "verify_hint": "A search in your app repo for the original owner's API address finds no match."
+    },
+    {
+      "title": "Publish the dashboard with GitHub Pages",
+      "instructions": "Open your app repo on GitHub. Choose Settings, then Pages. Set Source to Deploy from a branch. Pick the main branch and the root folder. Save. Wait two minutes. Then open the dashboard address.",
+      "copy": [
+        {"label": "Your dashboard address", "text": "{{app_url}}"}
+      ],
+      "checkbox_label": "The dashboard page opens.",
+      "verify_hint": "{{app_url}} shows the Super Connector dashboard with a sidebar."
+    },
+    {
+      "title": "Run a first test",
+      "instructions": "Open the dashboard. Open the Contacts page. It must load with no error message. A new install has no contacts, so an empty list is correct. Open the browser developer console and check that no request to {{api_url}} fails. A request that fails with an access error means the access code in config.js and SC_API_KEY in Railway do not match. Fix the mismatch and reload. Add one test contact with fake data only. Check that it shows in the list. Then delete it.",
+      "checkbox_label": "The Contacts page loads and a fake test contact works.",
+      "verify_hint": "The Contacts page shows your fake contact, and the API health address still answers."
+    },
+    {
+      "title": "Connect Claude",
+      "instructions": "To let Claude read and write your Super Connector, use the separate Super Connector MCP wizard. Open https://wizard-super-connector-mcp.netlify.app and follow it. It asks for your API address, which is {{api_url}}. Use the same access code you set in Railway. Do not enter the code anywhere except your own accounts.",
+      "copy": [
+        {"label": "Super Connector MCP wizard", "text": "https://wizard-super-connector-mcp.netlify.app"}
+      ],
+      "checkbox_label": "I finished the MCP wizard, or I will do it later.",
+      "verify_hint": "Claude lists the Super Connector tools after you add the connector."
+    },
+    {
+      "title": "How to update later",
+      "instructions": "When ReRev Labs publishes a new version, open the version history page of this wizard. Find your version, then follow the upgrade steps. For most updates, use Sync fork on both repos. Railway redeploys the API by itself. GitHub Pages rebuilds the dashboard by itself. If you changed enricher.py, drafter.py or config.js, you may get a merge conflict. Keep your own values when you resolve it.",
+      "checkbox_label": "I know where the version history is.",
+      "verify_hint": "You can open history.html on the same site as this wizard."
+    }
+  ]
+}
