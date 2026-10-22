@@ -9,5 +9,5 @@ product_repo: keyona-rerev/stakeholder-hub
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit cfe87a3)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (blocked: Sheets MCP error "Server not initialized" on 3 tries)
 notes: product is a static Vite/React/Lovable site (BTC fund decks), no database. Default branch main. No tags verified. No redirect file in repo.
