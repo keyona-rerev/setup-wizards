@@ -1,0 +1,142 @@
+{
+  "title": "GitHub MCP (client fork) setup",
+  "intro": "This tool lets Claude work with your own GitHub account. Claude can read files, browse repos, save changes, and manage issues and pull requests. You run the server on your own Railway account. You use your own GitHub token. Nobody else sees it. The install takes about 15 minutes. You need a GitHub account, a Railway account, and a Claude plan that supports custom connectors.",
+  "variables": [
+    {
+      "key": "github_username",
+      "label": "Your GitHub username",
+      "help": "The name in your GitHub profile address, github.com/NAME.",
+      "placeholder": "your-github-name",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$",
+      "pattern_error": "Use only letters, numbers and hyphens. Maximum 39 characters."
+    },
+    {
+      "key": "fork_name",
+      "label": "Name of your fork",
+      "help": "GitHub keeps the original name when you fork. Keep the default unless you rename it.",
+      "placeholder": "founder-fork-github-mcp-server",
+      "pattern": "^[A-Za-z0-9._-]+$",
+      "pattern_error": "Use only letters, numbers, dots, hyphens and underscores.",
+      "default": "founder-fork-github-mcp-server"
+    },
+    {
+      "key": "railway_domain",
+      "label": "Your Railway public domain",
+      "help": "Railway shows it after you generate a domain. It ends with .up.railway.app. Do not type https://.",
+      "placeholder": "your-app-production-1234.up.railway.app",
+      "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)*\\.up\\.railway\\.app$",
+      "pattern_error": "Paste only the domain, for example your-app-production-1234.up.railway.app. Do not add https:// or a path."
+    },
+    {
+      "key": "server_url",
+      "label": "Your server address",
+      "help": "Built from your Railway domain.",
+      "derive": "https://{{railway_domain}}"
+    }
+  ],
+  "steps": [
+    {
+      "title": "Read what you will build",
+      "instructions": "You will create two different secret values. Keep them apart.\n\n- GITHUB_TOKEN: GitHub makes it. It lets your server into your GitHub account.\n- MCP_AUTH_TOKEN: You make it. It is the lock on your server's front door.\n\nThey are not the same value. Never use one in place of the other.\n\nEnter both secret values only inside your own accounts: GitHub, Railway and Claude. This wizard never asks for them.",
+      "checkbox_label": "I have a GitHub account, a Railway account, and a Claude plan with custom connectors."
+    },
+    {
+      "title": "Enter your public details",
+      "instructions": "Enter your GitHub username. Keep the fork name as shown unless you plan to rename your fork. The wizard uses these values in later steps.",
+      "collect": ["github_username", "fork_name"],
+      "checkbox_label": "I entered my GitHub username and fork name."
+    },
+    {
+      "title": "Fork the code to your GitHub account",
+      "instructions": "Open the repository keyona-rerev/founder-fork-github-mcp-server on GitHub. This is the client-ready fork. Click Fork at the top right. Click Create fork.\n\nIf you forked it before, your copy may be old. Open your fork page. Look at the bar above the file list. If it says the branch is behind, click Sync fork, then Update branch.",
+      "copy": [
+        { "label": "Your fork address", "text": "https://github.com/{{github_username}}/{{fork_name}}" }
+      ],
+      "checkbox_label": "My fork exists and it is up to date.",
+      "verify_hint": "Open https://github.com/{{github_username}}/{{fork_name}}. You see the files Dockerfile, SETUP.md and src."
+    },
+    {
+      "title": "Create your GitHub token",
+      "instructions": "This token is your GITHUB_TOKEN. Make it inside GitHub only.\n\n1. Open GitHub, then Settings, then Developer settings, then Personal access tokens, then Fine-grained tokens.\n2. Click Generate new token.\n3. Enter a name, for example Claude MCP Server.\n4. Set an expiry date. Use 90 days or no expiry.\n5. Under Repository access, choose All repositories, or choose only the repos Claude may use.\n6. Under Permissions, set Contents to Read and write.\n7. Set Issues to Read and write.\n8. Set Pull requests to Read and write.\n9. Leave Metadata at Read-only. GitHub requires it.\n10. Click Generate token. Copy the token.\n\nGitHub shows the token one time. Save it in your password manager. Do not paste it in this wizard, in chat, or in a repo.",
+      "checkbox_label": "I created the token and saved it in my password manager."
+    },
+    {
+      "title": "Make your server's auth string",
+      "instructions": "This string is your MCP_AUTH_TOKEN. It has nothing to do with GitHub. You make it up.\n\nYour Railway address is public. Your server can write to your repos. This string stops a stranger who finds your address.\n\n1. Open https://www.random.org/strings/\n2. Set Generate to 1 random string.\n3. Set the length to 32 characters.\n4. Tick digits, uppercase letters and lowercase letters.\n5. Click Get Strings. Copy the result.\n\nSave it in your password manager. You paste the same value in Railway and in Claude. Both values must match exactly.\n\nDo not use your GitHub token here. This string goes into a web address. Web addresses can appear in browser history and logs.",
+      "checkbox_label": "I made the auth string and saved it in my password manager."
+    },
+    {
+      "title": "Create the Railway project",
+      "instructions": "1. Open railway.app and sign in.\n2. Click New Project.\n3. Click Deploy from GitHub repo.\n4. Choose your fork: {{github_username}}/{{fork_name}}.\n5. Railway finds the Dockerfile on its own.\n\nThe first build may fail. This is normal. The server will not start until you add its variables in the next step.",
+      "checkbox_label": "The Railway project exists and uses my fork."
+    },
+    {
+      "title": "Add the two variables in Railway",
+      "instructions": "1. In your Railway service, open the Variables tab.\n2. Add the two variables below.\n3. Replace each placeholder with your own saved value.\n4. Check the environment name at the top of the window. Add the variables to the same environment that deploys.\n\nRailway sets PORT for you. Do not add PORT.\n\nEnter these secret values only in Railway.",
+      "copy": [
+        { "label": "Variable 1", "text": "GITHUB_TOKEN=PASTE_YOUR_OWN_VALUE_HERE" },
+        { "label": "Variable 2", "text": "MCP_AUTH_TOKEN=PASTE_YOUR_OWN_VALUE_HERE" }
+      ],
+      "checkbox_label": "Both variables are in Railway.",
+      "verify_hint": "The Variables tab lists GITHUB_TOKEN and MCP_AUTH_TOKEN."
+    },
+    {
+      "title": "Make a public domain and wait for the deploy",
+      "instructions": "1. In Railway, open Settings, then Networking.\n2. Click Generate Domain.\n3. Copy the domain. It ends with .up.railway.app.\n4. Paste the domain below. Do not add https://.\n5. Open the Deployments tab. Wait 2 to 3 minutes for the build.\n\nSuccess: the newest deployment shows ACTIVE and Deployment successful.\n\nIf the newest deployment shows FAILED, click View logs. If the log says MCP_AUTH_TOKEN environment variable is required, the variable is missing in this service or this environment. Add it again in the Variables tab.\n\nImportant: when a deploy fails, Railway keeps the older deployment running. The service card still says Online. Always check which deployment has the ACTIVE badge.",
+      "collect": ["railway_domain"],
+      "checkbox_label": "The newest deployment shows ACTIVE.",
+      "verify_hint": "The Deployments tab shows ACTIVE on the newest row."
+    },
+    {
+      "title": "Check the health page",
+      "instructions": "Use a new Incognito window. Browsers keep old answers, and an old answer can mislead you.\n\nOpen the address below. It needs no key.",
+      "copy": [
+        { "label": "Health address", "text": "{{server_url}}/health" }
+      ],
+      "checkbox_label": "The health page shows status ok.",
+      "verify_hint": "You see {\"status\": \"ok\", \"server\": \"github-mcp-server\", \"version\": \"1.0.0\"} at {{server_url}}/health."
+    },
+    {
+      "title": "Check the lock on the front door",
+      "instructions": "Do both checks in a new Incognito window.\n\nCheck 1: open the first address with no key. You must see Forbidden.\n\nCheck 2: open the second address. Replace PASTE_YOUR_OWN_VALUE_HERE with your auth string from the earlier step. You must see status ok.\n\nIf check 1 shows status ok, your server has no lock. Check these in order:\n1. A failed deploy left an old build running. Check the ACTIVE badge in Railway.\n2. MCP_AUTH_TOKEN is missing in this service. Check the Variables tab.\n3. Your fork is old. Sync your fork on GitHub.\n4. Your browser shows an old answer. Try a new Incognito window.\n\nDo not connect Claude until check 1 shows Forbidden.",
+      "copy": [
+        { "label": "Check 1: no key", "text": "{{server_url}}/mcp" },
+        { "label": "Check 2: with your key", "text": "{{server_url}}/mcp?key=PASTE_YOUR_OWN_VALUE_HERE" }
+      ],
+      "checkbox_label": "Check 1 shows Forbidden and check 2 shows status ok.",
+      "verify_hint": "Check 1 shows {\"error\":\"Forbidden\"}. Check 2 shows {\"status\":\"ok\",\"name\":\"github-mcp-server\"}."
+    },
+    {
+      "title": "Connect the server to Claude",
+      "instructions": "1. Open claude.ai, then Settings, then Connectors.\n2. Click Add custom connector.\n3. Paste the address below. Replace PASTE_YOUR_OWN_VALUE_HERE with your auth string.\n4. Leave no space before ?key=. Paste the whole string. A cut-off paste is the most common cause of a 403 error.\n5. Save.\n\nThe connector shows about 20 tools. Most are read-only. Five write or delete.",
+      "copy": [
+        { "label": "Connector address", "text": "{{server_url}}/mcp?key=PASTE_YOUR_OWN_VALUE_HERE" }
+      ],
+      "checkbox_label": "The connector is saved and shows its tools.",
+      "verify_hint": "The connector lists the GitHub tools in Claude settings."
+    },
+    {
+      "title": "Set approval on the write tools",
+      "instructions": "Five tools change your repos: Create or Update File, Create Issue, Update Issue, Add Issue Comment, and Merge Pull Request. In the connector settings, set these five tools to ask first. Do this at least for repos that hold real work.",
+      "checkbox_label": "The five write tools ask for approval.",
+      "verify_hint": "The connector settings show an approval mode for each of the five write tools."
+    },
+    {
+      "title": "Test it in a new Claude chat",
+      "instructions": "Start a new chat in Claude. Paste the test prompt below. Read each answer.\n\nPass: Claude names your GitHub username, gives a real repo count, and shows real data for one repo. No errors.\n\nIf you see a problem:\n- 403 or Forbidden: the key in the connector address does not match MCP_AUTH_TOKEN in Railway. Copy it again.\n- No tools or tool not found: the address is wrong or the server is down. Repeat the health check.\n- 401 or Bad credentials: GITHUB_TOKEN is wrong or expired. Make a new one and update Railway.\n- GITHUB_TOKEN environment variable is not set: add it in the correct Railway service.\n- Wrong GitHub account: GITHUB_TOKEN belongs to another account.",
+      "copy": [
+        {
+          "label": "Test prompt for Claude",
+          "text": "Using my GitHub MCP connector, run these three tool calls and tell me exactly what each one returns:\n\n1. github_get_me - which GitHub account am I authenticated as?\n2. github_list_repos - how many repos come back on the first page?\n3. github_get_repo for one of the repos from that list - does it return real metadata?\n\nIf any of them fail, show me the exact error message instead of working around it."
+        }
+      ],
+      "checkbox_label": "Claude named my GitHub account and returned real repo data.",
+      "verify_hint": "Claude names {{github_username}} (or the account that owns your token) with no error."
+    },
+    {
+      "title": "Keep it safe and update it later",
+      "instructions": "Keep these rules:\n- Both tokens stay in Railway variables. Never put them in code.\n- Make your own auth string. Never reuse one from another install.\n- If you change MCP_AUTH_TOKEN in Railway, change the key in your Claude connector address too.\n- If you show either token in a chat, a repo, or a screenshot, make a new one at once.\n- GitHub allows 5,000 requests per hour for your token.\n\nTo update later: open the version history page of this wizard. Find your version. Follow the steps for each newer version. In most cases you click Sync fork on GitHub, and Railway redeploys on its own.",
+      "checkbox_label": "I read the safety rules and I know where the version history is."
+    }
+  ]
+}
