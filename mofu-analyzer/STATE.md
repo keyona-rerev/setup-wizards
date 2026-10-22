@@ -9,5 +9,5 @@ product_repo: keyona-rerev/mofu-content-analyzer
 - [x] 7 live check passed
 - [x] 8 files pushed to setup-wizards (index/history blob sha match)
 - [x] 9 product README link confirmed (commit 80921c308a0dd5a95900021ce17817e4ccbcef68)
-- [x] 10 history lines logged
+- [ ] 10 history lines logged (blocked: Sheets MCP returned 'Server not initialized' on 5 tries; lead to append)
 notes: Product repo hardcodes REPORT_BASE_URL (Keyona's site) and a default lead-notify address in netlify/functions/analyze-background.js; wizard tells client to change both. Env vars: ANTHROPIC_API_KEY, RESEND_API_KEY, RESEND_FROM, LEAD_NOTIFY_EMAIL.
