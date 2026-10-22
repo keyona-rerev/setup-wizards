@@ -1,0 +1,18 @@
+{
+  "product": "OR Booking Engine",
+  "current": "2026-10-22",
+  "how_to_find": "Open your fork of the page repo on GitHub. Look at the date of the newest commit that came from the original repository (for example commit 5768c12 dated 2026-09-18). The repo has no version number in its code and no git tags were seen (VERIFY). The Apps Script backend deployment descriptions were not readable in this audit (VERIFY). Match the commit date to the entries below.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The page repo keyona-rerev/template-fork-custom-prismm-booking- is at commit 5768c12 dated 2026-09-18 (Sync docs to actual current flow). The Apps Script backend state was not read in this audit (VERIFY). Later changes will appear above this entry.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Setup wizard for the OR Booking Engine. It covers the Apps Script copy, the web app address, calendar sharing, the page fork, Netlify and a first test booking." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
