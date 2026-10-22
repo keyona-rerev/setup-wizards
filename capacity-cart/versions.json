@@ -1,0 +1,18 @@
+{
+  "product": "Capacity Cart",
+  "current": "2026-10-22",
+  "how_to_find": "Open your fork of capacity-cart on GitHub. Compare the date of the newest commit that came from keyona-rerev/capacity-cart with the entries below. The newest upstream commit at wizard release is 333e1d1 from 2026-08-07. VERIFY: the repository has no tags or releases that the tools could list.",
+  "versions": [
+    {
+      "id": "2026-10-22",
+      "date": "2026-10-22",
+      "title": "Version at first wizard release",
+      "summary": "The setup wizard was released. The product state at this date: newest commit 333e1d1 (2026-08-07, plan page renders streams with answers). The repository has five data streams, a live plan page with a token link, email through Resend and storage through PostgREST.",
+      "upgrade_type": "none",
+      "changes": [
+        { "kind": "Added", "text": "Setup wizard for a client install on the client's own accounts." }
+      ],
+      "upgrade_steps": []
+    }
+  ]
+}
