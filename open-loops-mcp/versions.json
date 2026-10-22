@@ -1,0 +1,65 @@
+{
+  "product": "Open Loops MCP",
+  "current": "2026-10-09",
+  "how_to_find": "Open your copy of the repo on GitHub and read the date of the newest commit. Match it to the list below. The code also holds a VERSION value near the top of src/index.ts, and the /health address on your Railway site shows it. The repo has no git tags that this wizard could confirm (VERIFY).",
+  "versions": [
+    {
+      "id": "2026-10-09",
+      "date": "2026-10-09",
+      "title": "Table tools (code version 2.4.0)",
+      "summary": "Commit b12aa13 on 2026-10-09 adds table tools. Version label 2.4.0 comes from the commit message and the VERSION value in src/index.ts. The date comes from commit dates. VERIFY the date against your own copy.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Tool gdocs_read_tables reads every top-level table in a tab."},
+        {"kind": "Added", "text": "Tool gdocs_write_cells writes text into table cells."}
+      ],
+      "upgrade_steps": [
+        {"title": "Pull the change into your repo", "text": "In your copy of the repo on GitHub, choose Sync fork, then Update branch. Railway redeploys by itself. Then open the /health address and check the version."}
+      ]
+    },
+    {
+      "id": "2026-07-01",
+      "date": "2026-07-01",
+      "title": "Formatting tools (code version 2.3.0)",
+      "summary": "Commit 74e0a22 on 2026-07-01 adds formatting tools. VERIFY the date against your own copy.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "Tool gdocs_format_text sets bold, italic, strikethrough and underline."},
+        {"kind": "Added", "text": "Tools gdocs_make_bullets and gdocs_remove_bullets change paragraphs into native lists and back."}
+      ],
+      "upgrade_steps": [
+        {"title": "Pull the change into your repo", "text": "In your copy of the repo on GitHub, choose Sync fork, then Update branch. Railway redeploys by itself."}
+      ]
+    },
+    {
+      "id": "2026-06-03",
+      "date": "2026-06-03",
+      "title": "Any-doc targeting (code versions 2.1.0 and 2.2.0)",
+      "summary": "Commits from 2026-06-03 let each tool target any Google Doc by link or ID. The tab name became optional. VERIFY the date against your own copy.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Added", "text": "A doc argument on all tools. It accepts a Google Doc link or ID."},
+        {"kind": "Changed", "text": "The tab name is optional when a doc has one tab."},
+        {"kind": "Added", "text": "An optional second shortcut named radhika, set by the GDOCS_RADHIKA_DOC_ID variable."}
+      ],
+      "upgrade_steps": [
+        {"title": "Pull the change into your repo", "text": "In your copy of the repo on GitHub, choose Sync fork, then Update branch. Railway redeploys by itself."}
+      ]
+    },
+    {
+      "id": "2026-05-29",
+      "date": "2026-05-29",
+      "title": "Generic Google Docs server (code version 2.0)",
+      "summary": "Commits from 2026-05-29 turn the server into a generic Google Docs tool server and remove fixed tab names. The first code was added on 2026-05-28. VERIFY the dates against your own copy.",
+      "upgrade_type": "redeploy",
+      "changes": [
+        {"kind": "Changed", "text": "Tab names are now fully dynamic."},
+        {"kind": "Changed", "text": "The server runs TypeScript directly with tsx. There is no build step."},
+        {"kind": "Added", "text": "Tools to list tabs, read a tab, append text, insert text after a string, and find and replace."}
+      ],
+      "upgrade_steps": [
+        {"title": "Pull the change into your repo", "text": "In your copy of the repo on GitHub, choose Sync fork, then Update branch. Railway redeploys by itself."}
+      ]
+    }
+  ]
+}
