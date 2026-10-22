@@ -1,0 +1,100 @@
+{
+  "title": "I Have ADHD (Claude skill) setup",
+  "intro": "I Have ADHD is a skill for Claude Code. It changes how Claude writes its answers. Claude gives the next action first, numbers multi-step work, ends with one next step, cuts side topics, and gives time estimates in minutes. You turn it on with the /i-have-adhd command. It stays on for the session until you say \"stop adhd mode\". This is an output-style tool, not a medical tool. This wizard installs it in about 5 minutes.",
+  "variables": [
+    {
+      "key": "skill_source",
+      "label": "Skill source repo (owner/repo)",
+      "help": "The GitHub repo you install the skill from. Keep the default unless ReRev Labs gave you a different repo or you made your own fork.",
+      "placeholder": "keyona-rerev/i-have-adhd",
+      "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$",
+      "pattern_error": "Use the form owner/repo, for example keyona-rerev/i-have-adhd.",
+      "default": "keyona-rerev/i-have-adhd",
+      "optional": false
+    }
+  ],
+  "steps": [
+    {
+      "title": "Check what you need",
+      "instructions": "You need Claude Code installed on your computer. You need a terminal window. You do not need a GitHub account to install from a public repo. Open your terminal. Type the command below to check that Claude Code works. If you see a version number, go to the next step. Then enter the source repo for the skill in the field on this step.",
+      "collect": ["skill_source"],
+      "copy": [
+        { "label": "Check Claude Code", "text": "claude --version" }
+      ],
+      "checkbox_label": "Claude Code runs and shows a version number.",
+      "verify_hint": "The terminal prints a version number. If it says command not found, install Claude Code first and come back."
+    },
+    {
+      "title": "Add the skill source to Claude Code",
+      "instructions": "The repo is a Claude Code plugin marketplace. Add it with the command below. Run it in your terminal. This step only registers the source. It does not change how Claude writes yet.",
+      "copy": [
+        { "label": "Add the marketplace", "text": "claude plugin marketplace add {{skill_source}}" }
+      ],
+      "checkbox_label": "The marketplace add command finished without an error.",
+      "verify_hint": "The terminal confirms the marketplace was added. If the command fails, use the owner/repo form, for example {{skill_source}}. A local path must point to the repo root."
+    },
+    {
+      "title": "Install the skill",
+      "instructions": "Install the plugin from the marketplace you just added. The plugin name and the marketplace name are both i-have-adhd. Then check the list.",
+      "copy": [
+        { "label": "Install the plugin", "text": "claude plugin install i-have-adhd@i-have-adhd" },
+        { "label": "List installed plugins", "text": "claude plugin list" }
+      ],
+      "checkbox_label": "i-have-adhd shows in the plugin list.",
+      "verify_hint": "The list shows i-have-adhd. If you already installed another copy with the same name, remove it first. See the last step."
+    },
+    {
+      "title": "Restart Claude Code and run the first test",
+      "instructions": "Close Claude Code and open a new session. Claude Code reads the plugin list at start. Type /i-have-adhd and press Enter. Then ask any question, for example: How do I rename a file in my project? Check the answer. The first line must be an action. Multi-step answers must be numbered. The answer must end with one next step. There must be no \"Great question\" opener.",
+      "copy": [
+        { "label": "Turn the skill on", "text": "/i-have-adhd" },
+        { "label": "Test question", "text": "How do I rename a file in my project?" }
+      ],
+      "checkbox_label": "Claude answered action first, with numbered steps and one next step.",
+      "verify_hint": "If /i-have-adhd does not appear in autocomplete, restart Claude Code again. If answers still start with a long preamble, open a new session and run /i-have-adhd again."
+    },
+    {
+      "title": "Turn it off and on",
+      "instructions": "The skill stays on for the whole session after you run /i-have-adhd. To turn it off, tell Claude: stop adhd mode. You can also say: normal mode. Claude confirms in one line and returns to its normal style. The skill does not run by itself in a new session. Run /i-have-adhd again when you want it.",
+      "copy": [
+        { "label": "Turn the skill off", "text": "stop adhd mode" }
+      ],
+      "checkbox_label": "I turned the skill off and on once.",
+      "verify_hint": "After you say stop adhd mode, Claude confirms in one line. Run /i-have-adhd to turn it on again."
+    },
+    {
+      "title": "Optional: keep it on for every session",
+      "instructions": "Skip this step if you want to turn the skill on by hand. To load the rules at the start of every session, make an empty flag file. The plugin has a SessionStart hook. The hook only runs when the flag file exists. Restart Claude Code after you make the file. To go back to on-demand use, delete the file.",
+      "copy": [
+        { "label": "Turn always-on ON (macOS or Linux)", "text": "touch ~/.claude/.i-have-adhd-always" },
+        { "label": "Turn always-on OFF (macOS or Linux)", "text": "rm ~/.claude/.i-have-adhd-always" }
+      ],
+      "checkbox_label": "I made my choice. Always-on is on or off as I want.",
+      "verify_hint": "With the flag file in place, a new session follows the rules without /i-have-adhd. The repo documents the flag file path ~/.claude/.i-have-adhd-always and the CLAUDE_CONFIG_DIR setting. VERIFY the Windows path on your computer if you use Windows."
+    },
+    {
+      "title": "Optional: change the rules in your own fork",
+      "instructions": "The rules are in one file in the repo: skills/i-have-adhd/SKILL.md. To change them, fork the repo on GitHub. Edit that file in your fork. Then swap your copy in with the commands below. Replace YOUR_GITHUB_USERNAME with your own GitHub user name. Restart Claude Code and run /i-have-adhd again. Skip this step if you do not want to change the rules.",
+      "copy": [
+        { "label": "Remove the upstream copy", "text": "claude plugin uninstall i-have-adhd" },
+        { "label": "Remove the old marketplace", "text": "claude plugin marketplace remove i-have-adhd" },
+        { "label": "Add your fork", "text": "claude plugin marketplace add YOUR_GITHUB_USERNAME/i-have-adhd" },
+        { "label": "Install from your fork", "text": "claude plugin install i-have-adhd@i-have-adhd" }
+      ],
+      "checkbox_label": "I installed from my own fork, or I chose to skip this step.",
+      "verify_hint": "Run /i-have-adhd in a new session. Claude follows your edited rules. A fork and the upstream repo share both names, so you must remove the first copy before you add the second."
+    },
+    {
+      "title": "How to update",
+      "instructions": "To get a new version, refresh the marketplace with the command below. Then restart Claude Code. Open the version history page of this wizard to see what changed. Find your version on GitHub: open the repo {{skill_source}} and read the version in .claude-plugin/plugin.json, or read the date of the newest commit. To remove the skill, use the uninstall commands below. You can also keep it installed and turn it off.",
+      "copy": [
+        { "label": "Update the skill", "text": "claude plugin marketplace update i-have-adhd" },
+        { "label": "Disable without removing", "text": "claude plugin disable i-have-adhd" },
+        { "label": "Uninstall the plugin", "text": "claude plugin uninstall i-have-adhd" },
+        { "label": "Remove the marketplace", "text": "claude plugin marketplace remove i-have-adhd" }
+      ],
+      "checkbox_label": "I know how to update, turn off and remove the skill.",
+      "verify_hint": "Open history.html on this wizard site. Compare the newest entry with your version."
+    }
+  ]
+}
